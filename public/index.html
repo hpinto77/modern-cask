@@ -72,7 +72,7 @@ body{min-height:100dvh;}
 <body class="bg-surface text-on-surface font-body overflow-x-hidden selection:bg-primary/20">
 
 <!-- ══ AUTH OVERLAY ═══════════════════════════════════════════════════════ -->
-<div id="auth-overlay">
+<div id="auth-overlay" style="display:none">
   <div class="w-full max-w-sm px-6">
     <!-- Logo -->
     <div class="text-center mb-10">
@@ -934,25 +934,26 @@ async function init() {
   // Load bottle images from Supabase
   await loadBottleImages();
 
-  // Auth state listener — fires on login, logout, and after OAuth redirect
+  // Auth state listener — fires on all auth events including initial session restore
   sb.auth.onAuthStateChange((event, session) => {
-    console.log('Auth event:', event, session?.user?.email);
     if (session?.user) {
       onUserSignedIn(session.user);
-    } else if (event === 'SIGNED_OUT') {
-      S.user = null;
-      document.getElementById('auth-overlay').style.display = 'flex';
+    } else if (event === 'SIGNED_OUT' || event === 'INITIAL_SESSION') {
+      if (!session?.user) {
+        S.user = null;
+        document.getElementById('auth-overlay').style.display = 'flex';
+      }
     }
   });
 
-  // Check existing session (also handles Google OAuth redirect token in URL hash)
-  const { data: { session } } = await sb.auth.getSession();
-  if (session?.user) {
-    onUserSignedIn(session.user);
-  } else {
-    // Show auth screen if no session
-    document.getElementById('auth-overlay').style.display = 'flex';
-  }
+  // Check session in background — don't block whisky loading
+  sb.auth.getSession().then(({ data: { session } }) => {
+    if (session?.user) {
+      onUserSignedIn(session.user);
+    } else {
+      document.getElementById('auth-overlay').style.display = 'flex';
+    }
+  });
 
   // Filter pills
   document.querySelectorAll('.filter-pill').forEach(p=>p.addEventListener('click',()=>setFilter(p.dataset.f)));
