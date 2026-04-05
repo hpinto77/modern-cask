@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Modern Cask — Admin</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+  body { background:#0f0f0f; color:#e5e2e1; font-family:system-ui,sans-serif; }
+  .card { background:#1c1b1b; border:1px solid #2a2a2a; border-radius:12px; }
+  .badge-pending  { background:rgba(255,191,0,0.15); color:#FFD700; }
+  .badge-done     { background:rgba(76,175,80,0.15);  color:#4CAF50; }
+  .badge-rejected { background:rgba(244,67,54,0.15);  color:#f44336; }
+  .drop-zone { border:2px dashed #504532; border-radius:10px; transition:all 0.2s; }
+  .drop-zone.over { border-color:#FFBF00; background:rgba(255,191,0,0.05); }
+  input[type=file] { display:none; }
+</style>
+</head>
+<body class="min-h-screen p-6">
+
+<div class="max-w-4xl mx-auto">
+  <!-- Header -->
+  <div class="flex items-center justify-between mb-8">
+    <div>
+      <h1 class="text-2xl font-bold text-yellow-300">Modern Cask Admin</h1>
+      <p class="text-gray-500 text-sm mt-1">Bottle image upload queue</p>
+    </div>
+    <div class="flex items-center gap-3">
+      <span id="admin-email" class="text-gray-400 text-sm"></span>
+      <button onclick="signOut()" class="text-xs text-gray-500 hover:text-red-400 border border-gray-700 px-3 py-1.5 rounded-lg">Sign out</button>
+    </div>
+  </div>
+
+  <!-- Auth gate -->
+  <div id="auth-gate" class="card p-8 max-w-sm mx-auto hidden">
+    <h2 class="text-lg font-bold mb-4">Admin Sign In</h2>
+    <input id="admin-email-input" type="email" placeholder="Email" class="w-full bg-black/40 border border-gray-700 rounded-lg px-4 py-2.5 text-sm mb-3 outline-none focus:border-yellow-500/50"/>
+    <input id="admin-pass-input" type="password" placeholder="Password" class="w-full bg-black/40 border border-gray-700 rounded-lg px-4 py-2.5 text-sm mb-4 outline-none focus:border-yellow-500/50"/>
+    <button onclick="adminSignIn()" class="w-full bg-yellow-400 text-black font-bold py-2.5 rounded-lg text-sm hover:bg-yellow-300 transition-all">Sign In</button>
+    <p id="auth-error" class="text-red-400 text-xs mt-2 hidden"></p>
+  </div>
+
+  <!-- Main content -->
+  <div id="main-content" class="hidden">
+
+    <!-- Stats bar -->
+    <div class="grid grid-cols-3 gap-4 mb-6">
+      <div class="card p-4 text-center">
+        <p class="text-3xl font-bold text-yellow-400" id="stat-pending">–</p>
+        <p class="text-xs text-gray-500 uppercase tracking-wider mt-1">Pending</p>
+      </div>
+      <div class="card p-4 text-center">
+        <p class="text-3xl font-bold text-green-400" id="stat-done">–</p>
+        <p class="text-xs text-gray-500 uppercase tracking-wider mt-1">Fulfilled</p>
+      </div>
+      <div class="card p-4 text-center">
+        <p class="text-3xl font-bold text-blue-400" id="stat-images">–</p>
+        <p class="text-xs text-gray-500 uppercase tracking-wider mt-1">Images</p>
+      </div>
+    </div>
+
+    <!-- Upload any image manually -->
+    <div class="card p-5 mb-6">
+      <h2 class="text-sm font-bold text-yellow-300 uppercase tracking-wider mb-4">Upload Image Manually</h2>
+      <div class="grid grid-cols-2 gap-3 mb-3">
+        <div>
+          <label class="block text-xs text-gray-500 mb-1">Whisky Slug</label>
+          <input id="manual-slug" type="text" placeholder="e.g. lagavulin-16" class="w-full bg-black/40 border border-gray-700 rounded-lg px-3 py-2 text-sm outline-none focus:border-yellow-500/50"/>
+        </div>
+        <div>
+          <label class="block text-xs text-gray-500 mb-1">Whisky Name</label>
+          <input id="manual-name" type="text" placeholder="e.g. Lagavulin 16 Year Old" class="w-full bg-black/40 border border-gray-700 rounded-lg px-3 py-2 text-sm outline-none focus:border-yellow-500/50"/>
+        </div>
+      </div>
+      <div id="manual-drop" class="drop-zone p-8 text-center cursor-pointer mb-3" onclick="document.getElementById('manual-file').click()" ondragover="dragOver(event,'manual-drop')" ondragleave="dragLeave('manual-drop')" ondrop="dropFile(event,'manual')">
+        <p class="text-gray-400 text-sm">📷 Drag & drop bottle image here, or click to browse</p>
+        <p class="text-gray-600 text-xs mt-1">PNG, JPG, WEBP — any size</p>
+        <input type="file" id="manual-file" accept="image/*" onchange="handleManualFile(this)"/>
+      </div>
+      <div id="manual-preview" class="hidden mb-3 flex items-center gap-3">
+        <img id="manual-preview-img" class="w-16 h-24 object-contain bg-black/20 rounded-lg"/>
+        <div>
+          <p id="manual-preview-name" class="text-sm font-semibold"></p>
+          <p id="manual-preview-size" class="text-xs text-gray-500"></p>
+        </div>
+        <button onclick="clearManualFile()" class="ml-auto text-gray-500 hover:text-red-400 text-xs">✕ Clear</button>
+      </div>
+      <button onclick="uploadManual()" class="bg-yellow-400 text-black font-bold px-6 py-2.5 rounded-lg text-sm hover:bg-yellow-300 transition-all">Upload Image</button>
+      <p id="manual-status" class="text-xs mt-2 text-gray-500"></p>
+    </div>
+
+    <!-- Request queue -->
+    <div class="card p-5">
+      <div class="flex items-center justify-between mb-4">
+        <h2 class="text-sm font-bold text-yellow-300 uppercase tracking-wider">Photo Requests Queue</h2>
+        <button onclick="loadQueue()" class="text-xs text-gray-500 hover:text-yellow-300 border border-gray-700 px-3 py-1 rounded-lg">↻ Refresh</button>
+      </div>
+      <div id="queue-list" class="space-y-3">
+        <p class="text-gray-600 text-sm text-center py-8">Loading queue…</p>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+const SUPABASE_URL  = 'https://nluezhsmgwuqdryarrmd.supabase.co';
+const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5sdWV6aHNtZ3d1cWRyeWFycm1kIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU0MDMyODMsImV4cCI6MjA5MDk3OTI4M30.61Gt5y8k46nIBjtlpyu3n2B4RVcHpPYI1WBRoqnTOYM';
+const { createClient } = supabase;
+const sb = createClient(SUPABASE_URL, SUPABASE_ANON);
+
+let manualFileData = null;
+let manualFileType = null;
+
+// ── AUTH ────────────────────────────────────────────────────────────────────
+async function adminSignIn() {
+  const email = document.getElementById('admin-email-input').value;
+  const pass  = document.getElementById('admin-pass-input').value;
+  const { error } = await sb.auth.signInWithPassword({ email, password: pass });
+  if (error) {
+    const el = document.getElementById('auth-error');
+    el.textContent = error.message; el.classList.remove('hidden');
+  }
+}
+
+async function signOut() {
+  await sb.auth.signOut();
+  location.reload();
+}
+
+sb.auth.onAuthStateChange((event, session) => {
+  if (session?.user) {
+    document.getElementById('auth-gate').classList.add('hidden');
+    document.getElementById('main-content').classList.remove('hidden');
+    document.getElementById('admin-email').textContent = session.user.email;
+    loadQueue(); loadStats();
+  } else {
+    document.getElementById('auth-gate').classList.remove('hidden');
+    document.getElementById('main-content').classList.add('hidden');
+  }
+});
+
+// ── STATS ───────────────────────────────────────────────────────────────────
+async function loadStats() {
+  const [{ count: pending }, { count: done }, { count: images }] = await Promise.all([
+    sb.from('image_requests').select('*', { count: 'exact', head: true }).eq('status','pending'),
+    sb.from('image_requests').select('*', { count: 'exact', head: true }).eq('status','done'),
+    sb.from('bottle_images').select('*', { count: 'exact', head: true }),
+  ]);
+  document.getElementById('stat-pending').textContent = pending || 0;
+  document.getElementById('stat-done').textContent = done || 0;
+  document.getElementById('stat-images').textContent = images || 0;
+}
+
+// ── QUEUE ───────────────────────────────────────────────────────────────────
+async function loadQueue() {
+  const el = document.getElementById('queue-list');
+  const { data, error } = await sb.from('image_requests')
+    .select('*').order('requested_at', { ascending: false }).limit(50);
+  if (error || !data?.length) {
+    el.innerHTML = '<p class="text-gray-600 text-sm text-center py-8">No requests yet</p>';
+    return;
+  }
+  el.innerHTML = data.map(r => `
+    <div class="flex items-center gap-4 p-4 bg-black/20 rounded-xl border border-gray-800">
+      <div class="flex-1 min-w-0">
+        <p class="font-semibold text-sm">${r.whisky_name}</p>
+        <p class="text-xs text-gray-500 mt-0.5">${r.whisky_slug} · ${r.region || 'Unknown region'}</p>
+        <p class="text-xs text-gray-600 mt-0.5">${new Date(r.requested_at).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'})}</p>
+      </div>
+      <span class="badge-${r.status} text-xs font-bold px-2.5 py-1 rounded-full uppercase tracking-wider">${r.status}</span>
+      ${r.status === 'pending' ? `
+        <div class="flex gap-2">
+          <div class="drop-zone px-3 py-2 cursor-pointer text-center" style="min-width:100px" 
+            onclick="document.getElementById('file-${r.id}').click()"
+            ondragover="dragOver(event,'dz-${r.id}')" 
+            ondragleave="dragLeave('dz-${r.id}')"
+            ondrop="dropFile(event,'${r.id}','${r.whisky_slug}','${r.whisky_name}')"
+            id="dz-${r.id}">
+            <p class="text-xs text-gray-400">📁 Upload</p>
+            <input type="file" id="file-${r.id}" accept="image/*" 
+              onchange="handleQueueFile(this,'${r.id}','${r.whisky_slug}','${r.whisky_name}')"/>
+          </div>
+          <button onclick="rejectRequest('${r.id}')" class="text-xs text-gray-600 hover:text-red-400 border border-gray-800 px-2 py-1 rounded-lg">✕</button>
+        </div>
+      ` : r.image_url ? `<img src="${r.image_url}" class="w-10 h-14 object-contain rounded"/>` : ''}
+    </div>
+  `).join('');
+}
+
+// ── DRAG & DROP ─────────────────────────────────────────────────────────────
+function dragOver(e, id) { e.preventDefault(); document.getElementById(id)?.classList.add('over'); }
+function dragLeave(id) { document.getElementById(id)?.classList.remove('over'); }
+
+function dropFile(e, idOrAction, slug, name) {
+  e.preventDefault();
+  const dzId = typeof idOrAction === 'string' && !slug ? 'manual-drop' : `dz-${idOrAction}`;
+  document.getElementById(dzId)?.classList.remove('over');
+  const file = e.dataTransfer.files[0];
+  if (!file) return;
+  if (idOrAction === 'manual') {
+    setManualFile(file);
+  } else {
+    uploadQueueFile(file, idOrAction, slug, name);
+  }
+}
+
+// ── MANUAL UPLOAD ────────────────────────────────────────────────────────────
+function handleManualFile(input) {
+  if (input.files[0]) setManualFile(input.files[0]);
+}
+
+function setManualFile(file) {
+  const reader = new FileReader();
+  reader.onload = e => {
+    manualFileData = e.target.result.split(',')[1];
+    manualFileType = file.type;
+    document.getElementById('manual-preview').classList.remove('hidden');
+    document.getElementById('manual-preview-img').src = e.target.result;
+    document.getElementById('manual-preview-name').textContent = file.name;
+    document.getElementById('manual-preview-size').textContent = `${(file.size/1024).toFixed(0)}KB`;
+    document.getElementById('manual-drop').style.display = 'none';
+  };
+  reader.readAsDataURL(file);
+}
+
+function clearManualFile() {
+  manualFileData = null; manualFileType = null;
+  document.getElementById('manual-preview').classList.add('hidden');
+  document.getElementById('manual-drop').style.display = '';
+  document.getElementById('manual-file').value = '';
+}
+
+async function uploadManual() {
+  const slug = document.getElementById('manual-slug').value.trim();
+  const name = document.getElementById('manual-name').value.trim();
+  const statusEl = document.getElementById('manual-status');
+  if (!slug || !name) { statusEl.textContent = 'Enter slug and name'; statusEl.className = 'text-xs mt-2 text-red-400'; return; }
+  if (!manualFileData) { statusEl.textContent = 'Choose an image first'; statusEl.className = 'text-xs mt-2 text-red-400'; return; }
+  statusEl.textContent = 'Uploading…'; statusEl.className = 'text-xs mt-2 text-gray-400';
+  const url = await uploadToStorage(slug, manualFileData, manualFileType);
+  if (url) {
+    await sb.from('bottle_images').upsert({ slug, whisky_name: name, image_url: url }, { onConflict: 'slug' });
+    statusEl.textContent = `✓ Uploaded — ${url}`; statusEl.className = 'text-xs mt-2 text-green-400';
+    clearManualFile(); loadStats();
+  } else {
+    statusEl.textContent = 'Upload failed — check console'; statusEl.className = 'text-xs mt-2 text-red-400';
+  }
+}
+
+// ── QUEUE FILE UPLOAD ────────────────────────────────────────────────────────
+function handleQueueFile(input, requestId, slug, name) {
+  if (input.files[0]) uploadQueueFile(input.files[0], requestId, slug, name);
+}
+
+async function uploadQueueFile(file, requestId, slug, name) {
+  const dz = document.getElementById(`dz-${requestId}`);
+  if (dz) dz.innerHTML = '<p class="text-xs text-yellow-400">Uploading…</p>';
+  const reader = new FileReader();
+  reader.onload = async e => {
+    const base64 = e.target.result.split(',')[1];
+    const url = await uploadToStorage(slug, base64, file.type);
+    if (url) {
+      await Promise.all([
+        sb.from('bottle_images').upsert({ slug, whisky_name: name, image_url: url }, { onConflict: 'slug' }),
+        sb.from('image_requests').update({ status: 'done', image_url: url, fulfilled_at: new Date().toISOString() }).eq('id', requestId),
+      ]);
+      loadQueue(); loadStats();
+    } else {
+      if (dz) dz.innerHTML = '<p class="text-xs text-red-400">Failed</p>';
+    }
+  };
+  reader.readAsDataURL(file);
+}
+
+async function rejectRequest(id) {
+  await sb.from('image_requests').update({ status: 'rejected' }).eq('id', id);
+  loadQueue(); loadStats();
+}
+
+// ── SUPABASE STORAGE ─────────────────────────────────────────────────────────
+async function uploadToStorage(slug, base64Data, contentType) {
+  const ext = contentType.includes('png') ? 'png' : contentType.includes('webp') ? 'webp' : 'jpg';
+  const path = `whiskies/${slug}.${ext}`;
+  const binary = atob(base64Data);
+  const bytes = new Uint8Array(binary.length);
+  for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
+  const { error } = await sb.storage.from('bottle-photos').upload(path, bytes.buffer, {
+    contentType, upsert: true,
+  });
+  if (error) { console.error('Storage error:', error); return null; }
+  const { data } = sb.storage.from('bottle-photos').getPublicUrl(path);
+  return data.publicUrl;
+}
+</script>
+</body>
+</html>
