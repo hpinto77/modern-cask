@@ -579,6 +579,24 @@ async function handleGoogleSignIn() {
     options: { redirectTo: window.location.href }
   });
 }
+window.handleGoogleSignIn = handleGoogleSignIn;
+window.closeSearch = closeSearch;
+window.selectFromSearch = selectFromSearch;
+window.handlePhotoSearch = handlePhotoSearch;
+window.clearPhotoSearch = clearPhotoSearch;
+window.runAdvancedSearch = runAdvancedSearch;
+window.showView = showView;
+window.goBack = goBack;
+window.saveManualNote = saveManualNote;
+window.submitCheckin = submitCheckin;
+window.closeModal = closeModal;
+window.openModal = openModal;
+window.clearGeminiKey = clearGeminiKey;
+window.saveGeminiKey = saveGeminiKey;
+window.switchAuthTab = switchAuthTab;
+window.handleSignOut = handleSignOut;
+window.handleSignUp = handleSignUp;
+window.handleSignIn = handleSignIn;
 
 async function handleSignOut() {
   await sb.auth.signOut();
