@@ -188,15 +188,8 @@ body{min-height:100dvh;}
       </div>
       <div class="mt-4 bg-[#1c1b1b] rounded-xl p-4 border border-[#504532]/20">
         <p class="text-[#FFE2AB] text-[10px] font-bold uppercase tracking-wider mb-1">📷 Gemini Key</p>
-        <div id="gemini-key-form" class="space-y-2">
-          <input id="gemini-key-input" type="password" placeholder="Paste Gemini API key (AIza...)" class="adv-input text-[12px]"/>
-          <button id="save-gemini-btn" class="w-full amber-glow text-[#402d00] font-bold py-2.5 rounded-xl text-[10px] uppercase tracking-widest">Save Key</button>
-          <p class="text-[#504532] text-[9px] text-center">Get free at <span class="text-[#FFBF00]">aistudio.google.com</span></p>
-        </div>
-        <div id="gemini-key-set" class="hidden flex items-center justify-between">
-          <p class="text-[#4CAF50] text-[10px] font-bold uppercase tracking-wider">✓ Gemini configured</p>
-          <button id="clear-gemini-btn" class="text-[#9c8f78] text-[9px] hover:text-red-400">Remove</button>
-        </div>
+        <p class="text-[#4CAF50] text-[10px] font-bold uppercase tracking-wider">✓ Gemini Vision configured server-side</p>
+        <p class="text-[#504532] text-[9px] mt-1">Photo identification is ready — just take or upload a label photo above.</p>
       </div>
     </div>
   </div>
@@ -394,7 +387,19 @@ const FALLBACK = [
   {id:9,slug:'glenlivet-12',name:'Glenlivet 12 Year Old',description:'The definitive Speyside single malt.',metadata:{distillery:'The Glenlivet',region:'Speyside',country:'Scotland',abv:40,age:12,flavour:'Floral'},rating:{marcel:83,sascha:82},tasting_notes:{nose:'Floral, citrus and vanilla.',palate:'Smooth, honeyed with tropical fruit.',finish:'Clean and medium length.'}},
   {id:10,slug:'talisker-10',name:'Talisker 10 Year Old',description:'The king of the Hebrides.',metadata:{distillery:'Talisker',region:'Islands',country:'Scotland',abv:45.8,age:10,flavour:'Peated'},rating:{marcel:91,sascha:90},tasting_notes:{nose:'Intense pepper, smoke and brine.',palate:'Rich and warming with sweet fruit.',finish:'Famously long and peppery.'}},
   {id:11,slug:'balvenie-12-doublewood',name:'Balvenie 12 DoubleWood',description:'Finished in sherry casks — classic Speyside.',metadata:{distillery:'The Balvenie',region:'Speyside',country:'Scotland',abv:40,age:12,flavour:'Sherry'},rating:{marcel:88,sascha:87},tasting_notes:{nose:'Honey, vanilla and light sherry.',palate:'Rich with dried fruit and cinnamon.',finish:'Smooth and warming.'}},
-  {id:12,slug:'oban-14',name:'Oban 14 Year Old',description:'The gateway to the Western Highlands.',metadata:{distillery:'Oban',region:'Highland',country:'Scotland',abv:43,age:14,flavour:'Maritime'},rating:{marcel:87,sascha:86},tasting_notes:{nose:'Brine, heather and citrus peel.',palate:'Medium body, smooth and complex.',finish:'Dry and slightly smoky.'}}
+  {id:12,slug:'oban-14',name:'Oban 14 Year Old',description:'The gateway to the Western Highlands.',metadata:{distillery:'Oban',region:'Highland',country:'Scotland',abv:43,age:14,flavour:'Maritime'},rating:{marcel:87,sascha:86},tasting_notes:{nose:'Brine, heather and citrus peel.',palate:'Medium body, smooth and complex.',finish:'Dry and slightly smoky.'}},
+  {id:13,slug:'laphroaig-10',name:'Laphroaig 10 Year Old',description:"Arguably the world's most distinctive whisky — love it or hate it.",metadata:{distillery:'Laphroaig',region:'Islay',country:'Scotland',abv:40,age:10,flavour:'Peated'},rating:{marcel:88,sascha:89},tasting_notes:{nose:'Medicinal peat, seaweed, iodine and bacon smoke.',palate:'Full body, intensely peaty with hidden sweetness.',finish:'Very long, dry and remarkably smoky.'}},
+  {id:14,slug:'laphroaig-quarter-cask',name:'Laphroaig Quarter Cask',description:'Matured in small quarter casks for extra intensity.',metadata:{distillery:'Laphroaig',region:'Islay',country:'Scotland',abv:48,age:null,flavour:'Peated'},rating:{marcel:91,sascha:90},tasting_notes:{nose:'Rich vanilla and smoke, creamy peat.',palate:'Sweet vanilla fighting with powerful peat smoke.',finish:'Long, warming and spectacularly smoky.'}},
+  {id:15,slug:'old-pulteney-12',name:'Old Pulteney 12 Year Old',description:"The Maritime Malt from Scotland's most northerly mainland distillery.",metadata:{distillery:'Old Pulteney',region:'Highland',country:'Scotland',abv:40,age:12,flavour:'Maritime'},rating:{marcel:86,sascha:85},tasting_notes:{nose:'Sea air, honey, vanilla and fresh fruit.',palate:'Medium-bodied, coastal salt with malty sweetness.',finish:'Dry, nutty and pleasantly maritime.'}},
+  {id:16,slug:'old-pulteney-18',name:'Old Pulteney 18 Year Old',description:'Rich and complex maritime single malt from the far north.',metadata:{distillery:'Old Pulteney',region:'Highland',country:'Scotland',abv:46,age:18,flavour:'Maritime'},rating:{marcel:91,sascha:90},tasting_notes:{nose:'Butterscotch, brine, dried fruit and subtle oak.',palate:'Full and rich — honeyed fruit, sea spray and spice.',finish:'Long and warming with lingering maritime notes.'}},
+  {id:17,slug:'fettercairn-12',name:'Fettercairn 12 Year Old',description:'An unsung hero from the Eastern Highlands, rich and complex.',metadata:{distillery:'Fettercairn',region:'Highland',country:'Scotland',abv:40,age:12,flavour:'Fruity'},rating:{marcel:84,sascha:83},tasting_notes:{nose:'Tropical fruit, caramel and light floral notes.',palate:'Sweet with orchard fruit, vanilla and gentle oak.',finish:'Smooth with lingering sweetness.'}},
+  {id:18,slug:'fettercairn-16',name:'Fettercairn 16 Year Old',description:'A beautifully rounded Eastern Highland expression.',metadata:{distillery:'Fettercairn',region:'Highland',country:'Scotland',abv:46.8,age:16,flavour:'Fruity'},rating:{marcel:88,sascha:87},tasting_notes:{nose:'Rich dark fruit, molasses, leather and spice.',palate:'Complex — dried fruits, coffee, warm spices.',finish:'Long and satisfying with dark chocolate notes.'}},
+  {id:19,slug:'dalwhinnie-15',name:'Dalwhinnie 15 Year Old',description:"From one of Scotland's highest and most remote distilleries.",metadata:{distillery:'Dalwhinnie',region:'Highland',country:'Scotland',abv:43,age:15,flavour:'Floral'},rating:{marcel:85,sascha:86},tasting_notes:{nose:'Heather, honey, vanilla and a hint of peat smoke.',palate:'Gentle and smooth — heather-honey sweetness.',finish:'Clean, long and delicately spiced.'}},
+  {id:20,slug:'glenfarclas-15',name:'Glenfarclas 15 Year Old',description:'Family-owned Speyside sherry bomb — outstanding value.',metadata:{distillery:'Glenfarclas',region:'Speyside',country:'Scotland',abv:46,age:15,flavour:'Sherry'},rating:{marcel:91,sascha:92},tasting_notes:{nose:'Rich sherry, Christmas cake, dried fruits and nuts.',palate:'Full and warming — sherry, spice, dark chocolate.',finish:'Long and satisfying with oaky dryness.'}},
+  {id:21,slug:'benromach-10',name:'Benromach 10 Year Old',description:'Classic Speyside character with a subtle peaty twist.',metadata:{distillery:'Benromach',region:'Speyside',country:'Scotland',abv:43,age:10,flavour:'Peated'},rating:{marcel:87,sascha:86},tasting_notes:{nose:'Vanilla, light smoke, orchard fruit.',palate:'Malty and sweet with gentle peat and citrus.',finish:'Medium length with warming spice.'}},
+  {id:22,slug:'kilchoman-machir-bay',name:'Kilchoman Machir Bay',description:"Islay's farm distillery — fresh, young and intensely peated.",metadata:{distillery:'Kilchoman',region:'Islay',country:'Scotland',abv:46,age:null,flavour:'Peated'},rating:{marcel:89,sascha:88},tasting_notes:{nose:'Smoke, lemon zest, vanilla and light brine.',palate:'Lively peat with citrus fruit and barley sweetness.',finish:'Long, smoky and refreshing.'}},
+  {id:23,slug:'bruichladdich-classic-laddie',name:'Bruichladdich The Classic Laddie',description:'Unpeated Islay — progressive and terroir-driven.',metadata:{distillery:'Bruichladdich',region:'Islay',country:'Scotland',abv:50,age:null,flavour:'Floral'},rating:{marcel:88,sascha:87},tasting_notes:{nose:'Floral, citrus zest, barley and fresh cream.',palate:'Complex and layered — fruit, maritime and malt.',finish:'Long with delicate sea breeze and vanilla.'}},
+  {id:24,slug:'nikka-from-the-barrel',name:'Nikka From the Barrel',description:'Japan masterblend — exceptional value and complexity.',metadata:{distillery:'Nikka',region:'Japan',country:'Japan',abv:51.4,age:null,flavour:'Rich'},rating:{marcel:93,sascha:94},tasting_notes:{nose:'Vanilla, coconut, ripe fruits and light spice.',palate:'Powerful and complex — honey, wood spice, dried fruit.',finish:'Very long and warming with a hint of smoke.'}}
 ];
 
 // ── HELPERS ───────────────────────────────────────────────────────
@@ -526,10 +531,39 @@ function setFilter(f){
   renderList(filteredList());
 }
 async function loadWhiskies(){
-  const d=await apiGet({page:1,per_page:24});
-  if(d?.items?.length){S.whiskies=d.items;S.totalPages=Math.ceil(d.total/d.per_page);S.page=2;setAPIStatus(true);if(S.page<=S.totalPages)document.getElementById('load-more-wrap').classList.remove('hidden');}
-  else{S.whiskies=FALLBACK;setAPIStatus(false);}
-  setFilter('all');
+  // Load first 100 immediately for fast render
+  const d=await apiGet({page:1,per_page:100});
+  if(d?.items?.length){
+    S.whiskies=d.items;
+    S.totalPages=Math.ceil(d.total/100);
+    S.page=2;
+    setAPIStatus(true);
+    setFilter('all');
+    // Then load remaining pages in background
+    if(S.totalPages>1) loadRemainingWhiskies();
+  } else {
+    S.whiskies=FALLBACK;
+    setAPIStatus(false);
+    setFilter('all');
+  }
+}
+async function loadRemainingWhiskies(){
+  // Load all remaining pages sequentially in background
+  for(let pg=2; pg<=S.totalPages; pg++){
+    const d=await apiGet({page:pg,per_page:100});
+    if(d?.items?.length){
+      S.whiskies=[...S.whiskies,...d.items];
+      // Re-render if still on discover view
+      if(document.getElementById('view-discover')?.classList.contains('active')){
+        renderList(filteredList());
+      }
+    }
+    // Small delay to avoid hammering API
+    await new Promise(r=>setTimeout(r,300));
+  }
+  setAPIStatus(true);
+  // Hide load more - all loaded
+  document.getElementById('load-more-wrap').classList.add('hidden');
 }
 
 // ── SEARCH ──────────────────────────────────────────────────────────
@@ -632,7 +666,7 @@ async function showDetail(slugOrId){
     </div>`:''}
     ${m.abv?`<div class="bg-surface-container-low rounded-xl p-4 mb-4"><div class="flex justify-between text-[9px] mb-1.5"><span class="text-[#9c8f78] uppercase">ABV</span><span class="text-[#FFBF00] font-bold">${m.abv}%</span></div><div class="h-1 bg-[#353535] rounded-full overflow-hidden"><div class="h-full amber-glow" style="width:${Math.min(m.abv,100)}%"></div></div></div>`:''}
     ${userNote?`<div class="bg-surface-container-low rounded-xl p-4 mb-4 border border-[#FFBF00]/12"><div class="flex items-center gap-2 mb-2"><span class="text-[8px] uppercase tracking-widest text-[#FFBF00] font-bold">Your Note</span><div class="ml-auto flex">${starsHTML(userNote.rating,5,13)}</div></div>${userNote.notes?`<p class="text-[#9c8f78] text-sm italic">"${userNote.notes}"</p>`:''}</div>`:''}
-    ${!BOTTLE_IMAGES[String(w.id||w.slug)] ? `<button class="request-photo-btn w-full mt-3 py-3 border border-[#504532]/40 rounded-xl text-[9px] uppercase tracking-widest text-[#9c8f78] hover:text-primary hover:border-primary/30 transition-all font-bold flex items-center justify-center gap-2" data-slug="${w.slug||w.id}" data-name="${(w.name||'').replace(/"/g,'')}" data-region="${m.region||''}"><span class="material-symbols-outlined text-[14px]">add_photo_alternate</span>Request Bottle Photo</button>` : ''}
+    ${!BOTTLE_IMAGES[String(w.id||w.slug)] ? `<button class="request-photo-btn w-full mt-3 py-3 border border-[#504532]/40 rounded-xl text-[9px] uppercase tracking-widest text-[#9c8f78] hover:text-primary hover:border-primary/30 transition-all font-bold flex items-center justify-center gap-2" data-slug="${w.slug||w.id}" data-name="${(w.name||'').replace(/"/g,'')}" data-region="${m.region||''}"><span class="material-symbols-outlined text-[14px]">add_photo_alternate</span>📷 Request Bottle Photo</button>` : ''}
     <button class="w-full amber-glow text-[#402d00] font-headline font-bold py-4 rounded-xl uppercase tracking-widest text-[11px] hover:opacity-90 active:scale-[0.98] transition-all mt-2" onclick="openModal()">${isC?'Update Check-in':'Check In This Dram'}</button>
   `;
   showView('detail',false);
@@ -707,12 +741,23 @@ async function delManual(id){
 // ── REQUEST PHOTO ───────────────────────────────────────────────────
 async function requestImage(slug, name, region) {
   if (!S.user) { showToast('Sign in to request photos'); return; }
-  const { error } = await sb.from('image_requests').upsert(
-    { whisky_slug: slug, whisky_name: name, region, status: 'pending', user_id: S.user.id, requested_at: new Date().toISOString() },
-    { onConflict: 'whisky_slug' }
-  );
-  if (error) { showToast('Already requested or error'); }
-  else { showToast('📷 Photo requested — coming soon'); }
+  // Check if already requested
+  const { data: existing } = await sb.from('image_requests')
+    .select('id,status').eq('whisky_slug', slug).limit(1);
+  if (existing?.length) {
+    showToast(existing[0].status === 'done' ? '✓ Photo already added' : '📷 Already in the queue');
+    return;
+  }
+  const { error } = await sb.from('image_requests').insert({
+    whisky_slug: slug,
+    whisky_name: name,
+    region: region || '',
+    status: 'pending',
+    requested_by: S.user.id,
+    requested_at: new Date().toISOString()
+  });
+  if (error) { showToast('Request failed: ' + error.message); }
+  else { showToast('📷 Photo requested — check admin queue'); }
 }
 
 // ── PHOTO SEARCH ────────────────────────────────────────────────────
@@ -728,10 +773,8 @@ function handlePhotoSearch(input){
     document.getElementById('photo-error').classList.add('hidden');
     document.getElementById('photo-scanning').classList.remove('hidden');
     document.getElementById('photo-drop-zone').classList.add('hidden');
-    const key=localStorage.getItem('mc_gemini_key')||'';
-    if(!key){document.getElementById('photo-scanning').classList.add('hidden');document.getElementById('photo-error').classList.remove('hidden');document.getElementById('photo-error-msg').textContent='Add your Gemini API key below to enable photo search.';return;}
     try{
-      const gemUrl=IS_NETLIFY?`${API_PROXY}?action=gemini-vision`:`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${key}`;
+      const gemUrl=`${API_PROXY}?action=gemini-vision`;
       const res=await fetch(gemUrl,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({contents:[{parts:[{inline_data:{mime_type:file.type,data:base64}},{text:'Analyse this whisky label. Respond ONLY in JSON: {"distillery":"...","name":"...","age":"...","region":"...","abv":"...","searchQuery":"..."}'}]}],generationConfig:{temperature:0.1,maxOutputTokens:200}})});
       const gd=await res.json();
       const txt=gd.candidates?.[0]?.content?.parts?.[0]?.text||'';
@@ -763,7 +806,8 @@ function saveGeminiKey(){
   updateGeminiUI();showToast('Gemini key saved');
 }
 function clearGeminiKey(){localStorage.removeItem('mc_gemini_key');updateGeminiUI();}
-function updateGeminiUI(){
+function updateGeminiUI(){ return; // server-side
+
   const key=localStorage.getItem('mc_gemini_key');
   document.getElementById('gemini-key-form').classList.toggle('hidden',!!key);
   document.getElementById('gemini-key-set').classList.toggle('hidden',!key);
@@ -822,13 +866,7 @@ async function init(){
   // 6. Wire filter pills
   document.querySelectorAll('.filter-pill').forEach(p=>p.addEventListener('click',()=>setFilter(p.dataset.f)));
 
-  // 7. Wire load more
-  document.getElementById('load-more-btn').addEventListener('click',async()=>{
-    if(S.busy||S.page>S.totalPages)return;S.busy=true;
-    const d=await apiGet({page:S.page,per_page:24});
-    if(d?.items?.length){S.whiskies=[...S.whiskies,...d.items];S.page++;if(S.page>S.totalPages)document.getElementById('load-more-wrap').classList.add('hidden');renderList(filteredList());}
-    S.busy=false;
-  });
+  // 7. Load more hidden — auto-loads all in background
 
   // 8. Wire region grid
   const rg=document.getElementById('region-grid');
@@ -854,7 +892,6 @@ async function init(){
   document.getElementById('clear-photo-btn').addEventListener('click',clearPhotoSearch);
   document.getElementById('save-gemini-btn').addEventListener('click',saveGeminiKey);
   document.getElementById('clear-gemini-btn').addEventListener('click',clearGeminiKey);
-  updateGeminiUI();
 
   // 11. Auth — check session (non-blocking)
   sb.auth.onAuthStateChange((event,session)=>{
