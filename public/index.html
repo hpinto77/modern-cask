@@ -814,9 +814,9 @@ async function showDetail(slugOrId) {
     ${m.abv?`<div class="bg-surface-container-low rounded-xl p-4 mb-4"><div class="flex justify-between text-[9px] mb-1.5"><span class="text-[#9c8f78] uppercase tracking-tight">ABV</span><span class="text-[#FFBF00] font-bold">${m.abv}%</span></div><div class="h-1 bg-[#353535] rounded-full overflow-hidden"><div class="h-full amber-glow" style="width:${Math.min(m.abv,100)}%"></div></div></div>`:''}
     ${userNoteHTML(w.id||w.slug)}
     <button id="detail-checkin-action" class="w-full amber-glow text-[#402d00] font-headline font-bold py-4 rounded-xl uppercase tracking-widest text-[11px] hover:opacity-90 active:scale-[0.98] transition-all mt-2">${isC?'Update Check-in':'Check In This Dram'}</button>
-    ${!w.image?.url && !BOTTLE_IMAGES[w.slug||w.id] ? `
-    <button onclick="requestImage('${w.slug||w.id}','${w.name.replace(/'/g,"\'")}','${m.region||''}')" 
-      class="w-full mt-2 py-3 border border-[#504532]/40 rounded-xl text-[9px] uppercase tracking-widest text-[#9c8f78] hover:text-primary hover:border-primary/30 transition-all font-bold flex items-center justify-center gap-2">
+    ${!BOTTLE_IMAGES[w.slug||w.id] ? `
+    <button class="request-photo-btn w-full mt-2 py-3 border border-[#504532]/40 rounded-xl text-[9px] uppercase tracking-widest text-[#9c8f78] hover:text-primary hover:border-primary/30 transition-all font-bold flex items-center justify-center gap-2"
+      data-slug="${w.slug||w.id}" data-name="${(w.name||'')}" data-region="${m.region||''}">
       <span class="material-symbols-outlined text-[14px]">add_photo_alternate</span>
       Request Bottle Photo
     </button>` : ''}
@@ -997,6 +997,12 @@ async function init() {
   // Avatar → cellar
   document.getElementById('avatar-btn').addEventListener('click',()=>showView('cellar'));
 
+  // Request photo buttons (dynamically created, use event delegation)
+  document.addEventListener('click', e => {
+    const btn = e.target.closest('.request-photo-btn');
+    if (btn) requestImage(btn.dataset.slug, btn.dataset.name, btn.dataset.region);
+  });
+
   // ── Wire all button events (avoids global scope issues) ──────────────
   const wire = (id, fn) => { const el = document.getElementById(id); if(el) el.addEventListener('click', fn); };
   const wireChange = (id, fn) => { const el = document.getElementById(id); if(el) el.addEventListener('change', fn); };
@@ -1061,7 +1067,7 @@ async function requestImage(slug, name, region) {
     region: region,
     requested_by: S.user.id,
   });
-  if (!error) showToast('Photo requested — we'll add it soon ✓');
+  if (!error) showToast('Photo requested — we\'ll add it soon ✓');
   else showToast('Could not send request');
 }
 
@@ -1075,6 +1081,30 @@ async function loadBottleImages() {
     }
   } catch(e) { console.warn('Could not load bottle images:', e.message); }
 }
+
+// ── Expose all functions needed by HTML onclick/onchange to window ──────
+window.switchAuthTab = switchAuthTab;
+window.handleGoogleSignIn = handleGoogleSignIn;
+window.handleSignIn = handleSignIn;
+window.handleSignUp = handleSignUp;
+window.handleSignOut = handleSignOut;
+window.showView = showView;
+window.goBack = goBack;
+window.openModal = openModal;
+window.closeModal = closeModal;
+window.submitCheckin = submitCheckin;
+window.saveManualNote = saveManualNote;
+window.delManual = delManual;
+window.showDetail = showDetail;
+window.selectFromSearch = selectFromSearch;
+window.closeSearch = closeSearch;
+window.runAdvancedSearch = runAdvancedSearch;
+window.requestImage = requestImage;
+window.clearPhotoSearch = clearPhotoSearch;
+window.handlePhotoSearch = handlePhotoSearch;
+window.saveGeminiKey = saveGeminiKey;
+window.clearGeminiKey = clearGeminiKey;
+window.imgFallback = imgFallback;
 
 document.addEventListener('DOMContentLoaded', init);
 
@@ -1117,20 +1147,18 @@ async function handlePhotoSearch(input) {
         : `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${currentKey}`;
 
       const geminiRes = await fetch(geminiUrl, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            contents: [{
-              parts: [
-                { inline_data: { mime_type: mimeType, data: base64 } },
-                { text: `Analyse this whisky bottle label. Extract and respond ONLY in this JSON format:
-{"distillery":"...","name":"...","age":"...","region":"...","abv":"...","searchQuery":"..."}
-Where searchQuery is the best string to search for this whisky in a database.` }
-              ]
-            }],
-            generationConfig: { temperature: 0.1, maxOutputTokens: 200 }
-          })
-      );
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          contents: [{
+            parts: [
+              { inline_data: { mime_type: mimeType, data: base64 } },
+              { text: 'Analyse this whisky bottle label. Respond ONLY in JSON: {"distillery":"...","name":"...","age":"...","region":"...","abv":"...","searchQuery":"..."}' }
+            ]
+          }],
+          generationConfig: { temperature: 0.1, maxOutputTokens: 200 }
+        })
+      });
 
       const geminiData = await geminiRes.json();
       const textContent = geminiData.candidates?.[0]?.content?.parts?.[0]?.text;
