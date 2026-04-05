@@ -7,20 +7,9 @@
 <title>The Modern Cask</title>
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
 <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@200;400;600;700;800&family=Inter:wght@300;400;500;600&family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&display=swap" rel="stylesheet"/>
-<!-- Supabase JS SDK -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
-tailwind.config = {
-  darkMode:"class",
-  theme:{extend:{colors:{
-    "primary":"#ffe2ab","on-surface-variant":"#d4c5ab","surface":"#131313",
-    "surface-container-high":"#2a2a2a","primary-container":"#ffbf00",
-    "on-surface":"#e5e2e1","on-primary":"#402d00","secondary":"#e5c27b",
-    "outline-variant":"#504532","surface-container-low":"#1c1b1b",
-    "background":"#131313","outline":"#9c8f78","surface-container":"#20201f",
-    "on-background":"#e5e2e1","surface-container-highest":"#353535",
-  },fontFamily:{headline:["Manrope"],body:["Inter"],label:["Inter"]}}}
-}
+tailwind.config={darkMode:"class",theme:{extend:{colors:{"primary":"#ffe2ab","on-surface-variant":"#d4c5ab","surface":"#131313","surface-container-high":"#2a2a2a","primary-container":"#ffbf00","on-surface":"#e5e2e1","on-primary":"#402d00","secondary":"#e5c27b","outline-variant":"#504532","surface-container-low":"#1c1b1b","background":"#131313","outline":"#9c8f78","surface-container":"#20201f","on-background":"#e5e2e1","surface-container-highest":"#353535"},fontFamily:{headline:["Manrope"],body:["Inter"]}}}}
 </script>
 <style>
 .material-symbols-outlined{font-family:'Material Symbols Outlined';font-style:normal;display:inline-block;line-height:1;text-transform:none;letter-spacing:normal;word-wrap:normal;white-space:nowrap;direction:ltr;}
@@ -41,103 +30,67 @@ tailwind.config = {
 #toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
 .skeleton{background:linear-gradient(90deg,#1c1b1b 25%,#2a2a2a 50%,#1c1b1b 75%);background-size:200% 100%;animation:shimmer 1.5s infinite;border-radius:12px;}
 @keyframes shimmer{0%{background-position:200% 0;}100%{background-position:-200% 0;}}
-.star-btn{font-size:26px;color:#504532;cursor:pointer;transition:color 0.15s,transform 0.15s;font-family:'Material Symbols Outlined';}
+.star-btn{font-size:26px;color:#504532;cursor:pointer;transition:color 0.15s;font-family:'Material Symbols Outlined';}
 .star-btn.lit{color:#FFBF00;}
 #modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.88);backdrop-filter:blur(6px);display:none;align-items:flex-end;justify-content:center;z-index:500;}
 #modal-overlay.open{display:flex;}
 #modal-sheet{width:100%;max-width:480px;max-height:88vh;background:#1c1b1b;border-radius:16px 16px 0 0;overflow-y:auto;animation:slideUp 0.35s cubic-bezier(0.22,1,0.36,1);}
 @keyframes slideUp{from{transform:translateY(100%);}to{transform:translateY(0);}}
-#auth-overlay{position:fixed;inset:0;background:#131313;z-index:600;display:flex;align-items:center;justify-content:center;}
+#auth-overlay{position:fixed;inset:0;background:#131313;z-index:600;display:none;align-items:center;justify-content:center;}
 #search-panel{position:fixed;inset:0;z-index:400;background:#131313;display:none;flex-direction:column;padding-top:56px;}
 #search-panel.open{display:flex;}
 .row-item{transition:background 0.12s;border-radius:12px;}
 .row-item:hover{background:rgba(255,226,171,0.04);}
-.row-item:active{background:rgba(255,226,171,0.09);}
-.cask-card{transition:transform 0.2s ease;}
-.cask-card:active{transform:scale(0.98);}
-body{min-height:100dvh;}
 .filter-pill.on{background:rgba(255,191,0,0.12);border-color:rgba(255,191,0,0.45);color:#FFE2AB;}
 .search-tab{transition:all 0.2s;border-bottom:2px solid transparent;}
 .search-tab.active{border-bottom-color:#FFBF00;color:#FFE2AB;}
 .adv-input{width:100%;background:#1c1b1b;border:1px solid rgba(80,69,50,0.3);border-radius:10px;padding:10px 14px;color:#e5e2e1;font-size:13px;outline:none;font-family:'Inter',sans-serif;}
 .adv-input:focus{border-color:rgba(255,191,0,0.4);}
-.adv-input::placeholder{color:#504532;}
-/* Bottle image */
-.bottle-img{width:48px;height:72px;object-fit:contain;flex-shrink:0;}
-.bottle-img-lg{width:120px;height:180px;object-fit:contain;margin:0 auto;}
 .img-drop-zone{border:2px dashed rgba(80,69,50,0.4);border-radius:12px;padding:32px;text-align:center;cursor:pointer;transition:border-color 0.2s;}
-.img-drop-zone:hover{border-color:rgba(255,191,0,0.4);}
+body{min-height:100dvh;}
 </style>
 </head>
-<body class="bg-surface text-on-surface font-body overflow-x-hidden selection:bg-primary/20">
+<body class="bg-surface text-on-surface font-body overflow-x-hidden">
 
-<!-- ══ AUTH OVERLAY ═══════════════════════════════════════════════════════ -->
-<div id="auth-overlay" style="display:none">
+<!-- AUTH OVERLAY -->
+<div id="auth-overlay">
   <div class="w-full max-w-sm px-6">
-    <!-- Logo -->
     <div class="text-center mb-10">
       <h1 class="font-headline text-3xl font-extrabold text-[#FFE2AB] tracking-tight mb-1">The Modern Cask</h1>
       <p class="text-[#9c8f78] text-sm">Your single malt companion</p>
     </div>
-
-    <!-- Auth tabs -->
     <div class="flex gap-0 mb-6 border-b border-[#504532]/30">
-      <button id="tab-signin" class="flex-1 py-2.5 text-[10px] font-bold uppercase tracking-wider text-[#FFE2AB] border-b-2 border-[#FFBF00]" onclick="switchAuthTab('signin')">Sign In</button>
-      <button id="tab-signup" class="flex-1 py-2.5 text-[10px] font-bold uppercase tracking-wider text-[#9c8f78] border-b-2 border-transparent" onclick="switchAuthTab('signup')">Sign Up</button>
+      <button id="tab-signin-btn" class="flex-1 py-2.5 text-[10px] font-bold uppercase tracking-wider text-[#FFE2AB] border-b-2 border-[#FFBF00]">Sign In</button>
+      <button id="tab-signup-btn" class="flex-1 py-2.5 text-[10px] font-bold uppercase tracking-wider text-[#9c8f78] border-b-2 border-transparent">Sign Up</button>
     </div>
-
-    <!-- Sign In form -->
-    <form id="form-signin" class="space-y-4" id="form-signin-inner">
-      <div>
-        <label class="block text-[9px] uppercase tracking-wider text-[#9c8f78] mb-1.5">Email</label>
-        <input id="signin-email" type="email" required placeholder="you@example.com"
-          class="w-full bg-[#1c1b1b] border border-[#504532]/40 rounded-xl py-3 px-4 text-on-surface placeholder:text-[#504532] focus:border-[#FFBF00]/50 focus:outline-none text-sm"/>
-      </div>
-      <div>
-        <label class="block text-[9px] uppercase tracking-wider text-[#9c8f78] mb-1.5">Password</label>
-        <input id="signin-password" type="password" required placeholder="••••••••"
-          class="w-full bg-[#1c1b1b] border border-[#504532]/40 rounded-xl py-3 px-4 text-on-surface placeholder:text-[#504532] focus:border-[#FFBF00]/50 focus:outline-none text-sm"/>
-      </div>
+    <form id="form-signin" class="space-y-4">
+      <div><label class="block text-[9px] uppercase tracking-wider text-[#9c8f78] mb-1.5">Email</label>
+        <input id="signin-email" type="email" required placeholder="you@example.com" class="w-full bg-[#1c1b1b] border border-[#504532]/40 rounded-xl py-3 px-4 text-on-surface placeholder:text-[#504532] focus:border-[#FFBF00]/50 focus:outline-none text-sm"/></div>
+      <div><label class="block text-[9px] uppercase tracking-wider text-[#9c8f78] mb-1.5">Password</label>
+        <input id="signin-password" type="password" required placeholder="••••••••" class="w-full bg-[#1c1b1b] border border-[#504532]/40 rounded-xl py-3 px-4 text-on-surface placeholder:text-[#504532] focus:border-[#FFBF00]/50 focus:outline-none text-sm"/></div>
       <p id="signin-error" class="text-red-400 text-[10px] hidden"></p>
-      <button type="submit" class="w-full amber-glow text-[#402d00] font-headline font-bold py-3.5 rounded-xl uppercase tracking-widest text-[11px] hover:opacity-90 transition-all">
-        Sign In
-      </button>
+      <button type="submit" class="w-full amber-glow text-[#402d00] font-headline font-bold py-3.5 rounded-xl uppercase tracking-widest text-[11px] hover:opacity-90 transition-all">Sign In</button>
     </form>
-
-    <!-- Sign Up form -->
-    <form id="form-signup" class="space-y-4 hidden" id="form-signup-inner">
-      <div>
-        <label class="block text-[9px] uppercase tracking-wider text-[#9c8f78] mb-1.5">Email</label>
-        <input id="signup-email" type="email" required placeholder="you@example.com"
-          class="w-full bg-[#1c1b1b] border border-[#504532]/40 rounded-xl py-3 px-4 text-on-surface placeholder:text-[#504532] focus:border-[#FFBF00]/50 focus:outline-none text-sm"/>
-      </div>
-      <div>
-        <label class="block text-[9px] uppercase tracking-wider text-[#9c8f78] mb-1.5">Password</label>
-        <input id="signup-password" type="password" required placeholder="Min 6 characters"
-          class="w-full bg-[#1c1b1b] border border-[#504532]/40 rounded-xl py-3 px-4 text-on-surface placeholder:text-[#504532] focus:border-[#FFBF00]/50 focus:outline-none text-sm"/>
-      </div>
+    <form id="form-signup" class="space-y-4 hidden">
+      <div><label class="block text-[9px] uppercase tracking-wider text-[#9c8f78] mb-1.5">Email</label>
+        <input id="signup-email" type="email" required placeholder="you@example.com" class="w-full bg-[#1c1b1b] border border-[#504532]/40 rounded-xl py-3 px-4 text-on-surface placeholder:text-[#504532] focus:border-[#FFBF00]/50 focus:outline-none text-sm"/></div>
+      <div><label class="block text-[9px] uppercase tracking-wider text-[#9c8f78] mb-1.5">Password</label>
+        <input id="signup-password" type="password" required placeholder="Min 6 characters" class="w-full bg-[#1c1b1b] border border-[#504532]/40 rounded-xl py-3 px-4 text-on-surface placeholder:text-[#504532] focus:border-[#FFBF00]/50 focus:outline-none text-sm"/></div>
       <p id="signup-error" class="text-red-400 text-[10px] hidden"></p>
-      <button type="submit" class="w-full amber-glow text-[#402d00] font-headline font-bold py-3.5 rounded-xl uppercase tracking-widest text-[11px] hover:opacity-90 transition-all">
-        Create Account
-      </button>
+      <button type="submit" class="w-full amber-glow text-[#402d00] font-headline font-bold py-3.5 rounded-xl uppercase tracking-widest text-[11px] hover:opacity-90 transition-all">Create Account</button>
     </form>
-
-    <!-- Google SSO -->
     <div class="flex items-center gap-3 my-5">
-      <div class="flex-1 h-px bg-[#504532]/30"></div>
-      <span class="text-[#504532] text-[10px] uppercase tracking-wider">or</span>
-      <div class="flex-1 h-px bg-[#504532]/30"></div>
+      <div class="flex-1 h-px bg-[#504532]/30"></div><span class="text-[#504532] text-[10px] uppercase tracking-wider">or</span><div class="flex-1 h-px bg-[#504532]/30"></div>
     </div>
-    <button id="google-sso-btn" class="w-full bg-[#1c1b1b] border border-[#504532]/40 rounded-xl py-3 px-4 text-sm font-semibold text-on-surface-variant hover:border-[#FFBF00]/30 transition-all flex items-center justify-center gap-3">
+    <button id="google-btn" class="w-full bg-[#1c1b1b] border border-[#504532]/40 rounded-xl py-3 px-4 text-sm font-semibold text-on-surface-variant hover:border-[#FFBF00]/30 transition-all flex items-center justify-center gap-3">
       <svg width="16" height="16" viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
       Continue with Google
     </button>
-
-    <p class="text-[#504532] text-[9px] text-center mt-6 uppercase tracking-wider">Your data is private & synced across devices</p>
+    <p class="text-[#504532] text-[9px] text-center mt-6 uppercase tracking-wider">Private &amp; synced across devices</p>
   </div>
 </div>
 
-<!-- ══ TOP BAR ═══════════════════════════════════════════════════════════ -->
+<!-- TOP BAR -->
 <header class="fixed top-0 w-full z-50 bg-[#131313]/90 backdrop-blur-xl flex justify-between items-center px-5 h-14 border-b border-[#504532]/20">
   <h1 class="text-[13px] font-black uppercase tracking-[0.22em] text-[#FFE2AB] font-headline">The Modern Cask</h1>
   <div class="flex items-center gap-3">
@@ -149,16 +102,13 @@ body{min-height:100dvh;}
   </div>
 </header>
 
-<!-- ══ SEARCH PANEL ════════════════════════════════════════════════════════ -->
+<!-- SEARCH PANEL -->
 <div id="search-panel">
   <div class="px-4 py-3 border-b border-[#504532]/20 bg-[#131313]">
     <div class="flex items-center gap-3 bg-[#1c1b1b] rounded-xl px-4 py-2.5 border border-[#504532]/30">
       <span class="material-symbols-outlined text-[#9c8f78] text-[18px]">search</span>
-      <input id="search-input" type="text" placeholder="Search any whisky…"
-        class="flex-1 bg-transparent text-[#e5e2e1] placeholder:text-[#504532] text-[15px] focus:outline-none" autocomplete="off"/>
-      <button id="search-close-btn" class="text-[#9c8f78] hover:text-primary transition-colors">
-        <span class="material-symbols-outlined text-[20px]">close</span>
-      </button>
+      <input id="search-input" type="text" placeholder="Search any whisky…" class="flex-1 bg-transparent text-[#e5e2e1] placeholder:text-[#504532] text-[15px] focus:outline-none" autocomplete="off"/>
+      <button id="search-close-btn"><span class="material-symbols-outlined text-[#9c8f78] text-[20px]">close</span></button>
     </div>
   </div>
   <div class="flex gap-0 px-4 border-b border-[#504532]/20 bg-[#131313] overflow-x-auto" style="scrollbar-width:none;">
@@ -170,9 +120,7 @@ body{min-height:100dvh;}
     <button class="search-tab px-4 py-3 text-[9px] font-bold uppercase tracking-wider text-[#9c8f78] shrink-0" data-tab="photo">📷 Photo</button>
   </div>
   <div class="flex-1 overflow-y-auto">
-    <div id="tab-quick" class="search-pane px-4 py-4">
-      <div id="quick-results"><p class="text-[#504532] text-[10px] text-center pt-10 uppercase tracking-wider">Type above to search…</p></div>
-    </div>
+    <div id="tab-quick" class="search-pane px-4 py-4"><div id="quick-results"><p class="text-[#504532] text-[10px] text-center pt-10 uppercase tracking-wider">Type above to search…</p></div></div>
     <div id="tab-region" class="search-pane hidden px-4 py-4">
       <p class="text-[#9c8f78] text-[9px] uppercase tracking-widest mb-3 font-bold">Select a Region</p>
       <div class="grid grid-cols-2 gap-2" id="region-grid"></div>
@@ -188,79 +136,13 @@ body{min-height:100dvh;}
       <div class="grid grid-cols-3 gap-2" id="flavour-grid"></div>
       <div id="flavour-results" class="mt-5 divide-y divide-[#504532]/15"></div>
     </div>
-    <!-- PHOTO SEARCH TAB - Gemini Flash 1.5 Vision -->
-    <div id="tab-photo" class="search-pane hidden px-4 py-4">
-      <p class="text-[#9c8f78] text-[9px] uppercase tracking-widest mb-4 font-bold">Identify by Photo</p>
-      
-      <!-- Camera capture area -->
-      <div id="photo-drop-zone" class="img-drop-zone mb-4" id="photo-drop-zone-btn">
-        <span class="material-symbols-outlined text-[#504532] text-4xl block mb-3">photo_camera</span>
-        <p class="text-[#9c8f78] text-sm font-semibold mb-1">Take or upload a photo</p>
-        <p class="text-[#504532] text-[10px] uppercase tracking-tighter">Point at any whisky label</p>
-        <input id="photo-file-input" type="file" accept="image/*" capture="environment" class="hidden" id="photo-file-input"/>
-      </div>
-
-      <!-- Preview & result area -->
-      <div id="photo-preview" class="hidden mb-4">
-        <div class="relative rounded-xl overflow-hidden bg-[#1c1b1b]">
-          <img id="photo-preview-img" class="w-full max-h-48 object-contain" alt="Preview"/>
-          <div id="photo-scanning" class="absolute inset-0 flex flex-col items-center justify-center bg-black/70 hidden">
-            <div class="w-8 h-8 border-2 border-[#FFBF00] border-t-transparent rounded-full animate-spin mb-3"></div>
-            <p class="text-[#FFE2AB] text-[11px] font-bold uppercase tracking-widest">Analysing label…</p>
-            <p class="text-[#9c8f78] text-[9px] mt-1">Gemini Flash Vision</p>
-          </div>
-        </div>
-        <button id="clear-photo-btn" class="mt-2 text-[9px] uppercase tracking-wider text-[#9c8f78] hover:text-primary transition-colors">✕ Clear photo</button>
-      </div>
-
-      <!-- Gemini result -->
-      <div id="photo-result" class="hidden">
-        <div class="bg-[#1c1b1b] rounded-xl p-4 mb-4 border border-[#FFBF00]/20">
-          <p class="text-[8px] uppercase tracking-widest text-[#FFBF00] font-bold mb-2">Gemini Vision identified:</p>
-          <p id="photo-identified" class="text-on-surface text-sm font-semibold mb-1"></p>
-          <p id="photo-confidence" class="text-[#9c8f78] text-[10px]"></p>
-        </div>
-        <div id="photo-matches" class="divide-y divide-[#504532]/15"></div>
-      </div>
-
-      <!-- Error state -->
-      <div id="photo-error" class="hidden bg-[#1c1b1b] rounded-xl p-4 border border-red-900/30">
-        <p class="text-red-400 text-[10px]" id="photo-error-msg"></p>
-        <button id="photo-drop-zone-btn" class="mt-2 text-[9px] uppercase tracking-wider text-[#FFBF00]">Try again</button>
-      </div>
-
-      <!-- Gemini key setup -->
-      <div id="gemini-key-setup" class="mt-4 bg-[#1c1b1b] rounded-xl p-4 border border-[#504532]/20">
-        <div class="flex items-start gap-3 mb-3">
-          <span class="material-symbols-outlined text-[#FFBF00] text-[16px] mt-0.5">auto_awesome</span>
-          <div>
-            <p class="text-[#FFE2AB] text-[10px] font-bold uppercase tracking-wider mb-1">Powered by Gemini Flash 1.5</p>
-            <p class="text-[#9c8f78] text-[10px] leading-relaxed">Add your free Gemini API key to enable label photo identification.</p>
-          </div>
-        </div>
-        <div id="gemini-key-form" class="space-y-2">
-          <input id="gemini-key-input" type="password" placeholder="Paste Gemini API key (AIza...)"
-            class="adv-input text-[12px]" value=""/>
-          <button id="save-gemini-key-btn" class="w-full amber-glow text-[#402d00] font-bold py-2.5 rounded-xl text-[10px] uppercase tracking-widest hover:opacity-90 transition-all">
-            Save Key
-          </button>
-          <p class="text-[#504532] text-[9px] text-center">Get a free key at <span class="text-[#FFBF00]">aistudio.google.com</span> · Stored locally, never sent to our servers</p>
-        </div>
-        <div id="gemini-key-set" class="hidden flex items-center justify-between">
-          <p class="text-[#4CAF50] text-[10px] font-bold uppercase tracking-wider">✓ Gemini key configured</p>
-          <button id="clear-gemini-key-btn" class="text-[#9c8f78] text-[9px] hover:text-red-400 transition-colors uppercase tracking-wider">Remove</button>
-        </div>
-      </div>
-    </div>
-
     <div id="tab-advanced" class="search-pane hidden px-4 py-4">
       <p class="text-[#9c8f78] text-[9px] uppercase tracking-widest mb-4 font-bold">Advanced Search</p>
       <div class="space-y-3">
         <div><label class="block text-[9px] uppercase tracking-wider text-[#9c8f78] mb-1.5">Keyword</label><input id="adv-q" type="text" placeholder="e.g. sherry, smoky…" class="adv-input"/></div>
         <div class="grid grid-cols-2 gap-3">
           <div><label class="block text-[9px] uppercase tracking-wider text-[#9c8f78] mb-1.5">Country</label>
-            <select id="adv-country" class="adv-input"><option value="">Any</option><option>Scotland</option><option>Japan</option><option>Ireland</option><option>USA</option><option>India</option><option>Taiwan</option></select>
-          </div>
+            <select id="adv-country" class="adv-input"><option value="">Any</option><option>Scotland</option><option>Japan</option><option>Ireland</option><option>USA</option><option>India</option><option>Taiwan</option></select></div>
           <div><label class="block text-[9px] uppercase tracking-wider text-[#9c8f78] mb-1.5">Bottler</label><input id="adv-bottler" type="text" placeholder="e.g. Gordon MacPhail…" class="adv-input"/></div>
         </div>
         <div class="grid grid-cols-2 gap-3">
@@ -271,14 +153,56 @@ body{min-height:100dvh;}
           <div><label class="block text-[9px] uppercase tracking-wider text-[#9c8f78] mb-1.5">Min ABV %</label><input id="adv-min-abv" type="number" placeholder="40" class="adv-input" min="0" max="100" step="0.1"/></div>
           <div><label class="block text-[9px] uppercase tracking-wider text-[#9c8f78] mb-1.5">Max ABV %</label><input id="adv-max-abv" type="number" placeholder="65" class="adv-input" min="0" max="100" step="0.1"/></div>
         </div>
-        <button id="run-adv-search-btn" class="w-full amber-glow text-[#402d00] font-headline font-bold py-3.5 rounded-xl uppercase tracking-widest text-[11px] hover:opacity-90 active:scale-[0.98] transition-all">Search</button>
+        <button id="adv-search-btn" class="w-full amber-glow text-[#402d00] font-headline font-bold py-3.5 rounded-xl uppercase tracking-widest text-[11px] hover:opacity-90 transition-all">Search</button>
       </div>
       <div id="advanced-results" class="mt-5 divide-y divide-[#504532]/15"></div>
+    </div>
+    <div id="tab-photo" class="search-pane hidden px-4 py-4">
+      <p class="text-[#9c8f78] text-[9px] uppercase tracking-widest mb-4 font-bold">Identify by Photo</p>
+      <div id="photo-drop-zone" class="img-drop-zone mb-4">
+        <span class="material-symbols-outlined text-[#504532] text-4xl block mb-3">photo_camera</span>
+        <p class="text-[#9c8f78] text-sm font-semibold mb-1">Take or upload a photo</p>
+        <p class="text-[#504532] text-[10px] uppercase tracking-tighter">Point at any whisky label</p>
+        <input id="photo-file-input" type="file" accept="image/*" capture="environment" class="hidden"/>
+      </div>
+      <div id="photo-preview" class="hidden mb-4">
+        <div class="relative rounded-xl overflow-hidden bg-[#1c1b1b]">
+          <img id="photo-preview-img" class="w-full max-h-48 object-contain"/>
+          <div id="photo-scanning" class="absolute inset-0 flex flex-col items-center justify-center bg-black/70 hidden">
+            <div class="w-8 h-8 border-2 border-[#FFBF00] border-t-transparent rounded-full animate-spin mb-3"></div>
+            <p class="text-[#FFE2AB] text-[11px] font-bold uppercase tracking-widest">Analysing label…</p>
+          </div>
+        </div>
+        <button id="clear-photo-btn" class="mt-2 text-[9px] uppercase tracking-wider text-[#9c8f78] hover:text-primary transition-colors">✕ Clear photo</button>
+      </div>
+      <div id="photo-result" class="hidden">
+        <div class="bg-[#1c1b1b] rounded-xl p-4 mb-4 border border-[#FFBF00]/20">
+          <p class="text-[8px] uppercase tracking-widest text-[#FFBF00] font-bold mb-2">Gemini Vision identified:</p>
+          <p id="photo-identified" class="text-on-surface text-sm font-semibold mb-1"></p>
+          <p id="photo-confidence" class="text-[#9c8f78] text-[10px]"></p>
+        </div>
+        <div id="photo-matches" class="divide-y divide-[#504532]/15"></div>
+      </div>
+      <div id="photo-error" class="hidden bg-[#1c1b1b] rounded-xl p-4 border border-red-900/30">
+        <p class="text-red-400 text-[10px]" id="photo-error-msg"></p>
+      </div>
+      <div class="mt-4 bg-[#1c1b1b] rounded-xl p-4 border border-[#504532]/20">
+        <p class="text-[#FFE2AB] text-[10px] font-bold uppercase tracking-wider mb-1">📷 Gemini Key</p>
+        <div id="gemini-key-form" class="space-y-2">
+          <input id="gemini-key-input" type="password" placeholder="Paste Gemini API key (AIza...)" class="adv-input text-[12px]"/>
+          <button id="save-gemini-btn" class="w-full amber-glow text-[#402d00] font-bold py-2.5 rounded-xl text-[10px] uppercase tracking-widest">Save Key</button>
+          <p class="text-[#504532] text-[9px] text-center">Get free at <span class="text-[#FFBF00]">aistudio.google.com</span></p>
+        </div>
+        <div id="gemini-key-set" class="hidden flex items-center justify-between">
+          <p class="text-[#4CAF50] text-[10px] font-bold uppercase tracking-wider">✓ Gemini configured</p>
+          <button id="clear-gemini-btn" class="text-[#9c8f78] text-[9px] hover:text-red-400">Remove</button>
+        </div>
+      </div>
     </div>
   </div>
 </div>
 
-<!-- ══ VIEWS ══════════════════════════════════════════════════════════════ -->
+<!-- MAIN VIEWS -->
 <div id="app" class="pt-14 pb-[72px]">
 
   <!-- DISCOVER -->
@@ -331,38 +255,28 @@ body{min-height:100dvh;}
   <div class="view" id="view-notes">
     <div class="px-5 pt-7 pb-4">
       <h2 class="font-headline text-[44px] font-extrabold tracking-tight leading-none mb-2">New Note.</h2>
-      <p class="text-[#9c8f78] text-sm leading-relaxed">Archive your sensory journey.</p>
     </div>
-    <form id="note-form" class="px-5 space-y-5" onsubmit="return false;">
+    <div class="px-5 space-y-5">
       <div><label class="block text-[9px] uppercase tracking-[0.22em] text-[#9c8f78] mb-1.5">Whisky Name</label>
-        <input id="note-name" type="text" class="w-full bg-surface-container-low border-none rounded-xl py-3.5 px-4 text-on-surface placeholder:text-[#504532] focus:ring-1 focus:ring-[#FFE2AB]/20 focus:bg-[#2a2a2a] transition-all outline-none text-base font-semibold" placeholder="e.g. Macallan 18 Sherry Oak"/></div>
+        <input id="note-name" type="text" class="w-full bg-surface-container-low border-none rounded-xl py-3.5 px-4 text-on-surface placeholder:text-[#504532] focus:ring-1 focus:ring-[#FFE2AB]/20 transition-all outline-none text-base font-semibold" placeholder="e.g. Macallan 18 Sherry Oak"/></div>
       <div class="grid grid-cols-2 gap-3">
         <div><label class="block text-[9px] uppercase tracking-[0.22em] text-[#9c8f78] mb-1.5">Distillery</label><input id="note-distillery" type="text" class="w-full bg-surface-container-low border-none rounded-xl py-3 px-4 text-on-surface placeholder:text-[#504532] focus:ring-1 focus:ring-[#FFE2AB]/20 transition-all outline-none text-sm" placeholder="Speyside"/></div>
         <div><label class="block text-[9px] uppercase tracking-[0.22em] text-[#9c8f78] mb-1.5">ABV %</label><input id="note-abv" type="number" step="0.1" class="w-full bg-surface-container-low border-none rounded-xl py-3 px-4 text-on-surface placeholder:text-[#504532] focus:ring-1 focus:ring-[#FFE2AB]/20 transition-all outline-none text-sm" placeholder="43.0"/></div>
       </div>
       <div class="bg-[#2a2a2a] rounded-xl p-5">
-        <h4 class="font-headline font-bold text-sm mb-0.5">Master Rating</h4>
-        <p class="text-[#9c8f78] text-[10px] mb-4">Your personal score</p>
+        <h4 class="font-headline font-bold text-sm mb-4">Your Rating</h4>
         <div class="flex justify-between" id="note-stars">
           <span class="star-btn" data-v="1">star</span><span class="star-btn" data-v="2">star</span><span class="star-btn" data-v="3">star</span><span class="star-btn" data-v="4">star</span><span class="star-btn" data-v="5">star</span>
         </div>
-        <div class="mt-4 pt-4 border-t border-[#504532]/20 space-y-3">
-          <div><div class="flex justify-between text-[9px] mb-1.5"><span class="text-[#9c8f78] uppercase tracking-tight">Complexity</span><span class="text-[#FFBF00] font-bold" id="note-cval">5.0</span></div><input id="note-complexity" type="range" min="0" max="10" step="0.5" value="5" class="w-full accent-[#FFBF00]"/></div>
-          <div><div class="flex justify-between text-[9px] mb-1.5"><span class="text-[#9c8f78] uppercase tracking-tight">Value for Money</span><span class="text-[#FFBF00] font-bold" id="note-vval">5.0</span></div><input id="note-value" type="range" min="0" max="10" step="0.5" value="5" class="w-full accent-[#FFBF00]"/></div>
-        </div>
       </div>
-      <div>
-        <h3 class="font-headline text-lg font-bold text-[#FFE2AB] mb-3">Sensory Profile</h3>
-        <div class="space-y-3">
-          <div class="bg-surface-container-low p-4 rounded-xl relative overflow-hidden"><div class="absolute right-0 top-0 opacity-[0.035] -mr-2 -mt-2 pointer-events-none"><span class="material-symbols-outlined" style="font-size:80px;">air</span></div><label class="block text-[9px] uppercase tracking-[0.2em] text-[#FFBF00] mb-2">Nose</label><textarea id="note-nose" class="w-full bg-transparent border-none p-0 text-on-surface placeholder:text-[#504532] focus:ring-0 resize-none outline-none text-sm leading-relaxed" placeholder="Aromas and first impressions…" rows="2"></textarea></div>
-          <div class="bg-surface-container-low p-4 rounded-xl relative overflow-hidden"><div class="absolute right-0 top-0 opacity-[0.035] -mr-2 -mt-2 pointer-events-none"><span class="material-symbols-outlined" style="font-size:80px;">liquor</span></div><label class="block text-[9px] uppercase tracking-[0.2em] text-[#FFBF00] mb-2">Palate</label><textarea id="note-palate" class="w-full bg-transparent border-none p-0 text-on-surface placeholder:text-[#504532] focus:ring-0 resize-none outline-none text-sm leading-relaxed" placeholder="Texture, mouthfeel, sweetness…" rows="2"></textarea></div>
-          <div class="bg-surface-container-low p-4 rounded-xl relative overflow-hidden"><div class="absolute right-0 top-0 opacity-[0.035] -mr-2 -mt-2 pointer-events-none"><span class="material-symbols-outlined" style="font-size:80px;">hourglass_empty</span></div><label class="block text-[9px] uppercase tracking-[0.2em] text-[#FFBF00] mb-2">Finish</label><textarea id="note-finish" class="w-full bg-transparent border-none p-0 text-on-surface placeholder:text-[#504532] focus:ring-0 resize-none outline-none text-sm leading-relaxed" placeholder="Length, warmth, lingering notes…" rows="2"></textarea></div>
-        </div>
+      <div class="space-y-3">
+        <div class="bg-surface-container-low p-4 rounded-xl"><label class="block text-[9px] uppercase tracking-[0.2em] text-[#FFBF00] mb-2">Nose</label><textarea id="note-nose" class="w-full bg-transparent border-none p-0 text-on-surface placeholder:text-[#504532] focus:ring-0 resize-none outline-none text-sm leading-relaxed" placeholder="Aromas and first impressions…" rows="2"></textarea></div>
+        <div class="bg-surface-container-low p-4 rounded-xl"><label class="block text-[9px] uppercase tracking-[0.2em] text-[#FFBF00] mb-2">Palate</label><textarea id="note-palate" class="w-full bg-transparent border-none p-0 text-on-surface placeholder:text-[#504532] focus:ring-0 resize-none outline-none text-sm leading-relaxed" placeholder="Texture, mouthfeel, sweetness…" rows="2"></textarea></div>
+        <div class="bg-surface-container-low p-4 rounded-xl"><label class="block text-[9px] uppercase tracking-[0.2em] text-[#FFBF00] mb-2">Finish</label><textarea id="note-finish" class="w-full bg-transparent border-none p-0 text-on-surface placeholder:text-[#504532] focus:ring-0 resize-none outline-none text-sm leading-relaxed" placeholder="Length, warmth, lingering notes…" rows="2"></textarea></div>
       </div>
-      <div><label class="block text-[9px] uppercase tracking-[0.22em] text-[#9c8f78] mb-1.5">Location (optional)</label><input id="note-location" type="text" class="w-full bg-surface-container-low border-none rounded-xl py-3 px-4 text-on-surface placeholder:text-[#504532] focus:ring-1 focus:ring-[#FFE2AB]/20 transition-all outline-none text-sm" placeholder="Where are you enjoying this?"/></div>
-      <button type="button" id="save-note-btn" class="w-full amber-glow text-[#402d00] font-headline font-bold py-4 rounded-xl uppercase tracking-widest text-[11px] hover:opacity-90 active:scale-[0.98] transition-all shadow-[0_8px_28px_rgba(255,191,0,0.18)]">Archive Tasting Note</button>
+      <button id="save-note-btn" class="w-full amber-glow text-[#402d00] font-headline font-bold py-4 rounded-xl uppercase tracking-widest text-[11px] hover:opacity-90 active:scale-[0.98] transition-all">Archive Tasting Note</button>
       <div class="h-4"></div>
-    </form>
+    </div>
   </div>
 
   <!-- CELLAR -->
@@ -371,15 +285,11 @@ body{min-height:100dvh;}
       <p class="text-[#D4C5AB] text-[9px] uppercase tracking-[0.22em] mb-1 font-semibold">Your Journey</p>
       <h2 class="font-headline text-[44px] font-extrabold tracking-tight leading-none">Cellar.</h2>
     </div>
-    <!-- User info card -->
     <div class="px-5 mb-4">
       <div class="bg-surface-container-low rounded-xl p-4 flex items-center justify-between">
         <div class="flex items-center gap-3">
           <div id="cellar-avatar" class="w-10 h-10 rounded-full amber-glow flex items-center justify-center text-[#402d00] text-sm font-black">?</div>
-          <div>
-            <p id="cellar-email" class="text-[#e5e2e1] text-sm font-semibold truncate max-w-[180px]">Loading…</p>
-            <p class="text-[#9c8f78] text-[9px] uppercase tracking-wider">Member</p>
-          </div>
+          <div><p id="cellar-email" class="text-[#e5e2e1] text-sm font-semibold truncate max-w-[180px]">Loading…</p><p class="text-[#9c8f78] text-[9px] uppercase tracking-wider">Member</p></div>
         </div>
         <button id="signout-btn" class="text-[9px] uppercase tracking-wider font-bold text-[#9c8f78] hover:text-red-400 transition-colors border border-[#504532]/40 px-3 py-1.5 rounded-full">Sign Out</button>
       </div>
@@ -387,7 +297,7 @@ body{min-height:100dvh;}
     <div class="px-5 mb-6">
       <div class="bg-surface-container-low rounded-xl p-5 flex justify-between items-center">
         <div><p class="text-[9px] uppercase tracking-widest text-[#9c8f78]">Total Check-ins</p><p class="font-headline text-[42px] font-bold text-[#FFBF00] leading-none" id="cellar-total">0</p></div>
-        <div class="w-12 h-12 rounded-full bg-[#FFBF00]/10 flex items-center justify-center"><span class="material-symbols-outlined text-[#FFBF00]" style="font-size:22px;">inventory_2</span></div>
+        <span class="material-symbols-outlined text-[#FFBF00] text-4xl">inventory_2</span>
       </div>
     </div>
     <div class="px-5">
@@ -401,8 +311,8 @@ body{min-height:100dvh;}
   <!-- DETAIL -->
   <div class="view" id="view-detail">
     <div class="flex items-center justify-between px-5 pt-3 pb-1">
-      <button id="go-back-btn" class="flex items-center gap-1 text-[#9c8f78] hover:text-primary transition-colors text-sm"><span class="material-symbols-outlined" style="font-size:18px;">arrow_back</span><span class="font-semibold">Back</span></button>
-      <button id="detail-checkin-btn" id="detail-checkin-action" class="text-[9px] uppercase tracking-widest font-bold text-primary border border-primary/30 px-4 py-2 rounded-full hover:bg-primary/10 transition-all">Check In</button>
+      <button id="back-btn" class="flex items-center gap-1 text-[#9c8f78] hover:text-primary transition-colors text-sm"><span class="material-symbols-outlined" style="font-size:18px;">arrow_back</span><span class="font-semibold">Back</span></button>
+      <button id="detail-checkin-btn" class="text-[9px] uppercase tracking-widest font-bold text-primary border border-primary/30 px-4 py-2 rounded-full hover:bg-primary/10 transition-all">Check In</button>
     </div>
     <div id="detail-content" class="px-5 pb-6"></div>
   </div>
@@ -411,10 +321,10 @@ body{min-height:100dvh;}
 
 <!-- BOTTOM NAV -->
 <nav class="fixed bottom-0 left-0 w-full flex justify-around items-center h-[68px] px-2 pb-2 bg-[#1C1B1B]/93 backdrop-blur-lg z-50 rounded-t-2xl shadow-[0_-8px_28px_rgba(0,0,0,0.5)] border-t border-[#504532]/15">
-  <button class="nav-btn flex flex-col items-center justify-center px-4 py-1 rounded-xl" data-v="discover" onclick="showView('discover')"><span class="material-symbols-outlined nav-icon" style="font-size:22px;">explore</span><span class="text-[8px] font-bold uppercase tracking-tight mt-0.5">Discover</span></button>
-  <button class="nav-btn flex flex-col items-center justify-center px-4 py-1 rounded-xl" data-v="library" onclick="showView('library')"><span class="material-symbols-outlined nav-icon" style="font-size:22px;">shelves</span><span class="text-[8px] font-bold uppercase tracking-tight mt-0.5">Library</span></button>
-  <button class="nav-btn flex flex-col items-center justify-center px-4 py-1 rounded-xl" data-v="notes" onclick="showView('notes')"><span class="material-symbols-outlined nav-icon" style="font-size:22px;">edit_note</span><span class="text-[8px] font-bold uppercase tracking-tight mt-0.5">Notes</span></button>
-  <button class="nav-btn flex flex-col items-center justify-center px-4 py-1 rounded-xl" data-v="cellar" onclick="showView('cellar')"><span class="material-symbols-outlined nav-icon" style="font-size:22px;">inventory_2</span><span class="text-[8px] font-bold uppercase tracking-tight mt-0.5">Cellar</span></button>
+  <button class="nav-btn flex flex-col items-center justify-center px-4 py-1 rounded-xl" data-v="discover"><span class="material-symbols-outlined nav-icon" style="font-size:22px;">explore</span><span class="text-[8px] font-bold uppercase tracking-tight mt-0.5">Discover</span></button>
+  <button class="nav-btn flex flex-col items-center justify-center px-4 py-1 rounded-xl" data-v="library"><span class="material-symbols-outlined nav-icon" style="font-size:22px;">shelves</span><span class="text-[8px] font-bold uppercase tracking-tight mt-0.5">Library</span></button>
+  <button class="nav-btn flex flex-col items-center justify-center px-4 py-1 rounded-xl" data-v="notes"><span class="material-symbols-outlined nav-icon" style="font-size:22px;">edit_note</span><span class="text-[8px] font-bold uppercase tracking-tight mt-0.5">Notes</span></button>
+  <button class="nav-btn flex flex-col items-center justify-center px-4 py-1 rounded-xl" data-v="cellar"><span class="material-symbols-outlined nav-icon" style="font-size:22px;">inventory_2</span><span class="text-[8px] font-bold uppercase tracking-tight mt-0.5">Cellar</span></button>
 </nav>
 
 <!-- CHECK-IN MODAL -->
@@ -423,12 +333,11 @@ body{min-height:100dvh;}
     <div class="w-8 h-1 bg-[#504532]/50 rounded-full mx-auto mt-3"></div>
     <div class="flex justify-between items-center px-5 py-3 border-b border-[#504532]/15">
       <h3 class="font-headline font-bold text-base">Check In</h3>
-      <button id="modal-close-btn" class="text-[#9c8f78] hover:text-primary transition-colors"><span class="material-symbols-outlined" style="font-size:22px;">close</span></button>
+      <button id="modal-close-btn"><span class="material-symbols-outlined text-[#9c8f78] hover:text-primary" style="font-size:22px;">close</span></button>
     </div>
     <div class="px-5 py-4 space-y-4">
       <div id="modal-whisky-info" class="text-center py-2"></div>
-      <div>
-        <label class="block text-[9px] uppercase tracking-[0.22em] text-[#9c8f78] mb-2">Your Rating</label>
+      <div><label class="block text-[9px] uppercase tracking-[0.22em] text-[#9c8f78] mb-2">Your Rating</label>
         <div class="flex justify-center gap-3" id="modal-stars">
           <span class="star-btn" data-v="1">star</span><span class="star-btn" data-v="2">star</span><span class="star-btn" data-v="3">star</span><span class="star-btn" data-v="4">star</span><span class="star-btn" data-v="5">star</span>
         </div>
@@ -445,217 +354,143 @@ body{min-height:100dvh;}
 <div id="toast"></div>
 
 <script>
-// ══ CONFIG ═════════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════════
+// THE MODERN CASK — Clean single-script architecture
+// All code in one block, correct execution order
+// ═══════════════════════════════════════════════════════════════
+
+// ── CONFIG ──────────────────────────────────────────────────────
 const SUPABASE_URL  = 'https://nluezhsmgwuqdryarrmd.supabase.co';
 const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5sdWV6aHNtZ3d1cWRyeWFycm1kIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU0MDMyODMsImV4cCI6MjA5MDk3OTI4M30.61Gt5y8k46nIBjtlpyu3n2B4RVcHpPYI1WBRoqnTOYM';
-
-// API — uses Netlify proxy when deployed, falls back to direct when local
-// API routing — use proxy when on Netlify (functions deployed via Git)
-// Direct API when accessed locally or via drag-and-drop (no functions)
-const IS_NETLIFY = window.location.hostname.endsWith('.netlify.app') ||
-                   window.location.hostname.endsWith('.netlify.com');
 const API_PROXY  = '/.netlify/functions/whisky';
 const API_DIRECT = 'https://thewhiskyedition.com/api/whisky-reviews';
+const IS_NETLIFY = window.location.hostname.endsWith('.netlify.app');
 
-// ══ SUPABASE CLIENT ════════════════════════════════════════════════════════
-const { createClient } = supabase;
-const sb = createClient(SUPABASE_URL, SUPABASE_ANON, {
-  auth: {
-    detectSessionInUrl: true,
-    flowType: 'implicit',
-  }
+// ── SUPABASE ─────────────────────────────────────────────────────
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON, {
+  auth: { detectSessionInUrl: true, flowType: 'implicit' }
 });
 
-// ══ STATE ══════════════════════════════════════════════════════════════════
+// ── STATE ─────────────────────────────────────────────────────────
 const S = {
-  user: null,
-  whiskies:[], checkins:[], manualNotes:[],
-  current:null, modalRating:0, noteRating:0,
-  history:['discover'], page:1, totalPages:99,
-  filter:'all', busy:false, debounce:null
+  user: null, whiskies: [], checkins: [], manualNotes: [],
+  current: null, modalRating: 0, noteRating: 0,
+  history: ['discover'], page: 1, totalPages: 99,
+  filter: 'all', busy: false, debounce: null
 };
-
-// ══ FALLBACK DATA ══════════════════════════════════════════════════════════
-const FALLBACK = [
-  {id:1,slug:'lagavulin-16',name:'Lagavulin 16 Year Old',description:'One of Islay\'s crown jewels.',image:{url:'https://thewhiskyedition.com/wp-content/uploads/lagavulin-16.jpg'},metadata:{distillery:'Lagavulin',region:'Islay',country:'Scotland',abv:43,age:16,flavour:'Peated'},rating:{marcel:94,sascha:92},tasting_notes:{nose:'Intense peat smoke, iodine, seaweed.',palate:'Full-bodied, rich with dried fruit and coffee.',finish:'Very long, smoky, warming.'}},
-  {id:2,slug:'macallan-12-sherry',name:'Macallan 12 Sherry Oak',description:'The quintessential sherry-matured Scotch.',image:{url:''},metadata:{distillery:'The Macallan',region:'Speyside',country:'Scotland',abv:40,age:12,flavour:'Sherry'},rating:{marcel:91,sascha:90},tasting_notes:{nose:'Christmas spice, dried fruit, sherry.',palate:'Rich — dried fruit, toffee, warming oak.',finish:'Long, spicy with sherry sweetness.'}},
-  {id:3,slug:'ardbeg-10',name:'Ardbeg 10 Year Old',description:'Non-chill filtered at 46% — exceptional depth.',image:{url:''},metadata:{distillery:'Ardbeg',region:'Islay',country:'Scotland',abv:46,age:10,flavour:'Peated'},rating:{marcel:93,sascha:94},tasting_notes:{nose:'Smoke, dark chocolate, lemon zest.',palate:'Intense peat, citrus, coffee.',finish:'Long, smoky, dry and spiced.'}},
-  {id:4,slug:'yamazaki-12',name:'Yamazaki 12 Year Old',description:'Japan\'s pioneering single malt.',image:{url:''},metadata:{distillery:'Yamazaki',region:'Japan',country:'Japan',abv:43,age:12,flavour:'Fruity'},rating:{marcel:95,sascha:94},tasting_notes:{nose:'Peach, pineapple, grapefruit.',palate:'Rich — honey, red berries, coconut.',finish:'Long and elegant, with ginger.'}},
-  {id:5,slug:'springbank-10',name:'Springbank 10 Year Old',description:'Campbeltown\'s pride.',image:{url:''},metadata:{distillery:'Springbank',region:'Campbeltown',country:'Scotland',abv:46,age:10,flavour:'Maritime'},rating:{marcel:92,sascha:91},tasting_notes:{nose:'Brine, pear drops, light smoke.',palate:'Complex, oily, maritime salt.',finish:'Long and satisfying — salty and sweet.'}},
-  {id:6,slug:'highland-park-12',name:'Highland Park 12 Year Old',description:'Scotland\'s northernmost distillery.',image:{url:''},metadata:{distillery:'Highland Park',region:'Orkney',country:'Scotland',abv:40,age:12,flavour:'Peated'},rating:{marcel:88,sascha:87},tasting_notes:{nose:'Heather honey, smoke, dried fruit.',palate:'Balanced — smoky, sweet, malty.',finish:'Smooth, gently peated.'}},
-];
-
+const BOTTLE_IMAGES = {};
 const REGIONS  = ['Islay','Speyside','Highland','Lowland','Campbeltown','Islands','Orkney','Japan','Ireland'];
 const FLAVOURS = ['Peated','Sherry','Fruity','Floral','Maritime','Smoky','Spicy','Light','Rich','Complex'];
 const FLAVOUR_EMOJI = {'Peated':'🔥','Sherry':'🍷','Fruity':'🍊','Floral':'🌸','Maritime':'🌊','Smoky':'💨','Spicy':'🌶️','Light':'☁️','Rich':'✨','Complex':'🎯'};
+const FALLBACK = [
+  {id:1,slug:'lagavulin-16',name:'Lagavulin 16 Year Old',description:'One of Islay\'s crown jewels.',metadata:{distillery:'Lagavulin',region:'Islay',country:'Scotland',abv:43,age:16,flavour:'Peated'},rating:{marcel:94,sascha:92},tasting_notes:{nose:'Intense peat smoke, iodine, seaweed.',palate:'Full-bodied, rich with dried fruit.',finish:'Very long, smoky, warming.'}},
+  {id:2,slug:'macallan-12-sherry',name:'Macallan 12 Sherry Oak',description:'The quintessential sherry-matured Scotch.',metadata:{distillery:'The Macallan',region:'Speyside',country:'Scotland',abv:40,age:12,flavour:'Sherry'},rating:{marcel:91,sascha:90},tasting_notes:{nose:'Christmas spice, dried fruit, sherry.',palate:'Rich — dried fruit, toffee, oak.',finish:'Long, spicy with sherry sweetness.'}},
+  {id:3,slug:'ardbeg-10',name:'Ardbeg 10 Year Old',description:'Non-chill filtered at 46% — exceptional depth.',metadata:{distillery:'Ardbeg',region:'Islay',country:'Scotland',abv:46,age:10,flavour:'Peated'},rating:{marcel:93,sascha:94},tasting_notes:{nose:'Smoke, dark chocolate, lemon zest.',palate:'Intense peat, citrus, coffee.',finish:'Long, smoky, dry and spiced.'}},
+  {id:4,slug:'yamazaki-12',name:'Yamazaki 12 Year Old',description:'Japan\'s pioneering single malt.',metadata:{distillery:'Yamazaki',region:'Japan',country:'Japan',abv:43,age:12,flavour:'Fruity'},rating:{marcel:95,sascha:94},tasting_notes:{nose:'Peach, pineapple, grapefruit.',palate:'Rich — honey, red berries, coconut.',finish:'Long and elegant, with ginger.'}},
+  {id:5,slug:'springbank-10',name:'Springbank 10 Year Old',description:'Campbeltown\'s pride.',metadata:{distillery:'Springbank',region:'Campbeltown',country:'Scotland',abv:46,age:10,flavour:'Maritime'},rating:{marcel:92,sascha:91},tasting_notes:{nose:'Brine, pear drops, light smoke.',palate:'Complex, oily, maritime salt.',finish:'Long and satisfying.'}},
+  {id:6,slug:'highland-park-12',name:'Highland Park 12 Year Old',description:'Scotland\'s northernmost distillery.',metadata:{distillery:'Highland Park',region:'Orkney',country:'Scotland',abv:40,age:12,flavour:'Peated'},rating:{marcel:88,sascha:87},tasting_notes:{nose:'Heather honey, smoke, dried fruit.',palate:'Balanced — smoky, sweet, malty.',finish:'Smooth, gently peated.'}},
+  {id:7,slug:'laphroaig-10',name:'Laphroaig 10 Year Old',description:'Arguably the most distinctive whisky.',metadata:{distillery:'Laphroaig',region:'Islay',country:'Scotland',abv:40,age:10,flavour:'Peated'},rating:{marcel:89,sascha:88},tasting_notes:{nose:'Medicinal, seaweed, bonfire smoke.',palate:'Full, peaty with hidden sweetness.',finish:'Long, dry and remarkably smoky.'}},
+  {id:8,slug:'glenfiddich-12',name:'Glenfiddich 12 Year Old',description:'The world\'s most awarded single malt.',metadata:{distillery:'Glenfiddich',region:'Speyside',country:'Scotland',abv:40,age:12,flavour:'Fruity'},rating:{marcel:84,sascha:83},tasting_notes:{nose:'Fresh pear, creamy and subtle oak.',palate:'Smooth, malty with vanilla.',finish:'Clean and lingering.'}},
+  {id:9,slug:'glenlivet-12',name:'Glenlivet 12 Year Old',description:'The definitive Speyside single malt.',metadata:{distillery:'The Glenlivet',region:'Speyside',country:'Scotland',abv:40,age:12,flavour:'Floral'},rating:{marcel:83,sascha:82},tasting_notes:{nose:'Floral, citrus and vanilla.',palate:'Smooth, honeyed with tropical fruit.',finish:'Clean and medium length.'}},
+  {id:10,slug:'talisker-10',name:'Talisker 10 Year Old',description:'The king of the Hebrides.',metadata:{distillery:'Talisker',region:'Islands',country:'Scotland',abv:45.8,age:10,flavour:'Peated'},rating:{marcel:91,sascha:90},tasting_notes:{nose:'Intense pepper, smoke and brine.',palate:'Rich and warming with sweet fruit.',finish:'Famously long and peppery.'}},
+  {id:11,slug:'balvenie-12-doublewood',name:'Balvenie 12 DoubleWood',description:'Finished in sherry casks — classic Speyside.',metadata:{distillery:'The Balvenie',region:'Speyside',country:'Scotland',abv:40,age:12,flavour:'Sherry'},rating:{marcel:88,sascha:87},tasting_notes:{nose:'Honey, vanilla and light sherry.',palate:'Rich with dried fruit and cinnamon.',finish:'Smooth and warming.'}},
+  {id:12,slug:'oban-14',name:'Oban 14 Year Old',description:'The gateway to the Western Highlands.',metadata:{distillery:'Oban',region:'Highland',country:'Scotland',abv:43,age:14,flavour:'Maritime'},rating:{marcel:87,sascha:86},tasting_notes:{nose:'Brine, heather and citrus peel.',palate:'Medium body, smooth and complex.',finish:'Dry and slightly smoky.'}}
+];
 
-// ══ HELPERS ════════════════════════════════════════════════════════════════
+// ── HELPERS ───────────────────────────────────────────────────────
 function bColour(r=''){const v=(r||'').toLowerCase();if(v.includes('islay'))return['#4a7a8a','#2a5a6a'];if(v.includes('speyside'))return['#5a8a4a','#3a6a2a'];if(v.includes('highland')||v.includes('orkney'))return['#8a6a3a','#6a4a1a'];if(v.includes('lowland'))return['#6a8a5a','#4a6a3a'];if(v.includes('campbeltown'))return['#8a5a4a','#6a3a2a'];if(v.includes('japan'))return['#8a5a5a','#6a3a3a'];if(v.includes('ireland'))return['#4a8a5a','#2a6a3a'];return['#6a7a8a','#4a5a6a'];}
-function bSVG(region,w=32,h=56){const[c1,c2]=bColour(region);return`<svg width="${w}" height="${h}" viewBox="0 0 40 70" fill="none"><rect x="15" y="0" width="10" height="5" rx="1" fill="#2a2624"/><path d="M17 5L17 14L13 18L13 65C13 67 15 69 20 69C25 69 27 67 27 65L27 18L23 14L23 5Z" fill="${c1}" opacity=".9"/><rect x="17" y="5" width="6" height="8" fill="${c1}"/><rect x="14" y="30" width="12" height="20" rx="1" fill="#f8f6f3" opacity=".95"/><rect x="15" y="32" width="10" height="2" fill="${c2}"/><path d="M14 52L14 65C14 66.5 16 68 20 68C24 68 26 66.5 26 65L26 52Z" fill="${c2}" opacity=".4"/><path d="M15 18L15 60L16 60L16 18Z" fill="white" opacity=".12"/></svg>`;}
-
-// ── BOTTLE IMAGE MAP ── populated by admin dashboard uploads
-// Format: { "whisky-slug": "https://supabase.co/storage/.../slug.jpg" }
-const BOTTLE_IMAGES = {};
-
-// ── BOTTLE IMAGE WITH LABEL ──
-function bottleImg(w, listSize=false) {
-  // Check Supabase-hosted images first
-  const slug = w?.slug || String(w?.id || '');
-  const ownUrl = BOTTLE_IMAGES[slug];
-  if (ownUrl) {
-    const sz = listSize ? 'width:32px;height:56px' : 'width:120px;height:180px';
-    return `<img src="${ownUrl}" alt="${w?.name||''}" style="${sz};object-fit:contain;flex-shrink:0" loading="lazy"/>`;
-  }
-  const region = w?.metadata?.region || '';
-  const distillery = w?.metadata?.distillery || w?.name || '';
-  const age = w?.metadata?.age || '';
-  
-  if (listSize) {
-    return bottleSVGWithLabel(region, distillery, age, 32, 56);
-  } else {
-    return bottleSVGWithLabel(region, distillery, age, 52, 91);
-  }
-}
-
-// Enhanced SVG bottle with label text
-function bottleSVGWithLabel(region, distillery, age, w, h) {
-  const [c1, c2] = bColour(region);
-  // Short label - first word of distillery or first 6 chars
-  const label = (distillery.split(' ')[0] || '').substring(0, 7).toUpperCase();
-  const ageText = age ? age + 'YR' : '';
-  const vw = 40; const vh = 70;
-  return `<svg width="${w}" height="${h}" viewBox="0 0 ${vw} ${vh}" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <rect x="15" y="0" width="10" height="5" rx="1" fill="#2a2624"/>
-    <path d="M17 5L17 14L13 18L13 65C13 67 15 69 20 69C25 69 27 67 27 65L27 18L23 14L23 5Z" fill="${c1}" opacity=".9"/>
-    <rect x="17" y="5" width="6" height="8" fill="${c1}"/>
-    <rect x="13.5" y="29" width="13" height="22" rx="1" fill="#f5f0e8" opacity=".97"/>
-    <rect x="14.5" y="30" width="11" height="2.5" fill="${c2}" opacity=".9"/>
-    <text x="20" y="38" font-family="Arial,sans-serif" font-size="3.2" font-weight="700" fill="#2a2420" text-anchor="middle" letter-spacing="0.2">${label}</text>
-    ${ageText ? `<text x="20" y="43" font-family="Arial,sans-serif" font-size="2.8" fill="${c2}" text-anchor="middle" font-weight="600">${ageText}</text>` : ''}
-    <rect x="14.5" y="48" width="11" height="1.5" fill="${c2}" opacity=".5"/>
-    <path d="M14 52L14 65C14 66.5 16 68 20 68C24 68 26 66.5 26 65L26 52Z" fill="${c2}" opacity=".4"/>
-    <path d="M15 18L15 62L16 62L16 18Z" fill="white" opacity=".1"/>
-  </svg>`;
-}
-
-function rBadge(region=''){const r=(region||'').toLowerCase();let cls='region-other';if(r.includes('islay'))cls='region-islay';else if(r.includes('speyside'))cls='region-speyside';else if(r.includes('highland')||r.includes('orkney'))cls='region-highland';else if(r.includes('lowland'))cls='region-lowland';else if(r.includes('campbeltown'))cls='region-campbeltown';else if(r.includes('island'))cls='region-islands';else if(r.includes('japan'))cls='region-japan';else if(r.includes('ireland'))cls='region-ireland';return`<span class="${cls} text-[8px] uppercase tracking-wider font-bold px-2 py-0.5 rounded-full">${region||'Unknown'}</span>`;}
-function avgR(w){const m=w.rating?.marcel,s=w.rating?.sascha;if(m&&s)return((m+s)/2).toFixed(1);if(m)return m.toFixed(1);return'—';}
+function bSVG(region,w=32,h=56){const[c1,c2]=bColour(region);const label=(region||'').split(' ')[0].substring(0,6).toUpperCase();return `<svg width="${w}" height="${h}" viewBox="0 0 40 70" fill="none"><rect x="15" y="0" width="10" height="5" rx="1" fill="#2a2624"/><path d="M17 5L17 14L13 18L13 65C13 67 15 69 20 69C25 69 27 67 27 65L27 18L23 14L23 5Z" fill="${c1}" opacity=".9"/><rect x="17" y="5" width="6" height="8" fill="${c1}"/><rect x="13.5" y="29" width="13" height="6" rx="1" fill="${c2}" opacity=".95"/><text x="20" y="34" font-family="Arial,sans-serif" font-size="3.5" font-weight="700" fill="#ffffff" text-anchor="middle">${label}</text><rect x="14" y="38" width="12" height="13" rx="1" fill="#f5f0e8" opacity=".95"/><path d="M14 52L14 65C14 66.5 16 68 20 68C24 68 26 66.5 26 65L26 52Z" fill="${c2}" opacity=".4"/><path d="M15 18L15 62L16 62L16 18Z" fill="white" opacity=".1"/></svg>`;}
+function bottleImg(w,small=false){const slug=w?.slug||String(w?.id||'');if(BOTTLE_IMAGES[slug]){const sz=small?'width:32px;height:56px':'width:120px;height:180px';return `<img src="${BOTTLE_IMAGES[slug]}" style="${sz};object-fit:contain;flex-shrink:0" loading="lazy"/>`;}return bSVG(w?.metadata?.region,small?32:52,small?56:91);}
+function rBadge(r=''){const v=(r||'').toLowerCase();let cls='region-other';if(v.includes('islay'))cls='region-islay';else if(v.includes('speyside'))cls='region-speyside';else if(v.includes('highland')||v.includes('orkney'))cls='region-highland';else if(v.includes('lowland'))cls='region-lowland';else if(v.includes('campbeltown'))cls='region-campbeltown';else if(v.includes('island'))cls='region-islands';else if(v.includes('japan'))cls='region-japan';else if(v.includes('ireland'))cls='region-ireland';return `<span class="${cls} text-[8px] uppercase tracking-wider font-bold px-2 py-0.5 rounded-full">${r||'Unknown'}</span>`;}
+function avgR(w){const m=w?.rating?.marcel,s=w?.rating?.sascha;if(m&&s)return((m+s)/2).toFixed(1);if(m)return m.toFixed(1);return'—';}
 function starsHTML(n,max=5,sz=12){return[...Array(max)].map((_,i)=>`<span class="material-symbols-outlined" style="font-size:${sz}px;color:${i<n?'#FFBF00':'#504532'};font-variation-settings:'FILL' ${i<n?1:0};">star</span>`).join('');}
 function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2400);}
-function initials(email){return email?email.substring(0,2).toUpperCase():'?';}
-function emptyState(msg='No results'){return`<div class="py-12 text-center"><span class="material-symbols-outlined text-[#504532] text-4xl block mb-3">search_off</span><p class="text-[#9c8f78] text-[11px] uppercase tracking-widest font-bold">${msg}</p></div>`;}
+function ini(email){return email?email.substring(0,2).toUpperCase():'?';}
+function emptyEl(msg='No results'){return `<div class="py-12 text-center"><span class="material-symbols-outlined text-[#504532] text-4xl block mb-3">search_off</span><p class="text-[#9c8f78] text-[11px] uppercase tracking-widest font-bold">${msg}</p></div>`;}
+function skel(){return '<div class="skeleton h-14 rounded-xl my-2"></div><div class="skeleton h-14 rounded-xl my-2" style="animation-delay:.1s"></div>';}
 
-// ══ AUTH ═══════════════════════════════════════════════════════════════════
-function switchAuthTab(tab) {
-  document.getElementById('form-signin').classList.toggle('hidden', tab!=='signin');
-  document.getElementById('form-signup').classList.toggle('hidden', tab!=='signup');
-  document.getElementById('tab-signin').className = `flex-1 py-2.5 text-[10px] font-bold uppercase tracking-wider border-b-2 ${tab==='signin'?'text-[#FFE2AB] border-[#FFBF00]':'text-[#9c8f78] border-transparent'}`;
-  document.getElementById('tab-signup').className = `flex-1 py-2.5 text-[10px] font-bold uppercase tracking-wider border-b-2 ${tab==='signup'?'text-[#FFE2AB] border-[#FFBF00]':'text-[#9c8f78] border-transparent'}`;
-}
-
-async function handleSignIn(e) {
+// ── AUTH ──────────────────────────────────────────────────────────
+async function signIn(e){
   e.preventDefault();
-  const email = document.getElementById('signin-email').value;
-  const pass  = document.getElementById('signin-password').value;
-  const errEl = document.getElementById('signin-error');
-  const { error } = await sb.auth.signInWithPassword({ email, password: pass });
-  if (error) { errEl.textContent = error.message; errEl.classList.remove('hidden'); }
+  const email=document.getElementById('signin-email').value;
+  const pass=document.getElementById('signin-password').value;
+  const errEl=document.getElementById('signin-error');
+  const {error}=await sb.auth.signInWithPassword({email,password:pass});
+  if(error){errEl.textContent=error.message;errEl.classList.remove('hidden');}
   else errEl.classList.add('hidden');
 }
-
-async function handleSignUp(e) {
+async function signUp(e){
   e.preventDefault();
-  const email = document.getElementById('signup-email').value;
-  const pass  = document.getElementById('signup-password').value;
-  const errEl = document.getElementById('signup-error');
-  const { error } = await sb.auth.signUp({ email, password: pass });
-  if (error) { errEl.textContent = error.message; errEl.classList.remove('hidden'); }
-  else { errEl.classList.add('hidden'); showToast('Check your email to confirm your account'); }
+  const email=document.getElementById('signup-email').value;
+  const pass=document.getElementById('signup-password').value;
+  const errEl=document.getElementById('signup-error');
+  const {error}=await sb.auth.signUp({email,password:pass});
+  if(error){errEl.textContent=error.message;errEl.classList.remove('hidden');}
+  else{errEl.classList.add('hidden');showToast('Check your email to confirm your account');}
 }
-
-async function handleGoogleSignIn() {
-  await sb.auth.signInWithOAuth({
-    provider: 'google',
-    options: { redirectTo: window.location.href }
-  });
+async function googleSignIn(){
+  await sb.auth.signInWithOAuth({provider:'google',options:{redirectTo:window.location.origin}});
 }
-
-async function handleSignOut() {
+async function signOut(){
   await sb.auth.signOut();
-  S.user = null;
-  S.checkins = [];
-  S.manualNotes = [];
-  document.getElementById('auth-overlay').style.display = 'flex';
 }
-
-function onUserSignedIn(user) {
-  S.user = user;
-  document.getElementById('auth-overlay').style.display = 'none';
-  // Update avatar everywhere
-  const ini = initials(user.email);
-  document.getElementById('avatar-btn').textContent = ini;
-  document.getElementById('cellar-avatar').textContent = ini;
-  document.getElementById('cellar-email').textContent = user.email;
+function switchAuthTab(tab){
+  document.getElementById('form-signin').classList.toggle('hidden',tab!=='signin');
+  document.getElementById('form-signup').classList.toggle('hidden',tab!=='signup');
+  document.getElementById('tab-signin-btn').className=`flex-1 py-2.5 text-[10px] font-bold uppercase tracking-wider border-b-2 ${tab==='signin'?'text-[#FFE2AB] border-[#FFBF00]':'text-[#9c8f78] border-transparent'}`;
+  document.getElementById('tab-signup-btn').className=`flex-1 py-2.5 text-[10px] font-bold uppercase tracking-wider border-b-2 ${tab==='signup'?'text-[#FFE2AB] border-[#FFBF00]':'text-[#9c8f78] border-transparent'}`;
+}
+function showAuth(){document.getElementById('auth-overlay').style.display='flex';}
+function hideAuth(){document.getElementById('auth-overlay').style.display='none';}
+function onSignedIn(user){
+  S.user=user;
+  hideAuth();
+  const ini2=ini(user.email);
+  document.getElementById('avatar-btn').textContent=ini2;
+  document.getElementById('cellar-avatar').textContent=ini2;
+  document.getElementById('cellar-email').textContent=user.email;
   loadUserData();
 }
 
-// ══ SUPABASE DATA ══════════════════════════════════════════════════════════
-async function loadUserData() {
-  const uid = S.user?.id;
-  if (!uid) return;
-
-  // Load check-ins
-  const { data: checkins } = await sb.from('checkins').select('*').eq('user_id', uid).order('date', { ascending: false });
-  S.checkins = checkins || [];
-
-  // Load manual notes
-  const { data: notes } = await sb.from('manual_notes').select('*').eq('user_id', uid).order('date', { ascending: false });
-  S.manualNotes = notes || [];
-
-  renderLibrary();
-  renderCellar();
+// ── USER DATA ──────────────────────────────────────────────────────
+async function loadUserData(){
+  if(!S.user) return;
+  const[{data:ci},{data:mn}]=await Promise.all([
+    sb.from('checkins').select('*').eq('user_id',S.user.id).order('date',{ascending:false}),
+    sb.from('manual_notes').select('*').eq('user_id',S.user.id).order('date',{ascending:false})
+  ]);
+  S.checkins=ci||[];S.manualNotes=mn||[];
+  renderLibrary();renderCellar();
+}
+async function loadBottleImages(){
+  try{const{data}=await sb.from('bottle_images').select('slug,image_url');if(data)data.forEach(r=>{BOTTLE_IMAGES[r.slug]=r.image_url;});}catch(e){}
 }
 
-async function saveCheckin(checkin) {
-  const row = { ...checkin, user_id: S.user?.id };
-  await sb.from('checkins').upsert(row, { onConflict: 'id' });
-}
-
-async function saveManualNoteDB(note) {
-  const row = { ...note, user_id: S.user?.id };
-  await sb.from('manual_notes').insert(row);
-}
-
-// ══ WHISKY:EDITION API ════════════════════════════════════════════════════
-async function apiGet(params={}) {
-  const p = new URLSearchParams({ type:'Single Malt', ...params });
-  try {
-    const url = IS_NETLIFY ? `${API_PROXY}?${p}` : `${API_DIRECT}?${p}`;
-    const r = await fetch(url, { signal: AbortSignal.timeout(10000) });
-    if (!r.ok) throw new Error(`${r.status}`);
+// ── API ────────────────────────────────────────────────────────────
+async function apiGet(params={}){
+  const p=new URLSearchParams({type:'Single Malt',...params});
+  const url=IS_NETLIFY?`${API_PROXY}?${p}`:`${API_DIRECT}?${p}`;
+  try{
+    const r=await fetch(url,{signal:AbortSignal.timeout(10000)});
+    if(!r.ok)throw new Error(r.status);
     return await r.json();
-  } catch(e) {
-    console.warn('API error:', e.message);
-    return null;
-  }
+  }catch(e){return null;}
 }
-
-function setAPIStatus(ok) {
-  const el = document.getElementById('api-status');
-  el.className = ok
-    ? 'mx-5 mb-3 px-3 py-1.5 rounded-lg text-[9px] bg-[#1B5E20]/30 border border-[#4CAF50]/20 text-[#4CAF50] font-semibold uppercase tracking-wider'
-    : 'mx-5 mb-3 px-3 py-1.5 rounded-lg text-[9px] bg-[#504532]/20 border border-[#504532]/30 text-[#9c8f78] font-semibold uppercase tracking-wider';
-  el.textContent = ok ? '● Live — WHISKY:EDITION API' : '○ Offline — showing curated data';
+function setAPIStatus(ok){
+  const el=document.getElementById('api-status');
+  el.className=ok?'mx-5 mb-3 px-3 py-1.5 rounded-lg text-[9px] bg-[#1B5E20]/30 border border-[#4CAF50]/20 text-[#4CAF50] font-semibold uppercase tracking-wider':'mx-5 mb-3 px-3 py-1.5 rounded-lg text-[9px] bg-[#504532]/20 border border-[#504532]/30 text-[#9c8f78] font-semibold uppercase tracking-wider';
+  el.textContent=ok?'● Live — WHISKY:EDITION API':'○ Offline — showing curated data';
   el.classList.remove('hidden');
 }
 
-// ══ RENDER ═════════════════════════════════════════════════════════════════
-function whiskyRow(w, onclick='') {
-  const m = w.metadata||{};
-  const isC = S.checkins.some(c=>String(c.whisky_id||c.whiskyId)===String(w.id||w.slug));
-  const score = avgR(w);
-  return `<div class="row-item flex items-center gap-3 py-3 px-2 cursor-pointer" onclick="${onclick||`showDetail('${w.slug||w.id}')`}">
-    <div class="shrink-0 flex items-center justify-center w-[32px]">${bottleImg(w, true)}</div>
+// ── RENDER ─────────────────────────────────────────────────────────
+function whiskyRow(w,clickFn){
+  const m=w.metadata||{};
+  const isC=S.checkins.some(c=>String(c.whisky_id)===String(w.id||w.slug));
+  const score=avgR(w);
+  const fn=clickFn||`showDetail('${w.slug||w.id}')`;
+  return `<div class="row-item flex items-center gap-3 py-3 px-2 cursor-pointer" onclick="${fn}">
+    <div class="shrink-0">${bottleImg(w,true)}</div>
     <div class="flex-1 min-w-0">
       <div class="flex items-start justify-between gap-2">
         <div class="min-w-0">
@@ -671,129 +506,113 @@ function whiskyRow(w, onclick='') {
     </div>
   </div>`;
 }
-
-function renderList(list) {
-  const el = document.getElementById('whisky-list');
-  if(!list.length){el.innerHTML=emptyState();return;}
-  el.innerHTML = list.map(w=>whiskyRow(w)).join('<div class="border-t border-[#504532]/15"></div>');
+function renderList(list){
+  const el=document.getElementById('whisky-list');
+  if(!list.length){el.innerHTML=emptyEl();return;}
+  el.innerHTML=list.map(w=>whiskyRow(w)).join('<div class="border-t border-[#504532]/15"></div>');
 }
-
-function filteredList() {
+function filteredList(){
   let list=[...S.whiskies];
-  const f=S.filter;
-  if(f==='scotland') list=list.filter(w=>(w.metadata?.country||'').toLowerCase().includes('scotland'));
-  else if(f==='japan') list=list.filter(w=>(w.metadata?.country||'').toLowerCase().includes('japan'));
-  else if(f==='peated') list=list.filter(w=>(w.metadata?.flavour||w.name||'').toLowerCase().includes('peat'));
-  else if(f==='sherry') list=list.filter(w=>(w.metadata?.flavour||w.name||'').toLowerCase().includes('sherry'));
-  else if(f==='cask-strength') list=list.filter(w=>(w.metadata?.abv||0)>=55);
+  if(S.filter==='scotland')list=list.filter(w=>(w.metadata?.country||'').toLowerCase().includes('scotland'));
+  else if(S.filter==='japan')list=list.filter(w=>(w.metadata?.country||'').toLowerCase().includes('japan'));
+  else if(S.filter==='peated')list=list.filter(w=>(w.metadata?.flavour||w.name||'').toLowerCase().includes('peat'));
+  else if(S.filter==='sherry')list=list.filter(w=>(w.metadata?.flavour||w.name||'').toLowerCase().includes('sherry'));
+  else if(S.filter==='cask-strength')list=list.filter(w=>(w.metadata?.abv||0)>=55);
   return list;
 }
-
-function setFilter(f) {
+function setFilter(f){
   S.filter=f;
-  document.querySelectorAll('.filter-pill').forEach(p=>p.classList.toggle('on', p.dataset.f===f));
+  document.querySelectorAll('.filter-pill').forEach(p=>p.classList.toggle('on',p.dataset.f===f));
   renderList(filteredList());
 }
-
-async function loadWhiskies() {
-  const d = await apiGet({page:1, per_page:24});
-  if(d?.items?.length){
-    S.whiskies=d.items; S.totalPages=Math.ceil(d.total/d.per_page); S.page=2;
-    setAPIStatus(true);
-    if(S.page<=S.totalPages) document.getElementById('load-more-wrap').classList.remove('hidden');
-  } else {
-    S.whiskies=FALLBACK; setAPIStatus(false);
-  }
+async function loadWhiskies(){
+  const d=await apiGet({page:1,per_page:24});
+  if(d?.items?.length){S.whiskies=d.items;S.totalPages=Math.ceil(d.total/d.per_page);S.page=2;setAPIStatus(true);if(S.page<=S.totalPages)document.getElementById('load-more-wrap').classList.remove('hidden');}
+  else{S.whiskies=FALLBACK;setAPIStatus(false);}
   setFilter('all');
 }
 
-// ══ SEARCH ═════════════════════════════════════════════════════════════════
-function switchSearchTab(tab) {
-  document.querySelectorAll('.search-tab').forEach(t=>t.classList.toggle('active', t.dataset.tab===tab));
+// ── SEARCH ──────────────────────────────────────────────────────────
+function switchSearchTab(tab){
+  document.querySelectorAll('.search-tab').forEach(t=>t.classList.toggle('active',t.dataset.tab===tab));
   document.querySelectorAll('.search-pane').forEach(p=>p.classList.add('hidden'));
   document.getElementById('tab-'+tab).classList.remove('hidden');
 }
-
-async function runQuickSearch(q) {
-  const el = document.getElementById('quick-results');
+async function runQuickSearch(q){
+  const el=document.getElementById('quick-results');
   if(!q.trim()){el.innerHTML='<p class="text-[#504532] text-[10px] text-center pt-10 uppercase tracking-wider">Type above to search…</p>';return;}
-  el.innerHTML='<div class="skeleton h-14 rounded-xl my-2"></div><div class="skeleton h-14 rounded-xl my-2" style="animation-delay:.1s"></div>';
-  const d = await apiGet({q, per_page:12});
-  const results = d?.items || S.whiskies.filter(w=>[w.name,w.metadata?.distillery,w.metadata?.region].some(v=>(v||'').toLowerCase().includes(q.toLowerCase()))).slice(0,12);
-  el.innerHTML = results.length ? results.map(w=>whiskyRow(w,`selectFromSearch('${w.slug||w.id}')`)).join('<div class="border-t border-[#504532]/15"></div>') : emptyState();
+  el.innerHTML=skel();
+  const d=await apiGet({q,per_page:12});
+  const results=d?.items||S.whiskies.filter(w=>[w.name,w.metadata?.distillery,w.metadata?.region].some(v=>(v||'').toLowerCase().includes(q.toLowerCase()))).slice(0,12);
+  el.innerHTML=results.length?results.map(w=>whiskyRow(w,`closeSearchAndShow('${w.slug||w.id}')`)).join('<div class="border-t border-[#504532]/15"></div>'):emptyEl();
 }
-
-async function runRegionSearch(region) {
-  const el = document.getElementById('region-results');
-  el.innerHTML='<div class="skeleton h-14 rounded-xl my-2"></div><div class="skeleton h-14 rounded-xl my-2"></div>';
+async function runRegionSearch(region){
+  const el=document.getElementById('region-results');
+  el.innerHTML=skel();
   document.querySelectorAll('#region-grid button').forEach(b=>{b.classList.toggle('border-[#FFBF00]/50',b.dataset.region===region);b.classList.toggle('text-[#FFE2AB]',b.dataset.region===region);});
-  const d = await apiGet({region, per_page:20});
-  const results = d?.items || S.whiskies.filter(w=>(w.metadata?.region||'').toLowerCase()===region.toLowerCase());
-  el.innerHTML = results.length ? results.map(w=>whiskyRow(w,`selectFromSearch('${w.slug||w.id}')`)).join('<div class="border-t border-[#504532]/15"></div>') : emptyState(`No ${region} whiskies found`);
+  const d=await apiGet({region,per_page:20});
+  const results=d?.items||S.whiskies.filter(w=>(w.metadata?.region||'').toLowerCase()===region.toLowerCase());
+  el.innerHTML=results.length?results.map(w=>whiskyRow(w,`closeSearchAndShow('${w.slug||w.id}')`)).join('<div class="border-t border-[#504532]/15"></div>'):emptyEl(`No ${region} whiskies found`);
 }
-
-async function runDistillerySearch(q) {
-  const el = document.getElementById('distillery-results');
+async function runDistillerySearch(q){
+  const el=document.getElementById('distillery-results');
   if(!q.trim()){el.innerHTML='';return;}
-  el.innerHTML='<div class="skeleton h-14 rounded-xl my-2"></div><div class="skeleton h-14 rounded-xl my-2"></div>';
-  const d = await apiGet({distillery:q, per_page:20});
-  const results = d?.items || S.whiskies.filter(w=>(w.metadata?.distillery||'').toLowerCase().includes(q.toLowerCase()));
-  el.innerHTML = results.length ? results.map(w=>whiskyRow(w,`selectFromSearch('${w.slug||w.id}')`)).join('<div class="border-t border-[#504532]/15"></div>') : emptyState(`No results for "${q}"`);
+  el.innerHTML=skel();
+  const d=await apiGet({distillery:q,per_page:20});
+  const results=d?.items||S.whiskies.filter(w=>(w.metadata?.distillery||'').toLowerCase().includes(q.toLowerCase()));
+  el.innerHTML=results.length?results.map(w=>whiskyRow(w,`closeSearchAndShow('${w.slug||w.id}')`)).join('<div class="border-t border-[#504532]/15"></div>'):emptyEl(`No results for "${q}"`);
 }
-
-async function runFlavourSearch(flavour) {
-  const el = document.getElementById('flavour-results');
-  el.innerHTML='<div class="skeleton h-14 rounded-xl my-2"></div><div class="skeleton h-14 rounded-xl my-2"></div>';
+async function runFlavourSearch(flavour){
+  const el=document.getElementById('flavour-results');
+  el.innerHTML=skel();
   document.querySelectorAll('#flavour-grid button').forEach(b=>{b.classList.toggle('border-[#FFBF00]/50',b.dataset.flavour===flavour);b.classList.toggle('text-[#FFE2AB]',b.dataset.flavour===flavour);});
-  const d = await apiGet({flavour, per_page:20});
-  const results = d?.items || S.whiskies.filter(w=>(w.metadata?.flavour||'').toLowerCase().includes(flavour.toLowerCase()));
-  el.innerHTML = results.length ? results.map(w=>whiskyRow(w,`selectFromSearch('${w.slug||w.id}')`)).join('<div class="border-t border-[#504532]/15"></div>') : emptyState(`No ${flavour} whiskies found`);
+  const d=await apiGet({flavour,per_page:20});
+  const results=d?.items||S.whiskies.filter(w=>(w.metadata?.flavour||'').toLowerCase().includes(flavour.toLowerCase()));
+  el.innerHTML=results.length?results.map(w=>whiskyRow(w,`closeSearchAndShow('${w.slug||w.id}')`)).join('<div class="border-t border-[#504532]/15"></div>'):emptyEl(`No ${flavour} whiskies found`);
 }
-
-async function runAdvancedSearch() {
-  const el = document.getElementById('advanced-results');
-  const params = {};
+async function runAdvancedSearch(){
+  const el=document.getElementById('advanced-results');
+  const params={per_page:30};
   const q=document.getElementById('adv-q').value.trim();
   const country=document.getElementById('adv-country').value;
-  const bottler=document.getElementById('adv-bottler')?document.getElementById('adv-bottler').value.trim():'';
-  if(q) params.q=q; if(country) params.country=country; if(bottler) params.bottler=bottler;
-  const minAge=document.getElementById('adv-min-age').value; const maxAge=document.getElementById('adv-max-age').value;
-  const minAbv=document.getElementById('adv-min-abv').value; const maxAbv=document.getElementById('adv-max-abv').value;
-  if(minAge) params.min_age=minAge; if(maxAge) params.max_age=maxAge;
-  if(minAbv) params.min_abv=minAbv; if(maxAbv) params.max_abv=maxAbv;
-  params.per_page=30;
-  el.innerHTML='<div class="skeleton h-14 rounded-xl my-2"></div><div class="skeleton h-14 rounded-xl my-2"></div>';
-  const d = await apiGet(params);
-  const results = d?.items || [];
-  el.innerHTML = results.length ? results.map(w=>whiskyRow(w,`selectFromSearch('${w.slug||w.id}')`)).join('<div class="border-t border-[#504532]/15"></div>') : emptyState('No results — try broader filters');
+  if(q)params.q=q;if(country)params.country=country;
+  const minAge=document.getElementById('adv-min-age').value;const maxAge=document.getElementById('adv-max-age').value;
+  const minAbv=document.getElementById('adv-min-abv').value;const maxAbv=document.getElementById('adv-max-abv').value;
+  if(minAge)params.min_age=minAge;if(maxAge)params.max_age=maxAge;
+  if(minAbv)params.min_abv=minAbv;if(maxAbv)params.max_abv=maxAbv;
+  el.innerHTML=skel();
+  const d=await apiGet(params);
+  const results=d?.items||[];
+  el.innerHTML=results.length?results.map(w=>whiskyRow(w,`closeSearchAndShow('${w.slug||w.id}')`)).join('<div class="border-t border-[#504532]/15"></div>'):emptyEl('No results — try broader filters');
+}
+function closeSearchAndShow(slugOrId){
+  document.getElementById('search-panel').classList.remove('open');
+  document.getElementById('search-input').value='';
+  showDetail(slugOrId);
 }
 
-function selectFromSearch(slugOrId) { closeSearch(); showDetail(slugOrId); }
-function closeSearch() { document.getElementById('search-panel').classList.remove('open'); document.getElementById('search-input').value=''; }
-
-// ══ DETAIL ═════════════════════════════════════════════════════════════════
-async function showDetail(slugOrId) {
+// ── DETAIL ──────────────────────────────────────────────────────────
+async function showDetail(slugOrId){
   if(!slugOrId||slugOrId==='undefined'){showToast('Whisky not found');return;}
   let w=S.whiskies.find(x=>x.slug===slugOrId||String(x.id)===String(slugOrId));
   if(!w){
     try{
-      const url = IS_NETLIFY
-        ? `${API_PROXY}?slug=${encodeURIComponent(slugOrId)}`
-        : `${API_DIRECT}/${slugOrId}`;
+      const url=IS_NETLIFY?`${API_PROXY}?slug=${encodeURIComponent(slugOrId)}`:`${API_DIRECT}/${slugOrId}`;
       const r=await fetch(url,{signal:AbortSignal.timeout(6000)});
-      if(r.ok) w=await r.json();
-    }catch(e){console.warn('detail:',e.message);}
+      if(r.ok)w=await r.json();
+    }catch(e){}
   }
   if(!w||!w.name){showToast('Whisky not found');return;}
-  S.current=w; S.history.push('detail');
+  S.current=w;if(S.history[S.history.length-1]!=='detail')S.history.push('detail');
   const m=w.metadata||{},notes=w.tasting_notes||{},score=avgR(w);
-  const isC=S.checkins.some(c=>String(c.whisky_id||c.whiskyId)===String(w.id||w.slug));
+  const isC=S.checkins.some(c=>String(c.whisky_id)===String(w.id||w.slug));
   const btn=document.getElementById('detail-checkin-btn');
   if(isC){btn.textContent='✓ Checked In';btn.className='text-[9px] uppercase tracking-widest font-bold text-[#FFBF00] border border-[#FFBF00]/50 px-4 py-2 rounded-full bg-[#FFBF00]/10';}
   else{btn.textContent='Check In';btn.className='text-[9px] uppercase tracking-widest font-bold text-primary border border-primary/30 px-4 py-2 rounded-full hover:bg-primary/10 transition-all';}
+  const userNote=S.checkins.find(c=>String(c.whisky_id)===String(w.id||w.slug));
   document.getElementById('detail-content').innerHTML=`
     <div class="text-center py-6">
-      <div class="flex justify-center mb-5">${bottleImg(w, false)}</div>
+      <div class="flex justify-center mb-5">${bottleImg(w,false)}</div>
       <p class="text-[9px] uppercase tracking-widest text-[#9c8f78] mb-1">${m.distillery||''}</p>
       <h2 class="font-headline text-2xl font-extrabold tracking-tight mb-3">${w.name}</h2>
       <div class="flex justify-center gap-1.5 flex-wrap mb-3">
@@ -807,435 +626,239 @@ async function showDetail(slugOrId) {
     ${w.description?`<div class="bg-surface-container-low rounded-xl p-4 mb-4"><p class="text-[#9c8f78] text-sm leading-relaxed italic">"${w.description}"</p></div>`:''}
     ${notes.nose||notes.palate||notes.finish?`<div class="space-y-3 mb-4">
       <h3 class="font-headline text-base font-bold text-[#FFE2AB]">The Tasting Experience</h3>
-      ${notes.nose?`<div class="bg-surface-container-low p-4 rounded-xl"><span class="text-[8px] uppercase tracking-widest text-[#FFBF00] font-bold mb-1.5 block">Nose</span><p class="text-on-surface text-sm leading-relaxed">${notes.nose}</p></div>`:''}
-      ${notes.palate?`<div class="bg-surface-container-low p-4 rounded-xl"><span class="text-[8px] uppercase tracking-widest text-[#FFBF00] font-bold mb-1.5 block">Palate</span><p class="text-on-surface text-sm leading-relaxed">${notes.palate}</p></div>`:''}
-      ${notes.finish?`<div class="bg-surface-container-low p-4 rounded-xl"><span class="text-[8px] uppercase tracking-widest text-[#FFBF00] font-bold mb-1.5 block">Finish</span><p class="text-on-surface text-sm leading-relaxed">${notes.finish}</p></div>`:''}
+      ${notes.nose?`<div class="bg-surface-container-low p-4 rounded-xl"><span class="text-[8px] uppercase tracking-widest text-[#FFBF00] font-bold mb-1.5 block">Nose</span><p class="text-on-surface text-sm">${notes.nose}</p></div>`:''}
+      ${notes.palate?`<div class="bg-surface-container-low p-4 rounded-xl"><span class="text-[8px] uppercase tracking-widest text-[#FFBF00] font-bold mb-1.5 block">Palate</span><p class="text-on-surface text-sm">${notes.palate}</p></div>`:''}
+      ${notes.finish?`<div class="bg-surface-container-low p-4 rounded-xl"><span class="text-[8px] uppercase tracking-widest text-[#FFBF00] font-bold mb-1.5 block">Finish</span><p class="text-on-surface text-sm">${notes.finish}</p></div>`:''}
     </div>`:''}
-    ${m.abv?`<div class="bg-surface-container-low rounded-xl p-4 mb-4"><div class="flex justify-between text-[9px] mb-1.5"><span class="text-[#9c8f78] uppercase tracking-tight">ABV</span><span class="text-[#FFBF00] font-bold">${m.abv}%</span></div><div class="h-1 bg-[#353535] rounded-full overflow-hidden"><div class="h-full amber-glow" style="width:${Math.min(m.abv,100)}%"></div></div></div>`:''}
-    ${userNoteHTML(w.id||w.slug)}
-    <button id="detail-checkin-action" class="w-full amber-glow text-[#402d00] font-headline font-bold py-4 rounded-xl uppercase tracking-widest text-[11px] hover:opacity-90 active:scale-[0.98] transition-all mt-2">${isC?'Update Check-in':'Check In This Dram'}</button>
-    ${!BOTTLE_IMAGES[w.slug||w.id] ? `
-    <button class="request-photo-btn w-full mt-2 py-3 border border-[#504532]/40 rounded-xl text-[9px] uppercase tracking-widest text-[#9c8f78] hover:text-primary hover:border-primary/30 transition-all font-bold flex items-center justify-center gap-2"
-      data-slug="${w.slug||w.id}" data-name="${(w.name||'')}" data-region="${m.region||''}">
-      <span class="material-symbols-outlined text-[14px]">add_photo_alternate</span>
-      Request Bottle Photo
-    </button>` : ''}
+    ${m.abv?`<div class="bg-surface-container-low rounded-xl p-4 mb-4"><div class="flex justify-between text-[9px] mb-1.5"><span class="text-[#9c8f78] uppercase">ABV</span><span class="text-[#FFBF00] font-bold">${m.abv}%</span></div><div class="h-1 bg-[#353535] rounded-full overflow-hidden"><div class="h-full amber-glow" style="width:${Math.min(m.abv,100)}%"></div></div></div>`:''}
+    ${userNote?`<div class="bg-surface-container-low rounded-xl p-4 mb-4 border border-[#FFBF00]/12"><div class="flex items-center gap-2 mb-2"><span class="text-[8px] uppercase tracking-widest text-[#FFBF00] font-bold">Your Note</span><div class="ml-auto flex">${starsHTML(userNote.rating,5,13)}</div></div>${userNote.notes?`<p class="text-[#9c8f78] text-sm italic">"${userNote.notes}"</p>`:''}</div>`:''}
+    <button class="w-full amber-glow text-[#402d00] font-headline font-bold py-4 rounded-xl uppercase tracking-widest text-[11px] hover:opacity-90 active:scale-[0.98] transition-all mt-2" onclick="openModal()">${isC?'Update Check-in':'Check In This Dram'}</button>
   `;
   showView('detail',false);
 }
 
-function userNoteHTML(id) {
-  const c = [...S.checkins].find(x=>String(x.whisky_id||x.whiskyId)===String(id));
-  if(!c) return '';
-  return`<div class="bg-surface-container-low rounded-xl p-4 mb-4 border border-[#FFBF00]/12">
-    <div class="flex items-center gap-2 mb-2"><span class="material-symbols-outlined text-[#FFBF00]" style="font-size:14px;font-variation-settings:'FILL' 1;">edit_note</span><span class="text-[8px] uppercase tracking-widest text-[#FFBF00] font-bold">Your Note</span><div class="ml-auto flex">${starsHTML(c.rating,5,13)}</div></div>
-    ${c.notes?`<p class="text-[#9c8f78] text-sm italic leading-relaxed">"${c.notes}"</p>`:''}
-    <p class="text-[#504532] text-[9px] mt-1.5">${new Date(c.date).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'})}</p>
-  </div>`;
-}
-
-// ══ LIBRARY & CELLAR ═══════════════════════════════════════════════════════
+// ── LIBRARY & CELLAR ────────────────────────────────────────────────
 function renderLibrary(){
-  const ids=[...new Set(S.checkins.map(c=>String(c.whisky_id||c.whiskyId)))];
+  const ids=[...new Set(S.checkins.map(c=>String(c.whisky_id)))];
   const bottles=S.whiskies.filter(w=>ids.includes(String(w.id||w.slug)));
-  const regions=new Set(); const scores=[];
-  S.checkins.forEach(c=>{const w=S.whiskies.find(x=>String(x.id||x.slug)===String(c.whisky_id||c.whiskyId));if(w?.metadata?.region)regions.add(w.metadata.region);if(c.rating)scores.push(c.rating);});
+  const regions=new Set();const scores=[];
+  S.checkins.forEach(c=>{const w=S.whiskies.find(x=>String(x.id||x.slug)===String(c.whisky_id));if(w?.metadata?.region)regions.add(w.metadata.region);if(c.rating)scores.push(c.rating);});
   const total=bottles.length+S.manualNotes.length;
   document.getElementById('stat-bottles').textContent=total;
   document.getElementById('stat-regions').textContent=regions.size||0;
   document.getElementById('stat-avg').textContent=scores.length?(scores.reduce((a,b)=>a+b,0)/scores.length).toFixed(1)+'★':'—';
   const grid=document.getElementById('library-grid');
-  const empty=document.getElementById('library-empty');
-  if(!total){empty.style.display='block';return;} empty.style.display='none';
-  const cards=bottles.map(w=>{const m=w.metadata||{};const c=[...S.checkins].find(x=>String(x.whisky_id||x.whiskyId)===String(w.id||w.slug));
-    return`<div class="cask-card bg-[#2a2a2a] rounded-xl overflow-hidden cursor-pointer" onclick="showDetail('${w.slug||w.id}')"><div class="p-4 flex gap-3"><div class="shrink-0 flex items-center">${bottleImg(w,true)}</div><div class="flex-1 min-w-0"><div class="flex justify-between items-start"><div class="min-w-0 pr-2"><p class="font-headline font-bold text-[13px] leading-tight truncate">${w.name}</p><p class="text-[#9c8f78] text-[10px] mt-0.5">${m.distillery||''}</p></div><span class="font-headline font-black text-[#FFBF00] text-lg shrink-0">${avgR(w)}</span></div><div class="mt-1.5 flex gap-1">${rBadge(m.region||'')}</div>${c?.rating?`<div class="flex mt-1.5">${starsHTML(c.rating,5,12)}</div>`:''}</div></div>${m.abv?`<div class="px-4 pb-3"><div class="h-0.5 bg-[#353535] rounded-full overflow-hidden"><div class="h-full amber-glow" style="width:${Math.min(m.abv,100)}%"></div></div></div>`:''}</div>`;
-  });
-  const manuals=S.manualNotes.map(n=>`<div class="cask-card bg-[#2a2a2a] rounded-xl overflow-hidden"><div class="p-4 flex gap-3"><div class="shrink-0">${bSVG('',32,56)}</div><div class="flex-1 min-w-0"><div class="flex justify-between items-start"><div><p class="font-headline font-bold text-[13px] leading-tight">${n.name}</p><p class="text-[#9c8f78] text-[10px] mt-0.5">${n.distillery||''}${n.abv?' · '+n.abv+'%':''}</p></div><button onclick="event.stopPropagation();delManual(${n.id})" class="text-[#504532] hover:text-red-400"><span class="material-symbols-outlined" style="font-size:16px;">delete</span></button></div>${n.rating?`<div class="flex mt-1.5">${starsHTML(n.rating,5,12)}</div>`:''}</div></div></div>`);
+  document.getElementById('library-empty').style.display=total?'none':'block';
+  if(!total){grid.innerHTML='<div id="library-empty" class="text-center py-14"><span class="material-symbols-outlined text-[#504532] text-5xl block mb-3">liquor</span><p class="text-[#9c8f78] text-[11px] uppercase tracking-widest font-bold">No bottles yet</p></div>';return;}
+  const cards=bottles.map(w=>{const m=w.metadata||{};const c=S.checkins.find(x=>String(x.whisky_id)===String(w.id||w.slug));return `<div class="bg-[#2a2a2a] rounded-xl overflow-hidden cursor-pointer" onclick="showDetail('${w.slug||w.id}')"><div class="p-4 flex gap-3"><div class="shrink-0">${bottleImg(w,true)}</div><div class="flex-1 min-w-0"><div class="flex justify-between items-start"><div class="min-w-0 pr-2"><p class="font-headline font-bold text-[13px] truncate">${w.name}</p><p class="text-[#9c8f78] text-[10px] mt-0.5">${m.distillery||''}</p></div><span class="font-headline font-black text-[#FFBF00] text-lg">${avgR(w)}</span></div><div class="mt-1.5 flex gap-1">${rBadge(m.region||'')}</div>${c?.rating?`<div class="flex mt-1.5">${starsHTML(c.rating,5,12)}</div>`:''}</div></div></div>`;});
+  const manuals=S.manualNotes.map(n=>`<div class="bg-[#2a2a2a] rounded-xl overflow-hidden p-4 flex gap-3"><div class="shrink-0">${bSVG('',32,56)}</div><div class="flex-1 min-w-0"><div class="flex justify-between"><div><p class="font-headline font-bold text-[13px]">${n.name}</p><p class="text-[#9c8f78] text-[10px]">${n.distillery||''}${n.abv?' · '+n.abv+'%':''}</p></div><button onclick="delManual(${n.id})" class="text-[#504532] hover:text-red-400"><span class="material-symbols-outlined" style="font-size:16px;">delete</span></button></div>${n.rating?`<div class="flex mt-1.5">${starsHTML(n.rating,5,12)}</div>`:''}</div></div>`);
   grid.innerHTML=cards.join('')+manuals.join('');
 }
-
 function renderCellar(){
   document.getElementById('cellar-total').textContent=S.checkins.length;
   const list=document.getElementById('cellar-list');
-  const empty=document.getElementById('cellar-empty');
-  if(!S.checkins.length){empty.style.display='block';return;} empty.style.display='none';
-  list.innerHTML=[...S.checkins].map(c=>{const w=S.whiskies.find(x=>String(x.id||x.slug)===String(c.whisky_id||c.whiskyId));const name=w?.name||c.whisky_name||'Unknown';const region=w?.metadata?.region||'';
-    return`<div class="flex items-center gap-3 bg-surface-container-low rounded-xl p-3 cursor-pointer row-item" onclick="showDetail('${c.whisky_id||c.whiskyId}')"><div class="shrink-0">${bSVG(region,24,42)}</div><div class="flex-1 min-w-0"><p class="text-[13px] font-semibold truncate">${name}</p><p class="text-[#9c8f78] text-[9px] mt-0.5">${new Date(c.date).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'})}${c.location?' · '+c.location:''}</p></div><div class="flex shrink-0">${starsHTML(c.rating,5,11)}</div></div>`;
-  }).join('');
+  document.getElementById('cellar-empty').style.display=S.checkins.length?'none':'block';
+  if(!S.checkins.length)return;
+  list.innerHTML=S.checkins.map(c=>{const w=S.whiskies.find(x=>String(x.id||x.slug)===String(c.whisky_id));const name=w?.name||c.whisky_name||'Unknown';const region=w?.metadata?.region||'';return `<div class="flex items-center gap-3 bg-surface-container-low rounded-xl p-3 cursor-pointer" onclick="showDetail('${c.whisky_id}')"><div class="shrink-0">${bSVG(region,24,42)}</div><div class="flex-1 min-w-0"><p class="text-[13px] font-semibold truncate">${name}</p><p class="text-[#9c8f78] text-[9px] mt-0.5">${new Date(c.date).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'})}${c.location?' · '+c.location:''}</p></div><div class="flex">${starsHTML(c.rating,5,11)}</div></div>`;}).join('');
 }
 
-// ══ MODAL ══════════════════════════════════════════════════════════════════
+// ── MODAL ───────────────────────────────────────────────────────────
 function openModal(){
-  const w=S.current; if(!w) return;
+  const w=S.current;if(!w)return;
   const m=w.metadata||{};
   document.getElementById('modal-whisky-info').innerHTML=`<div class="flex justify-center mb-2">${bottleImg(w,false)}</div><p class="font-headline font-bold text-sm">${w.name}</p><p class="text-[#9c8f78] text-[10px] mt-0.5">${m.distillery||''}</p>`;
-  S.modalRating=0; ['modal-nose','modal-notes','modal-location'].forEach(id=>document.getElementById(id).value='');
-  updateMStars(); document.getElementById('modal-overlay').classList.add('open');
+  S.modalRating=0;
+  ['modal-nose','modal-notes','modal-location'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  updateMStars();
+  document.getElementById('modal-overlay').classList.add('open');
 }
 function closeModal(){document.getElementById('modal-overlay').classList.remove('open');}
 function updateMStars(){document.querySelectorAll('#modal-stars .star-btn').forEach(s=>{const on=+s.dataset.v<=S.modalRating;s.classList.toggle('lit',on);s.style.fontVariationSettings=on?"'FILL' 1":"'FILL' 0";});}
-
+function updateNStars(){document.querySelectorAll('#note-stars .star-btn').forEach(s=>{const on=+s.dataset.v<=S.noteRating;s.classList.toggle('lit',on);s.style.fontVariationSettings=on?"'FILL' 1":"'FILL' 0";});}
 async function submitCheckin(){
-  if(!S.current)return;
-  if(!S.modalRating){showToast('Please select a rating');return;}
+  if(!S.current||!S.modalRating){showToast('Please select a rating');return;}
   const w=S.current;
-  const checkin={
-    id: Date.now(),
-    whisky_id: String(w.id||w.slug),
-    whisky_name: w.name,
-    rating: S.modalRating,
-    nose: document.getElementById('modal-nose').value,
-    notes: document.getElementById('modal-notes').value,
-    location: document.getElementById('modal-location').value,
-    date: new Date().toISOString(),
-  };
-  S.checkins = S.checkins.filter(x=>String(x.whisky_id||x.whiskyId)!==checkin.whisky_id);
-  S.checkins.unshift(checkin);
-  await saveCheckin(checkin);
-  closeModal(); showToast('Archived — '+w.name);
-  renderList(filteredList()); renderLibrary(); renderCellar();
+  const ci={id:Date.now(),whisky_id:String(w.id||w.slug),whisky_name:w.name,rating:S.modalRating,nose:document.getElementById('modal-nose').value,notes:document.getElementById('modal-notes').value,location:document.getElementById('modal-location').value,date:new Date().toISOString(),user_id:S.user?.id};
+  S.checkins=S.checkins.filter(x=>String(x.whisky_id)!==ci.whisky_id);
+  S.checkins.unshift(ci);
+  if(S.user)await sb.from('checkins').upsert(ci,{onConflict:'id'});
+  closeModal();showToast('Archived — '+w.name);
+  renderList(filteredList());renderLibrary();renderCellar();
   const btn=document.getElementById('detail-checkin-btn');
   if(btn){btn.textContent='✓ Checked In';btn.className='text-[9px] uppercase tracking-widest font-bold text-[#FFBF00] border border-[#FFBF00]/50 px-4 py-2 rounded-full bg-[#FFBF00]/10';}
 }
-
-// ══ MANUAL NOTES ═══════════════════════════════════════════════════════════
-function updateNStars(){document.querySelectorAll('#note-stars .star-btn').forEach(s=>{const on=+s.dataset.v<=S.noteRating;s.classList.toggle('lit',on);s.style.fontVariationSettings=on?"'FILL' 1":"'FILL' 0";});}
-async function saveManualNote(){
+async function saveNote(){
   const name=document.getElementById('note-name').value.trim();
   if(!name){showToast('Please enter a whisky name');return;}
-  const n={id:Date.now(),name,distillery:document.getElementById('note-distillery').value,abv:document.getElementById('note-abv').value,rating:S.noteRating,complexity:document.getElementById('note-complexity').value,value_score:document.getElementById('note-value').value,nose:document.getElementById('note-nose').value,palate:document.getElementById('note-palate').value,finish:document.getElementById('note-finish').value,location:document.getElementById('note-location').value,date:new Date().toISOString()};
+  const n={id:Date.now(),name,distillery:document.getElementById('note-distillery').value,abv:document.getElementById('note-abv').value,rating:S.noteRating,nose:document.getElementById('note-nose').value,palate:document.getElementById('note-palate').value,finish:document.getElementById('note-finish').value,date:new Date().toISOString(),user_id:S.user?.id};
   S.manualNotes.unshift(n);
-  await saveManualNoteDB(n);
-  document.getElementById('note-form').reset(); S.noteRating=0; updateNStars();
-  document.getElementById('note-complexity').value=5; document.getElementById('note-value').value=5;
-  document.getElementById('note-cval').textContent='5.0'; document.getElementById('note-vval').textContent='5.0';
-  showToast('Archived — '+name); showView('library');
+  if(S.user)await sb.from('manual_notes').insert(n);
+  document.getElementById('note-name').value='';document.getElementById('note-distillery').value='';document.getElementById('note-abv').value='';document.getElementById('note-nose').value='';document.getElementById('note-palate').value='';document.getElementById('note-finish').value='';
+  S.noteRating=0;updateNStars();
+  showToast('Archived — '+name);showView('library');
 }
 async function delManual(id){
   S.manualNotes=S.manualNotes.filter(n=>n.id!==id);
-  await sb.from('manual_notes').delete().eq('id', id);
-  renderLibrary(); showToast('Note deleted');
+  if(S.user)await sb.from('manual_notes').delete().eq('id',id);
+  renderLibrary();showToast('Note deleted');
 }
 
-// ══ NAV ════════════════════════════════════════════════════════════════════
+// ── PHOTO SEARCH ────────────────────────────────────────────────────
+function handlePhotoSearch(input){
+  if(!input.files?.[0])return;
+  const file=input.files[0];
+  const reader=new FileReader();
+  reader.onload=async e=>{
+    const base64=e.target.result.split(',')[1];
+    document.getElementById('photo-preview').classList.remove('hidden');
+    document.getElementById('photo-preview-img').src=e.target.result;
+    document.getElementById('photo-result').classList.add('hidden');
+    document.getElementById('photo-error').classList.add('hidden');
+    document.getElementById('photo-scanning').classList.remove('hidden');
+    document.getElementById('photo-drop-zone').classList.add('hidden');
+    const key=localStorage.getItem('mc_gemini_key')||'';
+    if(!key){document.getElementById('photo-scanning').classList.add('hidden');document.getElementById('photo-error').classList.remove('hidden');document.getElementById('photo-error-msg').textContent='Add your Gemini API key below to enable photo search.';return;}
+    try{
+      const gemUrl=IS_NETLIFY?`${API_PROXY}?action=gemini-vision`:`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${key}`;
+      const res=await fetch(gemUrl,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({contents:[{parts:[{inline_data:{mime_type:file.type,data:base64}},{text:'Analyse this whisky label. Respond ONLY in JSON: {"distillery":"...","name":"...","age":"...","region":"...","abv":"...","searchQuery":"..."}'}]}],generationConfig:{temperature:0.1,maxOutputTokens:200}})});
+      const gd=await res.json();
+      const txt=gd.candidates?.[0]?.content?.parts?.[0]?.text||'';
+      const match=txt.match(/\{[\s\S]*\}/);
+      if(!match)throw new Error('Could not parse label');
+      const ld=JSON.parse(match[0]);
+      document.getElementById('photo-scanning').classList.add('hidden');
+      document.getElementById('photo-result').classList.remove('hidden');
+      document.getElementById('photo-identified').textContent=`${ld.distillery} — ${ld.name}${ld.age?' '+ld.age:''}`;
+      document.getElementById('photo-confidence').textContent=`${ld.region||''}${ld.abv?' · '+ld.abv+'%':''}`;
+      const d=await apiGet({q:ld.searchQuery||ld.distillery,per_page:6});
+      const results=d?.items||S.whiskies.filter(w=>(w.metadata?.distillery||'').toLowerCase().includes((ld.distillery||'').toLowerCase())).slice(0,6);
+      document.getElementById('photo-matches').innerHTML=results.length?results.map(w=>whiskyRow(w,`closeSearchAndShow('${w.slug||w.id}')`)).join('<div class="border-t border-[#504532]/15"></div>'):emptyEl('No match — try searching manually');
+    }catch(err){document.getElementById('photo-scanning').classList.add('hidden');document.getElementById('photo-error').classList.remove('hidden');document.getElementById('photo-error-msg').textContent='Analysis failed: '+err.message;}
+  };
+  reader.readAsDataURL(file);
+}
+function clearPhotoSearch(){
+  document.getElementById('photo-preview').classList.add('hidden');
+  document.getElementById('photo-result').classList.add('hidden');
+  document.getElementById('photo-error').classList.add('hidden');
+  document.getElementById('photo-drop-zone').classList.remove('hidden');
+  document.getElementById('photo-file-input').value='';
+}
+function saveGeminiKey(){
+  const key=document.getElementById('gemini-key-input').value.trim();
+  if(!key.startsWith('AIza')){showToast('Invalid key — should start with AIza');return;}
+  localStorage.setItem('mc_gemini_key',key);
+  updateGeminiUI();showToast('Gemini key saved');
+}
+function clearGeminiKey(){localStorage.removeItem('mc_gemini_key');updateGeminiUI();}
+function updateGeminiUI(){
+  const key=localStorage.getItem('mc_gemini_key');
+  document.getElementById('gemini-key-form').classList.toggle('hidden',!!key);
+  document.getElementById('gemini-key-set').classList.toggle('hidden',!key);
+}
+
+// ── NAV ─────────────────────────────────────────────────────────────
 function showView(id,push=true){
   document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
-  const v=document.getElementById('view-'+id); if(v) v.classList.add('active');
+  document.getElementById('view-'+id)?.classList.add('active');
   document.querySelectorAll('.nav-btn').forEach(b=>{const on=b.dataset.v===id;b.style.color=on?'#FFE2AB':'#9c8f78';const ic=b.querySelector('.nav-icon');if(ic)ic.style.fontVariationSettings=on?"'FILL' 1":"'FILL' 0";});
-  if(push&&S.history[S.history.length-1]!==id) S.history.push(id);
-  if(id==='library') renderLibrary();
-  if(id==='cellar') renderCellar();
+  if(push&&S.history[S.history.length-1]!==id)S.history.push(id);
+  if(id==='library')renderLibrary();
+  if(id==='cellar')renderCellar();
   window.scrollTo(0,0);
 }
-function goBack(){S.history.pop();const prev=S.history[S.history.length-1]||'discover';S.current=null;showView(prev,false);}
+function goBack(){
+  S.history.pop();
+  const prev=S.history[S.history.length-1]||'discover';
+  S.current=null;showView(prev,false);
+}
 
-// ══ INIT ═══════════════════════════════════════════════════════════════════
-async function init() {
-  // Load bottle images from Supabase
-  await loadBottleImages();
+// ── INIT ─────────────────────────────────────────────────────────────
+async function init(){
+  // 1. Wire auth forms
+  document.getElementById('form-signin').addEventListener('submit',signIn);
+  document.getElementById('form-signup').addEventListener('submit',signUp);
+  document.getElementById('google-btn').addEventListener('click',googleSignIn);
+  document.getElementById('tab-signin-btn').addEventListener('click',()=>switchAuthTab('signin'));
+  document.getElementById('tab-signup-btn').addEventListener('click',()=>switchAuthTab('signup'));
+  document.getElementById('signout-btn').addEventListener('click',signOut);
 
-  // Auth state listener — fires on all auth events including initial session restore
-  sb.auth.onAuthStateChange((event, session) => {
-    if (session?.user) {
-      onUserSignedIn(session.user);
-    } else if (event === 'SIGNED_OUT' || event === 'INITIAL_SESSION') {
-      if (!session?.user) {
-        S.user = null;
-        document.getElementById('auth-overlay').style.display = 'flex';
-      }
-    }
-  });
+  // 2. Wire navigation
+  document.querySelectorAll('.nav-btn').forEach(b=>b.addEventListener('click',()=>showView(b.dataset.v)));
+  document.getElementById('avatar-btn').addEventListener('click',()=>showView('cellar'));
+  document.getElementById('back-btn').addEventListener('click',goBack);
+  document.getElementById('detail-checkin-btn').addEventListener('click',openModal);
 
-  // Check session in background — don't block whisky loading
-  sb.auth.getSession().then(({ data: { session } }) => {
-    if (session?.user) {
-      onUserSignedIn(session.user);
-    } else {
-      document.getElementById('auth-overlay').style.display = 'flex';
-    }
-  });
+  // 3. Wire modal
+  document.getElementById('modal-close-btn').addEventListener('click',closeModal);
+  document.getElementById('modal-overlay').addEventListener('click',e=>{if(e.target===document.getElementById('modal-overlay'))closeModal();});
+  document.getElementById('submit-checkin-btn').addEventListener('click',submitCheckin);
+  document.querySelectorAll('#modal-stars .star-btn').forEach(s=>s.addEventListener('click',()=>{S.modalRating=+s.dataset.v;updateMStars();}));
 
-  // Filter pills
+  // 4. Wire notes
+  document.getElementById('save-note-btn').addEventListener('click',saveNote);
+  document.querySelectorAll('#note-stars .star-btn').forEach(s=>s.addEventListener('click',()=>{S.noteRating=+s.dataset.v;updateNStars();}));
+
+  // 5. Wire search
+  document.getElementById('search-open-btn').addEventListener('click',()=>{document.getElementById('search-panel').classList.add('open');setTimeout(()=>document.getElementById('search-input').focus(),80);});
+  document.getElementById('search-close-btn').addEventListener('click',()=>{document.getElementById('search-panel').classList.remove('open');});
+  document.getElementById('search-input').addEventListener('input',e=>{clearTimeout(S.debounce);S.debounce=setTimeout(()=>runQuickSearch(e.target.value),350);});
+  document.querySelectorAll('.search-tab').forEach(t=>t.addEventListener('click',()=>switchSearchTab(t.dataset.tab)));
+  document.getElementById('adv-search-btn').addEventListener('click',runAdvancedSearch);
+  document.getElementById('distillery-input').addEventListener('input',e=>{clearTimeout(S.debounce);S.debounce=setTimeout(()=>runDistillerySearch(e.target.value),400);});
+
+  // 6. Wire filter pills
   document.querySelectorAll('.filter-pill').forEach(p=>p.addEventListener('click',()=>setFilter(p.dataset.f)));
-  setFilter('all');
 
-  // Load more
-  document.getElementById('load-more-btn').addEventListener('click', async()=>{
-    if(S.busy||S.page>S.totalPages) return; S.busy=true;
+  // 7. Wire load more
+  document.getElementById('load-more-btn').addEventListener('click',async()=>{
+    if(S.busy||S.page>S.totalPages)return;S.busy=true;
     const d=await apiGet({page:S.page,per_page:24});
     if(d?.items?.length){S.whiskies=[...S.whiskies,...d.items];S.page++;if(S.page>S.totalPages)document.getElementById('load-more-wrap').classList.add('hidden');renderList(filteredList());}
     S.busy=false;
   });
 
-  // Search
-  document.getElementById('search-open-btn').addEventListener('click',()=>{document.getElementById('search-panel').classList.add('open');setTimeout(()=>document.getElementById('search-input').focus(),80);});
-  document.getElementById('search-close-btn').addEventListener('click',closeSearch);
-  document.getElementById('search-input').addEventListener('input',e=>{clearTimeout(S.debounce);S.debounce=setTimeout(()=>runQuickSearch(e.target.value),350);});
-  document.querySelectorAll('.search-tab').forEach(t=>t.addEventListener('click',()=>switchSearchTab(t.dataset.tab)));
-
-  // Region grid
+  // 8. Wire region grid
   const rg=document.getElementById('region-grid');
-  REGIONS.forEach(r=>{const b=document.createElement('button');b.dataset.region=r;b.className='p-3 bg-[#1c1b1b] rounded-xl text-[11px] font-bold uppercase tracking-wider text-[#9c8f78] border border-[#504532]/30 hover:border-[#FFBF00]/40 hover:text-primary transition-all text-left';b.innerHTML=`${rBadge(r)}<span class="block mt-1 text-[9px] text-[#504532]">${['Japan','Ireland'].includes(r)?r:'Scotland'}</span>`;b.onclick=()=>runRegionSearch(r);rg.appendChild(b);});
+  REGIONS.forEach(r=>{
+    const b=document.createElement('button');b.dataset.region=r;
+    b.className='p-3 bg-[#1c1b1b] rounded-xl text-[11px] font-bold uppercase tracking-wider text-[#9c8f78] border border-[#504532]/30 hover:border-[#FFBF00]/40 hover:text-primary transition-all text-left';
+    b.innerHTML=`${rBadge(r)}<span class="block mt-1 text-[9px] text-[#504532]">${['Japan','Ireland'].includes(r)?r:'Scotland'}</span>`;
+    b.addEventListener('click',()=>runRegionSearch(r));rg.appendChild(b);
+  });
 
-  // Flavour grid
+  // 9. Wire flavour grid
   const fg=document.getElementById('flavour-grid');
-  FLAVOURS.forEach(f=>{const b=document.createElement('button');b.dataset.flavour=f;b.className='p-3 bg-[#1c1b1b] rounded-xl text-center border border-[#504532]/30 hover:border-[#FFBF00]/40 transition-all';b.innerHTML=`<span class="block text-lg mb-1">${FLAVOUR_EMOJI[f]||'◎'}</span><span class="text-[9px] font-bold uppercase tracking-wider text-[#9c8f78]">${f}</span>`;b.onclick=()=>runFlavourSearch(f);fg.appendChild(b);});
-
-  // Distillery search debounce
-  document.getElementById('distillery-input').addEventListener('input',e=>{clearTimeout(S.debounce);S.debounce=setTimeout(()=>runDistillerySearch(e.target.value),400);});
-
-  // Stars
-  document.querySelectorAll('#modal-stars .star-btn').forEach(s=>s.addEventListener('click',()=>{S.modalRating=+s.dataset.v;updateMStars();}));
-  document.querySelectorAll('#note-stars .star-btn').forEach(s=>s.addEventListener('click',()=>{S.noteRating=+s.dataset.v;updateNStars();}));
-
-  // Sliders
-  document.getElementById('note-complexity').addEventListener('input',e=>{document.getElementById('note-cval').textContent=parseFloat(e.target.value).toFixed(1);});
-  document.getElementById('note-value').addEventListener('input',e=>{document.getElementById('note-vval').textContent=parseFloat(e.target.value).toFixed(1);});
-
-  // Modal close on overlay
-  document.getElementById('modal-overlay').addEventListener('click',e=>{if(e.target===document.getElementById('modal-overlay'))closeModal();});
-
-  // Avatar → cellar
-  document.getElementById('avatar-btn').addEventListener('click',()=>showView('cellar'));
-
-  // Request photo buttons (dynamically created, use event delegation)
-  document.addEventListener('click', e => {
-    const btn = e.target.closest('.request-photo-btn');
-    if (btn) requestImage(btn.dataset.slug, btn.dataset.name, btn.dataset.region);
+  FLAVOURS.forEach(f=>{
+    const b=document.createElement('button');b.dataset.flavour=f;
+    b.className='p-3 bg-[#1c1b1b] rounded-xl text-center border border-[#504532]/30 hover:border-[#FFBF00]/40 transition-all';
+    b.innerHTML=`<span class="block text-lg mb-1">${FLAVOUR_EMOJI[f]||'◎'}</span><span class="text-[9px] font-bold uppercase tracking-wider text-[#9c8f78]">${f}</span>`;
+    b.addEventListener('click',()=>runFlavourSearch(f));fg.appendChild(b);
   });
 
-  // ── Wire all button events (avoids global scope issues) ──────────────
-  const wire = (id, fn) => { const el = document.getElementById(id); if(el) el.addEventListener('click', fn); };
-  const wireChange = (id, fn) => { const el = document.getElementById(id); if(el) el.addEventListener('change', fn); };
+  // 10. Wire photo search
+  document.getElementById('photo-drop-zone').addEventListener('click',()=>document.getElementById('photo-file-input').click());
+  document.getElementById('photo-file-input').addEventListener('change',e=>handlePhotoSearch(e.target));
+  document.getElementById('clear-photo-btn').addEventListener('click',clearPhotoSearch);
+  document.getElementById('save-gemini-btn').addEventListener('click',saveGeminiKey);
+  document.getElementById('clear-gemini-btn').addEventListener('click',clearGeminiKey);
+  updateGeminiUI();
 
-  // Auth
-  wire('google-sso-btn', handleGoogleSignIn);
-  wire('signout-btn', handleSignOut);
-
-  const signinForm = document.getElementById('form-signin-inner');
-  if (signinForm) signinForm.addEventListener('submit', handleSignIn);
-  const signupForm = document.getElementById('form-signup-inner');
-  if (signupForm) signupForm.addEventListener('submit', handleSignUp);
-
-  // Auth tab switching
-  document.getElementById('tab-signin')?.addEventListener('click', () => switchAuthTab('signin'));
-  document.getElementById('tab-signup')?.addEventListener('click', () => switchAuthTab('signup'));
-
-  // Modal
-  wire('modal-close-btn', closeModal);
-  wire('submit-checkin-btn', submitCheckin);
-  wire('detail-checkin-action', openModal);
-
-  // Notes
-  wire('save-note-btn', saveManualNote);
-
-  // Navigation
-  wire('go-back-btn', goBack);
-
-  // Advanced search
-  wire('run-adv-search-btn', runAdvancedSearch);
-
-  // Photo search
-  wire('clear-photo-btn', clearPhotoSearch);
-  wire('photo-drop-zone-btn', () => document.getElementById('photo-file-input')?.click());
-  wireChange('photo-file-input', (e) => handlePhotoSearch(e.target));
-
-  // Gemini key
-  wire('save-gemini-key-btn', saveGeminiKey);
-  wire('clear-gemini-key-btn', clearGeminiKey);
-
-  // Detail check-in button (top right)
-  const detailCheckinTop = document.getElementById('detail-checkin-btn');
-  if (detailCheckinTop) detailCheckinTop.addEventListener('click', openModal);
-
-  // Load whiskies
-  await loadWhiskies();
-  
-  // Init Gemini key UI
-  updateGeminiKeyUI();
-}
-
-// ── IMAGE REQUEST SYSTEM ──────────────────────────────────────────────────
-async function requestImage(slug, name, region) {
-  if (!S.user) { showToast('Sign in to request photos'); return; }
-  // Check not already requested
-  const { data: existing } = await sb.from('image_requests')
-    .select('id').eq('whisky_slug', slug).eq('status','pending').limit(1);
-  if (existing?.length) { showToast('Already requested — check back soon'); return; }
-  const { error } = await sb.from('image_requests').insert({
-    whisky_slug: slug,
-    whisky_name: name,
-    region: region,
-    requested_by: S.user.id,
+  // 11. Auth — check session (non-blocking)
+  sb.auth.onAuthStateChange((event,session)=>{
+    if(session?.user)onSignedIn(session.user);
+    else if(event==='SIGNED_OUT'){S.user=null;S.checkins=[];S.manualNotes=[];showAuth();}
   });
-  if (!error) showToast('Photo requested — we\'ll add it soon ✓');
-  else showToast('Could not send request');
+  sb.auth.getSession().then(({data:{session}})=>{
+    if(session?.user)onSignedIn(session.user);
+    else showAuth();
+  });
+
+  // 12. Load bottle images and whiskies in parallel
+  await Promise.all([loadBottleImages(),loadWhiskies()]);
 }
 
-// Load bottle images from Supabase on startup
-async function loadBottleImages() {
-  try {
-    const { data } = await sb.from('bottle_images').select('slug,image_url');
-    if (data?.length) {
-      data.forEach(row => { BOTTLE_IMAGES[row.slug] = row.image_url; });
-      console.log(`Loaded ${data.length} bottle images`);
-    }
-  } catch(e) { console.warn('Could not load bottle images:', e.message); }
-}
-
-// ── Expose all functions needed by HTML onclick/onchange to window ──────
-window.switchAuthTab = switchAuthTab;
-window.handleGoogleSignIn = handleGoogleSignIn;
-window.handleSignIn = handleSignIn;
-window.handleSignUp = handleSignUp;
-window.handleSignOut = handleSignOut;
-window.showView = showView;
-window.goBack = goBack;
-window.openModal = openModal;
-window.closeModal = closeModal;
-window.submitCheckin = submitCheckin;
-window.saveManualNote = saveManualNote;
-window.delManual = delManual;
-window.showDetail = showDetail;
-window.selectFromSearch = selectFromSearch;
-window.closeSearch = closeSearch;
-window.runAdvancedSearch = runAdvancedSearch;
-window.requestImage = requestImage;
-window.clearPhotoSearch = clearPhotoSearch;
-window.handlePhotoSearch = handlePhotoSearch;
-window.saveGeminiKey = saveGeminiKey;
-window.clearGeminiKey = clearGeminiKey;
-window.imgFallback = imgFallback;
-
-document.addEventListener('DOMContentLoaded', init);
-
-// ══ GEMINI PHOTO SEARCH ════════════════════════════════════════════════════
-// Uses Google Gemini Flash 1.5 Vision to read whisky labels
-// To enable: add your Gemini API key below
-// Gemini key stored in localStorage to avoid exposing in source
-// Set once via Settings → will persist across sessions
-const GEMINI_API_KEY = localStorage.getItem('mc_gemini_key') || '';
-
-async function handlePhotoSearch(input) {
-  if (!input.files?.[0]) return;
-  const file = input.files[0];
-
-  // Show preview
-  const reader = new FileReader();
-  reader.onload = async (e) => {
-    const base64 = e.target.result.split(',')[1];
-    const mimeType = file.type;
-
-    document.getElementById('photo-preview').classList.remove('hidden');
-    document.getElementById('photo-preview-img').src = e.target.result;
-    document.getElementById('photo-result').classList.add('hidden');
-    document.getElementById('photo-error').classList.add('hidden');
-    document.getElementById('photo-scanning').classList.remove('hidden');
-    document.getElementById('photo-drop-zone').classList.add('hidden');
-
-    const currentKey = localStorage.getItem('mc_gemini_key') || '';
-    if (!currentKey) {
-      document.getElementById('photo-scanning').classList.add('hidden');
-      showPhotoError('Add your Gemini API key in the box below to enable photo search.');
-      return;
-    }
-
-    try {
-      // Call Gemini Flash 1.5 Vision
-      // Use server-side proxy on Netlify (key in env var), direct call otherwise
-      const geminiUrl = IS_NETLIFY
-        ? `${API_PROXY}?action=gemini-vision`
-        : `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${currentKey}`;
-
-      const geminiRes = await fetch(geminiUrl, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          contents: [{
-            parts: [
-              { inline_data: { mime_type: mimeType, data: base64 } },
-              { text: 'Analyse this whisky bottle label. Respond ONLY in JSON: {"distillery":"...","name":"...","age":"...","region":"...","abv":"...","searchQuery":"..."}' }
-            ]
-          }],
-          generationConfig: { temperature: 0.1, maxOutputTokens: 200 }
-        })
-      });
-
-      const geminiData = await geminiRes.json();
-      const textContent = geminiData.candidates?.[0]?.content?.parts?.[0]?.text;
-
-      if (!textContent) throw new Error('No response from Gemini');
-
-      // Parse JSON from Gemini response
-      const jsonMatch = textContent.match(/\{[\s\S]*\}/);
-      if (!jsonMatch) throw new Error('Could not parse label data');
-      const labelData = JSON.parse(jsonMatch[0]);
-
-      document.getElementById('photo-scanning').classList.add('hidden');
-      document.getElementById('photo-result').classList.remove('hidden');
-      document.getElementById('photo-identified').textContent = 
-        `${labelData.distillery} — ${labelData.name}${labelData.age ? ' ' + labelData.age : ''}`;
-      document.getElementById('photo-confidence').textContent = 
-        `${labelData.region || ''}${labelData.abv ? ' · ' + labelData.abv + '%' : ''}`;
-
-      // Search the whisky database with Gemini's extracted query
-      const searchQuery = labelData.searchQuery || `${labelData.distillery} ${labelData.name}`;
-      const d = await apiGet({ q: searchQuery, per_page: 6 });
-      const results = d?.items || S.whiskies.filter(w =>
-        (w.name||'').toLowerCase().includes((labelData.distillery||'').toLowerCase()) ||
-        (w.metadata?.distillery||'').toLowerCase().includes((labelData.distillery||'').toLowerCase())
-      ).slice(0, 6);
-
-      const matchEl = document.getElementById('photo-matches');
-      if (results.length) {
-        matchEl.innerHTML = `<p class="text-[#9c8f78] text-[9px] uppercase tracking-widest mb-3 font-bold">${results.length} matches found</p>` +
-          results.map(w => whiskyRow(w, `selectFromSearch('${w.slug||w.id}')`)).join('<div class="border-t border-[#504532]/15"></div>');
-      } else {
-        matchEl.innerHTML = emptyState('No database match — try searching manually');
-      }
-
-    } catch (err) {
-      document.getElementById('photo-scanning').classList.add('hidden');
-      showPhotoError(`Analysis failed: ${err.message}`);
-    }
-  };
-  reader.readAsDataURL(file);
-}
-
-function saveGeminiKey() {
-  const key = document.getElementById('gemini-key-input').value.trim();
-  if (!key.startsWith('AIza')) { showToast('Invalid key format — should start with AIza'); return; }
-  localStorage.setItem('mc_gemini_key', key);
-  updateGeminiKeyUI();
-  showToast('Gemini key saved');
-}
-function clearGeminiKey() {
-  localStorage.removeItem('mc_gemini_key');
-  updateGeminiKeyUI();
-}
-function updateGeminiKeyUI() {
-  const key = localStorage.getItem('mc_gemini_key');
-  const form = document.getElementById('gemini-key-form');
-  const set = document.getElementById('gemini-key-set');
-  if (form && set) {
-    form.classList.toggle('hidden', !!key);
-    set.classList.toggle('hidden', !key);
-  }
-}
-
-function showPhotoError(msg) {
-  const el = document.getElementById('photo-error');
-  el.classList.remove('hidden');
-  document.getElementById('photo-error-msg').textContent = msg;
-}
-
-function clearPhotoSearch() {
-  document.getElementById('photo-preview').classList.add('hidden');
-  document.getElementById('photo-result').classList.add('hidden');
-  document.getElementById('photo-error').classList.add('hidden');
-  document.getElementById('photo-drop-zone').classList.remove('hidden');
-  document.getElementById('photo-file-input').value = '';
-}
+document.addEventListener('DOMContentLoaded',init);
 </script>
 </body>
 </html>
