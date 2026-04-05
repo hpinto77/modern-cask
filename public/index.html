@@ -599,7 +599,7 @@ async function showDetail(slugOrId){
     try{
       const url=IS_NETLIFY?`${API_PROXY}?slug=${encodeURIComponent(slugOrId)}`:`${API_DIRECT}/${slugOrId}`;
       const r=await fetch(url,{signal:AbortSignal.timeout(6000)});
-      if(r.ok)w=await r.json();
+      if(r.ok){const d=await r.json();w=d.item||d;}
     }catch(e){}
   }
   if(!w||!w.name){showToast('Whisky not found');return;}
@@ -632,6 +632,7 @@ async function showDetail(slugOrId){
     </div>`:''}
     ${m.abv?`<div class="bg-surface-container-low rounded-xl p-4 mb-4"><div class="flex justify-between text-[9px] mb-1.5"><span class="text-[#9c8f78] uppercase">ABV</span><span class="text-[#FFBF00] font-bold">${m.abv}%</span></div><div class="h-1 bg-[#353535] rounded-full overflow-hidden"><div class="h-full amber-glow" style="width:${Math.min(m.abv,100)}%"></div></div></div>`:''}
     ${userNote?`<div class="bg-surface-container-low rounded-xl p-4 mb-4 border border-[#FFBF00]/12"><div class="flex items-center gap-2 mb-2"><span class="text-[8px] uppercase tracking-widest text-[#FFBF00] font-bold">Your Note</span><div class="ml-auto flex">${starsHTML(userNote.rating,5,13)}</div></div>${userNote.notes?`<p class="text-[#9c8f78] text-sm italic">"${userNote.notes}"</p>`:''}</div>`:''}
+    ${!BOTTLE_IMAGES[String(w.id||w.slug)] ? `<button class="request-photo-btn w-full mt-3 py-3 border border-[#504532]/40 rounded-xl text-[9px] uppercase tracking-widest text-[#9c8f78] hover:text-primary hover:border-primary/30 transition-all font-bold flex items-center justify-center gap-2" data-slug="${w.slug||w.id}" data-name="${(w.name||'').replace(/"/g,'')}" data-region="${m.region||''}"><span class="material-symbols-outlined text-[14px]">add_photo_alternate</span>Request Bottle Photo</button>` : ''}
     <button class="w-full amber-glow text-[#402d00] font-headline font-bold py-4 rounded-xl uppercase tracking-widest text-[11px] hover:opacity-90 active:scale-[0.98] transition-all mt-2" onclick="openModal()">${isC?'Update Check-in':'Check In This Dram'}</button>
   `;
   showView('detail',false);
@@ -701,6 +702,17 @@ async function delManual(id){
   S.manualNotes=S.manualNotes.filter(n=>n.id!==id);
   if(S.user)await sb.from('manual_notes').delete().eq('id',id);
   renderLibrary();showToast('Note deleted');
+}
+
+// ── REQUEST PHOTO ───────────────────────────────────────────────────
+async function requestImage(slug, name, region) {
+  if (!S.user) { showToast('Sign in to request photos'); return; }
+  const { error } = await sb.from('image_requests').upsert(
+    { whisky_slug: slug, whisky_name: name, region, status: 'pending', user_id: S.user.id, requested_at: new Date().toISOString() },
+    { onConflict: 'whisky_slug' }
+  );
+  if (error) { showToast('Already requested or error'); }
+  else { showToast('📷 Photo requested — coming soon'); }
 }
 
 // ── PHOTO SEARCH ────────────────────────────────────────────────────
@@ -852,6 +864,12 @@ async function init(){
   sb.auth.getSession().then(({data:{session}})=>{
     if(session?.user)onSignedIn(session.user);
     else showAuth();
+  });
+
+  // Event delegation for dynamically rendered request-photo buttons
+  document.addEventListener('click', e => {
+    const btn = e.target.closest('.request-photo-btn');
+    if (btn) requestImage(btn.dataset.slug, btn.dataset.name, btn.dataset.region);
   });
 
   // 12. Load bottle images and whiskies in parallel
