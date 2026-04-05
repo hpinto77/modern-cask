@@ -459,7 +459,12 @@ const API_DIRECT = 'https://thewhiskyedition.com/api/whisky-reviews';
 
 // ══ SUPABASE CLIENT ════════════════════════════════════════════════════════
 const { createClient } = supabase;
-const sb = createClient(SUPABASE_URL, SUPABASE_ANON);
+const sb = createClient(SUPABASE_URL, SUPABASE_ANON, {
+  auth: {
+    detectSessionInUrl: true,
+    flowType: 'implicit',
+  }
+});
 
 // ══ STATE ══════════════════════════════════════════════════════════════════
 const S = {
@@ -929,18 +934,25 @@ async function init() {
   // Load bottle images from Supabase
   await loadBottleImages();
 
-  // Auth state listener
+  // Auth state listener — fires on login, logout, and after OAuth redirect
   sb.auth.onAuthStateChange((event, session) => {
-    if (session?.user) onUserSignedIn(session.user);
-    else {
+    console.log('Auth event:', event, session?.user?.email);
+    if (session?.user) {
+      onUserSignedIn(session.user);
+    } else if (event === 'SIGNED_OUT') {
       S.user = null;
       document.getElementById('auth-overlay').style.display = 'flex';
     }
   });
 
-  // Check existing session
+  // Check existing session (also handles Google OAuth redirect token in URL hash)
   const { data: { session } } = await sb.auth.getSession();
-  if (session?.user) onUserSignedIn(session.user);
+  if (session?.user) {
+    onUserSignedIn(session.user);
+  } else {
+    // Show auth screen if no session
+    document.getElementById('auth-overlay').style.display = 'flex';
+  }
 
   // Filter pills
   document.querySelectorAll('.filter-pill').forEach(p=>p.addEventListener('click',()=>setFilter(p.dataset.f)));
