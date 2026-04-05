@@ -66,11 +66,11 @@
       <div class="grid grid-cols-2 gap-3 mb-3">
         <div>
           <label class="block text-xs text-gray-500 mb-1">Whisky Slug</label>
-          <input id="manual-slug" type="text" placeholder="e.g. lagavulin-16" class="w-full bg-black/40 border border-gray-700 rounded-lg px-3 py-2 text-sm outline-none focus:border-yellow-500/50"/>
+          <input id="manual-slug" type="text" placeholder="e.g. lagavulin-16" oninput="this.dataset.manualOverride='true'" class="w-full bg-black/40 border border-gray-700 rounded-lg px-3 py-2 text-sm outline-none focus:border-yellow-500/50"/>
         </div>
         <div>
           <label class="block text-xs text-gray-500 mb-1">Whisky Name</label>
-          <input id="manual-name" type="text" placeholder="e.g. Lagavulin 16 Year Old" class="w-full bg-black/40 border border-gray-700 rounded-lg px-3 py-2 text-sm outline-none focus:border-yellow-500/50"/>
+          <input id="manual-name" type="text" placeholder="e.g. Lagavulin 16 Year Old" class="w-full bg-black/40 border border-gray-700 rounded-lg px-3 py-2 text-sm outline-none focus:border-yellow-500/50" oninput="autoSlug(this.value)"/>
         </div>
       </div>
       <div id="manual-drop" class="drop-zone p-8 text-center cursor-pointer mb-3" onclick="document.getElementById('manual-file').click()" ondragover="dragOver(event,'manual-drop')" ondragleave="dragLeave('manual-drop')" ondrop="dropFile(event,'manual')">
@@ -211,6 +211,15 @@ function handleManualFile(input) {
   if (input.files[0]) setManualFile(input.files[0]);
 }
 
+function autoSlug(name) {
+  const slug = name.toLowerCase()
+    .replace(/[^a-z0-9\s-]/g, '')
+    .trim()
+    .replace(/\s+/g, '-')
+    .replace(/-+/g, '-');
+  const slugEl = document.getElementById('manual-slug');
+  if (slugEl && !slugEl.dataset.manualOverride) slugEl.value = slug;
+}
 function setManualFile(file) {
   const reader = new FileReader();
   reader.onload = e => {
