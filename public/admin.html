@@ -327,11 +327,11 @@ function handleQueueFile(input, requestId, slug, name) {
 
 async function uploadQueueFile(file, requestId, slug, name) {
   const dz = document.getElementById(`dz-${requestId}`);
-  if (dz) dz.innerHTML = '<p class="text-xs text-yellow-400">Uploading…</p>';
-  const reader = new FileReader();
-  reader.onload = async e => {
-    const base64 = e.target.result.split(',')[1];
-    const url = await uploadToStorage(slug, base64, file.type);
+  if (dz) dz.innerHTML = '<p class="text-xs text-yellow-400">Optimising…</p>';
+  try {
+    const { base64, contentType } = await optimiseImage(file);
+    if (dz) dz.innerHTML = '<p class="text-xs text-yellow-400">Uploading…</p>';
+    const url = await uploadToStorage(slug, base64, contentType);
     if (url) {
       await Promise.all([
         sb.from('bottle_images').upsert({ slug, whisky_name: name, image_url: url }, { onConflict: 'slug' }),
@@ -339,10 +339,12 @@ async function uploadQueueFile(file, requestId, slug, name) {
       ]);
       loadQueue(); loadStats();
     } else {
-      if (dz) dz.innerHTML = '<p class="text-xs text-red-400">Failed</p>';
+      if (dz) dz.innerHTML = '<p class="text-xs text-red-400">Upload failed</p>';
     }
-  };
-  reader.readAsDataURL(file);
+  } catch(err) {
+    console.error('uploadQueueFile error:', err);
+    if (dz) dz.innerHTML = '<p class="text-xs text-red-400">Error: ' + err.message + '</p>';
+  }
 }
 
 async function rejectRequest(id) {

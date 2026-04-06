@@ -477,10 +477,10 @@ function bigBottleImg(w){
 function heroBottleImg(w){
   const slug=w?.slug||String(w?.id||'');
   const m=w?.metadata||{};
-  if(BOTTLE_IMAGES[slug]){
-    return `<img src="${BOTTLE_IMAGES[slug]}" style="height:280px;max-width:160px;object-fit:contain;object-position:bottom" loading="lazy"/>`;
+  const imgUrl=BOTTLE_IMAGES[slug];
+  if(imgUrl){
+    return `<img src="${imgUrl}" style="height:280px;max-width:160px;object-fit:contain;object-position:bottom" loading="lazy" onerror="this.style.display='none'"/>`;
   }
-  // Large SVG for hero
   return bSVG(m.region,110,192);
 }
 function bottleImg(w,small=false){const slug=w?.slug||String(w?.id||'');if(BOTTLE_IMAGES[slug]){const sz=small?'width:32px;height:56px':'width:120px;height:180px';return `<img src="${BOTTLE_IMAGES[slug]}" style="${sz};object-fit:contain;flex-shrink:0" loading="lazy"/>`;}return bSVG(w?.metadata?.region,small?32:52,small?56:91);}
@@ -559,7 +559,17 @@ async function loadUserData(){
   renderLibrary();renderCellar();
 }
 async function loadBottleImages(){
-  try{const{data}=await sb.from('bottle_images').select('slug,image_url');if(data)data.forEach(r=>{BOTTLE_IMAGES[r.slug]=r.image_url;});}catch(e){}
+  try{
+    const{data}=await sb.from('bottle_images').select('slug,image_url');
+    if(data) data.forEach(r=>{
+      // Store by exact slug
+      BOTTLE_IMAGES[r.slug]=r.image_url;
+      // Also store by slug with/without year suffix variants
+      // e.g. 'lagavulin-16-2023' also maps to 'lagavulin-16'
+      const base=r.slug.replace(/-\d{4}$/,'').replace(/-20\d{2}.*$/,'');
+      if(base!==r.slug) BOTTLE_IMAGES[base]=r.image_url;
+    });
+  }catch(e){}
 }
 
 // ── API ────────────────────────────────────────────────────────────
@@ -616,7 +626,7 @@ function whiskyCard(w){
       <div class="absolute inset-0" style="background:radial-gradient(ellipse 80% 90% at 50% 80%,${bGradientLight(m.region)}28 0%,transparent 65%)"></div>
       <div class="relative z-10 pb-3" style="filter:drop-shadow(0 16px 40px rgba(0,0,0,0.85))">
         ${BOTTLE_IMAGES[slug]
-          ? `<img src="${BOTTLE_IMAGES[slug]}" style="height:220px;max-width:150px;object-fit:contain;object-position:bottom" loading="lazy"/>`
+          ? `<img src="${BOTTLE_IMAGES[slug]}" style="height:220px;max-width:150px;object-fit:contain;object-position:bottom" loading="lazy" onerror="this.style.display='none'"/>`
           : bSVG(m.region,100,175)
         }
       </div>
