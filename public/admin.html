@@ -46,95 +46,151 @@
   <div id="main-content" class="hidden">
 
     <!-- Stats bar -->
-    <div class="grid grid-cols-3 gap-4 mb-6">
-      <div class="card p-4 text-center">
-        <p class="text-3xl font-bold text-yellow-400" id="stat-pending">–</p>
-        <p class="text-xs text-gray-500 uppercase tracking-wider mt-1">Pending</p>
+    <div class="grid grid-cols-4 gap-3 mb-5">
+      <div class="card p-3 text-center"><p class="text-2xl font-bold text-yellow-400" id="stat-pending">–</p><p class="text-[10px] text-gray-500 uppercase tracking-wider mt-1">Pending</p></div>
+      <div class="card p-3 text-center"><p class="text-2xl font-bold text-green-400" id="stat-done">–</p><p class="text-[10px] text-gray-500 uppercase tracking-wider mt-1">Fulfilled</p></div>
+      <div class="card p-3 text-center"><p class="text-2xl font-bold text-blue-400" id="stat-images">–</p><p class="text-[10px] text-gray-500 uppercase tracking-wider mt-1">Images</p></div>
+      <div class="card p-3 text-center"><p class="text-2xl font-bold text-purple-400" id="stat-feedback">–</p><p class="text-[10px] text-gray-500 uppercase tracking-wider mt-1">Feedback</p></div>
+    </div>
+
+    <!-- Tabs -->
+    <div class="flex gap-1 mb-5 border-b border-gray-800 overflow-x-auto" style="scrollbar-width:none">
+      <button class="admin-tab active px-4 py-2.5 text-xs font-bold uppercase tracking-wider whitespace-nowrap" data-tab="images" onclick="switchTab('images')">📷 Images</button>
+      <button class="admin-tab px-4 py-2.5 text-xs font-bold uppercase tracking-wider whitespace-nowrap text-gray-500" data-tab="requests" onclick="switchTab('requests')">📋 Requests</button>
+      <button class="admin-tab px-4 py-2.5 text-xs font-bold uppercase tracking-wider whitespace-nowrap text-gray-500" data-tab="feedback" onclick="switchTab('feedback')">💬 Feedback</button>
+      <button class="admin-tab px-4 py-2.5 text-xs font-bold uppercase tracking-wider whitespace-nowrap text-gray-500" data-tab="config" onclick="switchTab('config')">⚙️ Config</button>
+    </div>
+
+    <!-- TAB: IMAGES -->
+    <div id="tab-images" class="admin-tab-panel">
+
+      <!-- Upload any image manually -->
+      <div class="card p-5 mb-5">
+        <h2 class="text-sm font-bold text-yellow-300 uppercase tracking-wider mb-4">Upload Image</h2>
+        <div class="grid grid-cols-2 gap-3 mb-3">
+          <div>
+            <label class="block text-xs text-gray-500 mb-1">Whisky Slug</label>
+            <input id="manual-slug" type="text" placeholder="e.g. lagavulin-16" oninput="this.dataset.manualOverride='true'" class="w-full bg-black/40 border border-gray-700 rounded-lg px-3 py-2 text-sm outline-none focus:border-yellow-500/50"/>
+          </div>
+          <div>
+            <label class="block text-xs text-gray-500 mb-1">Whisky Name</label>
+            <input id="manual-name" type="text" placeholder="e.g. Lagavulin 16 Year Old" class="w-full bg-black/40 border border-gray-700 rounded-lg px-3 py-2 text-sm outline-none focus:border-yellow-500/50" oninput="autoSlug(this.value)"/>
+          </div>
+        </div>
+        <div id="manual-drop" class="drop-zone p-8 text-center cursor-pointer mb-3" onclick="document.getElementById('manual-file').click()" ondragover="dragOver(event,'manual-drop')" ondragleave="dragLeave('manual-drop')" ondrop="dropFile(event,'manual')">
+          <p class="text-gray-400 text-sm">📷 Drag & drop bottle image, or click to browse</p>
+          <p class="text-gray-600 text-xs mt-1">Any format → auto-converted to 600×900 WebP</p>
+          <input type="file" id="manual-file" accept="image/*" onchange="handleManualFile(this)"/>
+        </div>
+        <div id="manual-preview" class="hidden mb-3 flex items-center gap-3">
+          <img id="manual-preview-img" class="w-16 h-24 object-contain bg-black/20 rounded-lg"/>
+          <div><p id="manual-preview-name" class="text-sm font-semibold"></p><p id="manual-preview-size" class="text-xs text-gray-500"></p></div>
+          <button onclick="clearManualFile()" class="ml-auto text-gray-500 hover:text-red-400 text-xs">✕</button>
+        </div>
+        <button onclick="uploadManual()" class="bg-yellow-400 text-black font-bold px-6 py-2.5 rounded-lg text-sm hover:bg-yellow-300 transition-all">Upload</button>
+        <p id="manual-status" class="text-xs mt-2 text-gray-500"></p>
       </div>
-      <div class="card p-4 text-center">
-        <p class="text-3xl font-bold text-green-400" id="stat-done">–</p>
-        <p class="text-xs text-gray-500 uppercase tracking-wider mt-1">Fulfilled</p>
-      </div>
-      <div class="card p-4 text-center">
-        <p class="text-3xl font-bold text-blue-400" id="stat-images">–</p>
-        <p class="text-xs text-gray-500 uppercase tracking-wider mt-1">Images</p>
+
+      <!-- Image Audit -->
+      <div class="card p-5">
+        <div class="flex items-center justify-between mb-4">
+          <h2 class="text-sm font-bold text-yellow-300 uppercase tracking-wider">Uploaded Images</h2>
+          <button onclick="loadAudit()" class="text-xs text-gray-500 hover:text-yellow-300 border border-gray-700 px-3 py-1 rounded-lg">↻ Refresh</button>
+        </div>
+        <p class="text-xs text-gray-600 mb-3">Fix slugs or delete and re-upload wrong images.</p>
+        <div id="audit-list" class="space-y-2"><p class="text-gray-600 text-sm text-center py-4">Loading…</p></div>
       </div>
     </div>
 
-    <!-- Upload any image manually -->
-    <div class="card p-5 mb-6">
-      <h2 class="text-sm font-bold text-yellow-300 uppercase tracking-wider mb-4">Upload Image Manually</h2>
-      <div class="grid grid-cols-2 gap-3 mb-3">
-        <div>
-          <label class="block text-xs text-gray-500 mb-1">Whisky Slug</label>
-          <input id="manual-slug" type="text" placeholder="e.g. lagavulin-16" oninput="this.dataset.manualOverride='true'" class="w-full bg-black/40 border border-gray-700 rounded-lg px-3 py-2 text-sm outline-none focus:border-yellow-500/50"/>
+    <!-- TAB: REQUESTS -->
+    <div id="tab-requests" class="admin-tab-panel hidden">
+      <div class="card p-5 mb-5">
+        <div class="flex items-center justify-between mb-4">
+          <h2 class="text-sm font-bold text-yellow-300 uppercase tracking-wider">Photo Request Queue</h2>
+          <button onclick="loadQueue()" class="text-xs text-gray-500 hover:text-yellow-300 border border-gray-700 px-3 py-1 rounded-lg">↻ Refresh</button>
         </div>
-        <div>
-          <label class="block text-xs text-gray-500 mb-1">Whisky Name</label>
-          <input id="manual-name" type="text" placeholder="e.g. Lagavulin 16 Year Old" class="w-full bg-black/40 border border-gray-700 rounded-lg px-3 py-2 text-sm outline-none focus:border-yellow-500/50" oninput="autoSlug(this.value)"/>
+        <div id="queue-list" class="space-y-3"><p class="text-gray-600 text-sm text-center py-8">Loading…</p></div>
+      </div>
+      <div class="card p-5">
+        <div class="flex items-center justify-between mb-4">
+          <h2 class="text-sm font-bold text-yellow-300 uppercase tracking-wider">All Requests</h2>
+          <div class="flex gap-2">
+            <select id="req-filter" onchange="loadAllRequests()" class="text-xs text-gray-400 bg-black/40 border border-gray-700 rounded px-2 py-1 outline-none">
+              <option value="all">All</option>
+              <option value="pending">Pending</option>
+              <option value="done">Done</option>
+              <option value="rejected">Rejected</option>
+              <option value="user_request">User Requests</option>
+            </select>
+            <button onclick="loadAllRequests()" class="text-xs text-gray-500 hover:text-yellow-300 border border-gray-700 px-3 py-1 rounded-lg">↻</button>
+          </div>
         </div>
-      </div>
-      <div id="manual-drop" class="drop-zone p-8 text-center cursor-pointer mb-3" onclick="document.getElementById('manual-file').click()" ondragover="dragOver(event,'manual-drop')" ondragleave="dragLeave('manual-drop')" ondrop="dropFile(event,'manual')">
-        <p class="text-gray-400 text-sm">📷 Drag & drop bottle image here, or click to browse</p>
-        <p class="text-gray-600 text-xs mt-1">PNG, JPG, WEBP — any size</p>
-        <input type="file" id="manual-file" accept="image/*" onchange="handleManualFile(this)"/>
-      </div>
-      <div id="manual-preview" class="hidden mb-3 flex items-center gap-3">
-        <img id="manual-preview-img" class="w-16 h-24 object-contain bg-black/20 rounded-lg"/>
-        <div>
-          <p id="manual-preview-name" class="text-sm font-semibold"></p>
-          <p id="manual-preview-size" class="text-xs text-gray-500"></p>
-        </div>
-        <button onclick="clearManualFile()" class="ml-auto text-gray-500 hover:text-red-400 text-xs">✕ Clear</button>
-      </div>
-      <button onclick="uploadManual()" class="bg-yellow-400 text-black font-bold px-6 py-2.5 rounded-lg text-sm hover:bg-yellow-300 transition-all">Upload Image</button>
-      <p id="manual-status" class="text-xs mt-2 text-gray-500"></p>
-    </div>
-
-    <!-- Request queue -->
-    <div class="card p-5 mb-6">
-      <div class="flex items-center justify-between mb-4">
-        <h2 class="text-sm font-bold text-yellow-300 uppercase tracking-wider">Photo Requests Queue</h2>
-        <button onclick="loadQueue()" class="text-xs text-gray-500 hover:text-yellow-300 border border-gray-700 px-3 py-1 rounded-lg">↻ Refresh</button>
-      </div>
-      <div id="queue-list" class="space-y-3">
-        <p class="text-gray-600 text-sm text-center py-8">Loading queue…</p>
+        <div id="all-requests-list" class="space-y-2"><p class="text-gray-600 text-sm text-center py-4">Select filter above…</p></div>
       </div>
     </div>
 
-    <!-- Image Audit panel -->
-    <div class="card p-5 mb-6">
-      <div class="flex items-center justify-between mb-4">
-        <h2 class="text-sm font-bold text-yellow-300 uppercase tracking-wider">Image Audit</h2>
-        <button onclick="loadAudit()" class="text-xs text-gray-500 hover:text-yellow-300 border border-gray-700 px-3 py-1 rounded-lg">↻ Refresh</button>
-      </div>
-      <p class="text-xs text-gray-500 mb-4">All uploaded images. Fix slugs that don't match the API, or delete and re-upload wrong ones.</p>
-      <div id="audit-list" class="space-y-2">
-        <p class="text-gray-600 text-sm text-center py-4">Click Refresh to audit…</p>
+    <!-- TAB: FEEDBACK -->
+    <div id="tab-feedback" class="admin-tab-panel hidden">
+      <div class="card p-5">
+        <div class="flex items-center justify-between mb-4">
+          <h2 class="text-sm font-bold text-yellow-300 uppercase tracking-wider">User Feedback</h2>
+          <div class="flex gap-2">
+            <select id="feedback-filter" onchange="loadFeedback()" class="text-xs text-gray-400 bg-black/40 border border-gray-700 rounded px-2 py-1 outline-none">
+              <option value="all">All</option>
+              <option value="bug">🐛 Bugs</option>
+              <option value="idea">💡 Ideas</option>
+              <option value="praise">⭐ Praise</option>
+              <option value="other">💬 Other</option>
+            </select>
+            <button onclick="loadFeedback()" class="text-xs text-gray-500 hover:text-yellow-300 border border-gray-700 px-3 py-1 rounded-lg">↻</button>
+          </div>
+        </div>
+        <div id="feedback-list" class="space-y-3"><p class="text-gray-600 text-sm text-center py-8">Loading…</p></div>
       </div>
     </div>
 
-    <!-- All requests (including done/rejected) -->
-    <div class="card p-5">
-      <div class="flex items-center justify-between mb-4">
-        <h2 class="text-sm font-bold text-yellow-300 uppercase tracking-wider">All Requests</h2>
-        <div class="flex gap-2">
-          <select id="req-filter" onchange="loadAllRequests()" class="text-xs text-gray-400 bg-black/40 border border-gray-700 rounded px-2 py-1 outline-none">
-            <option value="all">All</option>
-            <option value="pending">Pending</option>
-            <option value="done">Done</option>
-            <option value="rejected">Rejected</option>
-          </select>
-          <button onclick="loadAllRequests()" class="text-xs text-gray-500 hover:text-yellow-300 border border-gray-700 px-3 py-1 rounded-lg">↻ Refresh</button>
+    <!-- TAB: CONFIG -->
+    <div id="tab-config" class="admin-tab-panel hidden">
+      <div class="card p-5 mb-4">
+        <h2 class="text-sm font-bold text-yellow-300 uppercase tracking-wider mb-4">Configuration</h2>
+        <p class="text-xs text-gray-500 mb-4">Read-only view. Edit these in the source code CFG block or Netlify environment variables.</p>
+        <div class="space-y-3" id="config-display"></div>
+      </div>
+      <div class="card p-5 mb-4">
+        <h2 class="text-sm font-bold text-yellow-300 uppercase tracking-wider mb-3">Netlify Env Variables</h2>
+        <p class="text-xs text-gray-500 mb-3">Keys that must be set in Netlify dashboard → Site config → Environment variables:</p>
+        <div class="space-y-2">
+          <div class="flex justify-between items-center bg-black/30 rounded-lg px-3 py-2">
+            <div><p class="text-xs font-mono text-yellow-300">GEMINI_API_KEY</p><p class="text-[10px] text-gray-500">Gemini Vision API — for photo label search</p></div>
+            <a href="https://aistudio.google.com/app/apikey" target="_blank" class="text-[10px] text-blue-400 hover:underline">Get key ↗</a>
+          </div>
+          <div class="flex justify-between items-center bg-black/30 rounded-lg px-3 py-2">
+            <div><p class="text-xs font-mono text-yellow-300">SUPABASE_SERVICE_KEY</p><p class="text-[10px] text-gray-500">Server-side admin operations (if needed)</p></div>
+            <a href="https://supabase.com/dashboard/project/nluezhsmgwuqdryarrmd/settings/api" target="_blank" class="text-[10px] text-blue-400 hover:underline">Dashboard ↗</a>
+          </div>
         </div>
       </div>
-      <div id="all-requests-list" class="space-y-2">
-        <p class="text-gray-600 text-sm text-center py-4">Select a filter above…</p>
+      <div class="card p-5">
+        <h2 class="text-sm font-bold text-yellow-300 uppercase tracking-wider mb-3">Sentry Error Monitoring</h2>
+        <div class="space-y-2">
+          <div class="flex justify-between items-center bg-black/30 rounded-lg px-3 py-2">
+            <div><p class="text-xs text-gray-300">Dashboard</p><p class="text-[10px] text-gray-500" id="sentry-dsn-display">DSN loaded from CFG</p></div>
+            <a href="https://sentry.io" target="_blank" class="text-[10px] text-blue-400 hover:underline">Open Sentry ↗</a>
+          </div>
+          <button onclick="testSentry()" class="text-xs border border-gray-700 px-4 py-2 rounded-lg text-gray-400 hover:text-yellow-300 hover:border-yellow-300/30 transition-all">Test Sentry (fire test error)</button>
+          <p id="sentry-test-result" class="text-xs text-gray-600"></p>
+        </div>
       </div>
     </div>
 
   </div>
-</div>
+
+<style>
+.admin-tab{border-bottom:2px solid transparent;color:#6b7280;transition:all .2s;}
+.admin-tab.active{border-bottom-color:#facc15;color:#fde047;}
+.admin-tab-panel{display:block;}
+.admin-tab-panel.hidden{display:none;}
+</style>
 
 <script>
 const SUPABASE_URL  = 'https://nluezhsmgwuqdryarrmd.supabase.co';
@@ -174,7 +230,7 @@ sb.auth.onAuthStateChange((event, session) => {
     document.getElementById('auth-gate').classList.add('hidden');
     document.getElementById('main-content').classList.remove('hidden');
     document.getElementById('admin-email').textContent = session.user.email;
-    loadQueue(); loadStats(); loadAudit(); loadAllRequests();
+    loadStats(); loadFeedbackCount(); loadAudit(); loadQueue();
   } else {
     document.getElementById('auth-gate').classList.remove('hidden');
     document.getElementById('main-content').classList.add('hidden');
@@ -376,6 +432,80 @@ async function uploadQueueFile(file, requestId, slug, name) {
     console.error('uploadQueueFile error:', err);
     if (dz) dz.innerHTML = '<p class="text-xs text-red-400">Error: ' + err.message + '</p>';
   }
+}
+
+function switchTab(tab){
+  document.querySelectorAll('.admin-tab').forEach(b=>{
+    b.classList.toggle('active', b.dataset.tab===tab);
+    b.classList.toggle('text-gray-500', b.dataset.tab!==tab);
+  });
+  document.querySelectorAll('.admin-tab-panel').forEach(p=>p.classList.add('hidden'));
+  document.getElementById('tab-'+tab)?.classList.remove('hidden');
+  if(tab==='images') loadAudit();
+  if(tab==='requests'){loadQueue();loadAllRequests();}
+  if(tab==='feedback') loadFeedback();
+  if(tab==='config') renderConfig();
+}
+
+async function loadFeedback(){
+  const el=document.getElementById('feedback-list');
+  const filter=document.getElementById('feedback-filter')?.value||'all';
+  el.innerHTML='<p class="text-gray-600 text-sm text-center py-4">Loading…</p>';
+  let q=sb.from('feedback').select('id,type,message,email,user_id,created_at,url').order('created_at',{ascending:false}).limit(100);
+  if(filter!=='all') q=q.eq('type',filter);
+  const {data,error}=await q;
+  if(error){
+    el.innerHTML=`<p class="text-red-400 text-sm text-center py-4">Error: ${error.message}</p>`;
+    if(error.code==='42P01') el.innerHTML='<p class="text-gray-500 text-sm text-center py-8">feedback table not created yet.<br><span class="text-yellow-400 text-xs">Run: CREATE TABLE feedback (id bigserial primary key, type text, message text, email text, user_id uuid, app_version text, url text, created_at timestamptz default now());</span></p>';
+    return;
+  }
+  if(!data?.length){el.innerHTML='<p class="text-gray-500 text-sm text-center py-8">No feedback yet.</p>';return;}
+  const typeEmoji={bug:'🐛',idea:'💡',praise:'⭐',other:'💬'};
+  el.innerHTML=data.map(f=>`
+    <div class="bg-black/30 rounded-lg p-3 border border-gray-800">
+      <div class="flex items-start gap-2 mb-1">
+        <span class="text-sm">${typeEmoji[f.type]||'💬'}</span>
+        <span class="text-[10px] font-bold uppercase tracking-wider text-gray-500">${f.type||'other'}</span>
+        <span class="text-[10px] text-gray-600 ml-auto">${new Date(f.created_at).toLocaleDateString('en-GB',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'})}</span>
+      </div>
+      <p class="text-gray-300 text-sm leading-relaxed">${f.message}</p>
+      ${f.email?`<p class="text-[10px] text-blue-400 mt-1">${f.email}</p>`:''}
+      ${f.url?`<p class="text-[10px] text-gray-600 mt-0.5 truncate">${f.url}</p>`:''}
+    </div>`).join('');
+  document.getElementById('stat-feedback').textContent=data.length;
+}
+
+function renderConfig(){
+  const cfg={
+    'Supabase URL': SUPABASE_URL,
+    'Supabase Anon Key': SUPABASE_ANON.substring(0,30)+'…',
+    'API Proxy': '/.netlify/functions/whisky',
+    'API Direct': 'https://thewhiskyedition.com/api/whisky-reviews',
+    'Gemini Model': 'gemini-2.0-flash (set in whisky.js)',
+    'Sentry DSN': 'b9a540d5… (see index.html CFG.SENTRY_DSN)',
+  };
+  document.getElementById('config-display').innerHTML=Object.entries(cfg).map(([k,v])=>`
+    <div class="flex justify-between items-center bg-black/30 rounded-lg px-3 py-2 gap-3">
+      <p class="text-xs text-gray-400 shrink-0">${k}</p>
+      <p class="text-xs font-mono text-gray-300 text-right truncate">${v}</p>
+    </div>`).join('');
+  document.getElementById('sentry-dsn-display').textContent='DSN: b9a540d5…@js-de.sentry-cdn.com';
+}
+
+function testSentry(){
+  const el=document.getElementById('sentry-test-result');
+  try{
+    if(typeof Sentry==='undefined'){el.textContent='Sentry not loaded';return;}
+    Sentry.captureMessage('Admin test error — '+new Date().toISOString());
+    el.textContent='✓ Test event sent — check Sentry dashboard';
+    el.className='text-xs text-green-400';
+  }catch(e){el.textContent='✗ '+e.message;el.className='text-xs text-red-400';}
+}
+
+async function loadFeedbackCount(){
+  const {count}=await sb.from('feedback').select('*',{count:'exact',head:true});
+  const el=document.getElementById('stat-feedback');
+  if(el) el.textContent=count||0;
 }
 
 async function rejectRequest(id) {

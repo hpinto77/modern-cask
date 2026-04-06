@@ -54,16 +54,7 @@ tailwind.config={darkMode:"class",theme:{extend:{colors:{"primary":"#ffe2ab","on
 .adv-input:focus{border-color:rgba(255,191,0,0.4);}
 .img-drop-zone{border:2px dashed rgba(80,69,50,0.4);border-radius:12px;padding:32px;text-align:center;cursor:pointer;transition:border-color 0.2s;}
 body{min-height:100dvh;}
-.cellar-row{position:relative;overflow:hidden;border-radius:12px;touch-action:pan-y;}
-.cellar-row-inner{position:relative;background:var(--row-bg,#1c1b1b);border-radius:12px;transition:transform 0.2s ease;will-change:transform;z-index:2;}
-.cellar-row-inner.revealed{z-index:0;}
-.cellar-row-actions{position:absolute;right:0;z-index:3;top:0;bottom:0;display:flex;align-items:center;}
-.cellar-del-btn{height:100%;padding:0 20px;background:#c0392b;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;cursor:pointer;border-radius:0 12px 12px 0;}
-.cellar-del-btn span{font-size:18px;color:#fff;}
-.cellar-del-btn p{font-size:8px;font-weight:700;color:#fff;text-transform:uppercase;letter-spacing:.05em;}
-.cellar-edit-btn{height:100%;padding:0 16px;background:#2a2a2a;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;cursor:pointer;border:1px solid #504532;}
-.cellar-edit-btn span{font-size:18px;color:#FFE2AB;}
-.cellar-edit-btn p{font-size:8px;font-weight:700;color:#9c8f78;text-transform:uppercase;letter-spacing:.05em;}
+.cellar-row{border-radius:12px;margin-bottom:8px;}
 @supports(padding-bottom: env(safe-area-inset-bottom)){
   nav.fixed.bottom-0{padding-bottom:calc(8px + env(safe-area-inset-bottom));}
   #auth-overlay{padding-bottom:env(safe-area-inset-bottom);}
@@ -125,9 +116,12 @@ body{min-height:100dvh;}
       <span class="material-symbols-outlined text-[16px]">search</span>
       <span class="text-[12px] tracking-wide">Search whiskies…</span>
     </button>
-    <!-- Request button -->
+    <!-- Request + Feedback buttons -->
     <button onclick="openRequestModal()" class="shrink-0 w-8 h-8 rounded-full flex items-center justify-center border border-[#504532]/40 hover:border-[#FFE2AB]/30 transition-all" style="background:rgba(28,27,27,0.8)" title="Request a whisky">
       <span class="material-symbols-outlined" style="font-size:16px;color:#9c8f78">add</span>
+    </button>
+    <button onclick="openFeedbackModal()" class="shrink-0 w-8 h-8 rounded-full flex items-center justify-center border border-[#504532]/40 hover:border-[#FFE2AB]/30 transition-all" style="background:rgba(28,27,27,0.8)" title="Send feedback">
+      <span class="material-symbols-outlined" style="font-size:16px;color:#9c8f78">chat_bubble</span>
     </button>
     <!-- Avatar -->
     <div id="avatar-btn" class="w-8 h-8 rounded-full amber-glow flex items-center justify-center text-[#402d00] text-[10px] font-black cursor-pointer select-none shrink-0">?</div>
@@ -372,6 +366,34 @@ body{min-height:100dvh;}
 
 <div id="toast"></div>
 
+<!-- Feedback Modal -->
+<div id="feedback-modal-overlay" style="position:fixed;inset:0;background:rgba(0,0,0,0.88);backdrop-filter:blur(6px);display:none;align-items:flex-end;justify-content:center;z-index:500">
+  <div style="width:100%;max-width:480px;background:#1c1b1b;border-radius:16px 16px 0 0;animation:slideUp 0.35s cubic-bezier(0.22,1,0.36,1)">
+    <div class="w-8 h-1 bg-[#504532]/50 rounded-full mx-auto mt-3"></div>
+    <div class="flex justify-between items-center px-5 py-3 border-b border-[#504532]/15">
+      <h3 class="font-headline font-bold text-base">Share Feedback</h3>
+      <button onclick="closeFeedbackModal()" class="text-[#9c8f78] hover:text-primary"><span class="material-symbols-outlined" style="font-size:22px">close</span></button>
+    </div>
+    <div class="px-5 py-4 space-y-4">
+      <div class="grid grid-cols-4 gap-2">
+        <button class="feedback-type-btn py-2.5 rounded-xl text-[10px] font-bold uppercase tracking-wider border border-[#504532]/30 text-[#9c8f78] hover:border-[#FFE2AB]/30 transition-all" data-type="bug">🐛 Bug</button>
+        <button class="feedback-type-btn py-2.5 rounded-xl text-[10px] font-bold uppercase tracking-wider border border-[#504532]/30 text-[#9c8f78] hover:border-[#FFE2AB]/30 transition-all" data-type="idea">💡 Idea</button>
+        <button class="feedback-type-btn py-2.5 rounded-xl text-[10px] font-bold uppercase tracking-wider border border-[#504532]/30 text-[#9c8f78] hover:border-[#FFE2AB]/30 transition-all" data-type="praise">⭐ Praise</button>
+        <button class="feedback-type-btn py-2.5 rounded-xl text-[10px] font-bold uppercase tracking-wider border border-[#504532]/30 text-[#9c8f78] hover:border-[#FFE2AB]/30 transition-all" data-type="other">💬 Other</button>
+      </div>
+      <div>
+        <textarea id="feedback-text" placeholder="What's on your mind? Be as specific as you like…" rows="4" class="w-full bg-[#2a2a2a] border border-[#504532]/30 rounded-xl py-3 px-4 text-[#e5e2e1] placeholder:text-[#504532] focus:border-[#FFBF00]/40 focus:outline-none text-[16px] resize-none"></textarea>
+      </div>
+      <div>
+        <label class="block text-[9px] uppercase tracking-[0.22em] text-[#9c8f78] mb-1.5">Email (optional — if you want a reply)</label>
+        <input id="feedback-email" type="email" placeholder="your@email.com" class="w-full bg-[#2a2a2a] border border-[#504532]/30 rounded-xl py-3 px-4 text-[#e5e2e1] placeholder:text-[#504532] focus:border-[#FFBF00]/40 focus:outline-none text-[16px]"/>
+      </div>
+      <button onclick="submitFeedback()" class="w-full amber-glow text-[#402d00] font-headline font-bold py-4 rounded-xl uppercase tracking-widest text-[11px] hover:opacity-90 active:scale-[0.98] transition-all">Send Feedback</button>
+      <div class="h-2"></div>
+    </div>
+  </div>
+</div>
+
 <!-- Request a Whisky Modal -->
 <div id="request-modal-overlay" style="position:fixed;inset:0;background:rgba(0,0,0,0.88);backdrop-filter:blur(6px);display:none;align-items:flex-end;justify-content:center;z-index:500">
   <div style="width:100%;max-width:480px;max-height:88vh;background:#1c1b1b;border-radius:16px 16px 0 0;overflow-y:auto;animation:slideUp 0.35s cubic-bezier(0.22,1,0.36,1)">
@@ -422,19 +444,42 @@ body{min-height:100dvh;}
 // ═══════════════════════════════════════════════════════════════
 
 // ── CONFIG ──────────────────────────────────────────────────────
-const SUPABASE_URL  = 'https://nluezhsmgwuqdryarrmd.supabase.co';
-const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5sdWV6aHNtZ3d1cWRyeWFycm1kIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU0MDMyODMsImV4cCI6MjA5MDk3OTI4M30.61Gt5y8k46nIBjtlpyu3n2B4RVcHpPYI1WBRoqnTOYM';
-const API_PROXY  = '/.netlify/functions/whisky';
-const API_DIRECT = 'https://thewhiskyedition.com/api/whisky-reviews';
-const IS_NETLIFY = window.location.hostname.endsWith('.netlify.app');
+// ══════════════════════════════════════════════════════════════════════════════
+// CONFIG — all keys, models and endpoints in one place. Swap anything here.
+// ══════════════════════════════════════════════════════════════════════════════
+const CFG = {
+  // ── Supabase (project: modern-cask) ──────────────────────────────────────
+  SUPABASE_URL:  'https://nluezhsmgwuqdryarrmd.supabase.co',
+  SUPABASE_ANON: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5sdWV6aHNtZ3d1cWRyeWFycm1kIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU0MDMyODMsImV4cCI6MjA5MDk3OTI4M30.61Gt5y8k46nIBjtlpyu3n2B4RVcHpPYI1WBRoqnTOYM',
 
-// ── SUPABASE ─────────────────────────────────────────────────────
+  // ── Whisky data API (WHISKY:EDITION — no key required) ───────────────────
+  API_PROXY:   '/.netlify/functions/whisky',            // Netlify proxy (CORS bypass)
+  API_DIRECT:  'https://thewhiskyedition.com/api/whisky-reviews',
+
+  // ── Gemini Vision (label photo search) — key lives server-side in Netlify env
+  GEMINI_MODEL: 'gemini-2.0-flash',                    // swap model here
+  // GEMINI_KEY set as GEMINI_API_KEY in Netlify environment variables
+
+  // ── Sentry error monitoring — DSN is write-only, safe in client code ─────
+  SENTRY_DSN:    'https://b9a540d51bfee4b8d51e19b7c03598a8@js-de.sentry-cdn.com/0',
+  SENTRY_TRACES: 0.1,                                   // 10% perf sampling
+
+  // ── Feature flags ─────────────────────────────────────────────────────────
+  USE_SUPABASE: true,
+};
+// Aliases — legacy names used throughout, sourced from CFG
+const SUPABASE_URL  = CFG.SUPABASE_URL;
+const SUPABASE_ANON = CFG.SUPABASE_ANON;
+const IS_NETLIFY    = location.hostname !== 'localhost';
+const API_PROXY     = CFG.API_PROXY;
+const API_DIRECT    = CFG.API_DIRECT;
+
 // ══ SENTRY ══════════════════════════════════════════════════════════════
 if(typeof Sentry !== 'undefined'){
   Sentry.init({
-    dsn: 'https://b9a540d51bfee4b8d51e19b7c03598a8@js-de.sentry-cdn.com/0',
-    environment: location.hostname.includes('localhost') ? 'development' : 'production',
-    tracesSampleRate: 0.1,
+    dsn: CFG.SENTRY_DSN,
+    environment: IS_NETLIFY ? 'production' : 'development',
+    tracesSampleRate: CFG.SENTRY_TRACES,
     ignoreErrors: ['ResizeObserver loop','Non-Error promise rejection'],
   });
 }
@@ -919,24 +964,22 @@ function renderCellar(){
     const w=S.whiskies.find(x=>String(x.id||x.slug)===String(ci.whisky_id));
     const name=w?.name||ci.whisky_name||'Unknown';
     const region=w?.metadata?.region||'';
-    return `<div class="cellar-row mb-2" data-id="${ci.id}" data-whisky-id="${ci.whisky_id}">
-      <div class="cellar-row-actions">
-        <div class="cellar-edit-btn" data-action="edit" data-id="${ci.id}">
-          <span class="material-symbols-outlined">edit</span>
-          <p>Edit</p>
-        </div>
-        <div class="cellar-del-btn" data-action="delete" data-id="${ci.id}">
-          <span class="material-symbols-outlined">delete</span>
-          <p>Delete</p>
-        </div>
-      </div>
-      <div class="cellar-row-inner flex items-center gap-3 p-3 cursor-pointer" data-action="detail" data-whisky-id="${ci.whisky_id}">
+    return `<div class="cellar-row" data-id="${ci.id}">
+      <div class="flex items-center gap-3 p-3 rounded-xl cursor-pointer" style="background:#1c1b1b" data-action="detail" data-whisky-id="${ci.whisky_id}">
         <div class="shrink-0">${bSVG(region,24,42)}</div>
         <div class="flex-1 min-w-0">
           <p class="text-[13px] font-semibold truncate">${name}</p>
           <p class="text-[#9c8f78] text-[9px] mt-0.5">${new Date(ci.date).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'})}${ci.location?' · '+ci.location:''}</p>
+          <div class="flex mt-1">${starsHTML(ci.rating,5,11)}</div>
         </div>
-        <div class="flex">${starsHTML(ci.rating,5,11)}</div>
+        <div class="flex items-center gap-1 shrink-0">
+          <button class="w-7 h-7 rounded-lg flex items-center justify-center hover:bg-[#2a2a2a] transition-colors" data-action="edit" data-id="${ci.id}" title="Edit">
+            <span class="material-symbols-outlined pointer-events-none" style="font-size:15px;color:#9c8f78">edit</span>
+          </button>
+          <button class="w-7 h-7 rounded-lg flex items-center justify-center hover:bg-[#2a2a2a] transition-colors" data-action="delete" data-id="${ci.id}" title="Delete">
+            <span class="material-symbols-outlined pointer-events-none" style="font-size:15px;color:#9c8f78">delete</span>
+          </button>
+        </div>
       </div>
     </div>`;
   }).join('');
@@ -946,73 +989,16 @@ function renderCellar(){
 function initSwipe(){
   const list = document.getElementById('cellar-list');
   if(!list) return;
-
-  // ── Event delegation: handle all taps on cellar rows ──
-  // Unbind previous to avoid duplicates
   if(list._delegated){ list.removeEventListener('click', list._delegated); }
   list._delegated = function(e){
-    const editBtn = e.target.closest('[data-action="edit"]');
-    const delBtn  = e.target.closest('[data-action="delete"]');
-    const detBtn  = e.target.closest('[data-action="detail"]');
-    if(editBtn){ editCheckin(editBtn.dataset.id); return; }
-    if(delBtn){  deleteCheckin(delBtn.dataset.id); return; }
-    // Only navigate if row is not swiped open
-    if(detBtn){
-      const row = detBtn.closest('.cellar-row');
-      if(row && row.dataset.swiped === '1') return;
-      showDetail(detBtn.dataset.whiskyId);
-    }
+    const editBtn  = e.target.closest('[data-action="edit"]');
+    const delBtn   = e.target.closest('[data-action="delete"]');
+    const detailEl = e.target.closest('[data-action="detail"]');
+    if(editBtn){ e.stopPropagation(); editCheckin(editBtn.dataset.id); return; }
+    if(delBtn){  e.stopPropagation(); deleteCheckin(delBtn.dataset.id); return; }
+    if(detailEl){ showDetail(detailEl.dataset.whiskyId); }
   };
   list.addEventListener('click', list._delegated);
-
-  // ── Swipe on each row ──
-  document.querySelectorAll('.cellar-row').forEach(row=>{
-    const inner = row.querySelector('.cellar-row-inner');
-    if(!inner || row._swipeInit) return;
-    row._swipeInit = true;
-    const W = 160;
-    let x0=0, revealed=false;
-
-    inner.addEventListener('touchstart', e=>{
-      x0 = e.touches[0].clientX;
-      inner.style.transition='none';
-    }, {passive:true});
-
-    inner.addEventListener('touchmove', e=>{
-      const dx = e.touches[0].clientX - x0;
-      const base = revealed ? -W : 0;
-      const pos = Math.min(0, Math.max(-W, base + dx));
-      inner.style.transform = `translateX(${pos}px)`;
-    }, {passive:true});
-
-    inner.addEventListener('touchend', e=>{
-      const dx = e.changedTouches[0].clientX - x0;
-      const base = revealed ? -W : 0;
-      const final = base + dx;
-      inner.style.transition = 'transform 0.2s ease';
-      if(final < -W/2){
-        inner.style.transform = `translateX(-${W}px)`;
-        inner.classList.add('revealed');
-        row.dataset.swiped = '1';
-        revealed = true;
-      } else {
-        inner.style.transform = 'translateX(0)';
-        inner.classList.remove('revealed');
-        row.dataset.swiped = '0';
-        revealed = false;
-      }
-    }, {passive:true});
-  });
-
-  // Close all rows on tap outside the list
-  document.addEventListener('touchstart', e=>{
-    if(!list.contains(e.target)){
-      document.querySelectorAll('.cellar-row').forEach(row=>{
-        const inner = row.querySelector('.cellar-row-inner');
-        if(inner){ inner.style.transition='transform 0.2s ease'; inner.style.transform='translateX(0)'; inner.classList.remove('revealed'); row.dataset.swiped='0'; }
-      });
-    }
-  }, {passive:true});
 }
 
 async function deleteCheckin(id){
@@ -1108,6 +1094,45 @@ async function requestImage(slug, name, region) {
 }
 
 // ── PHOTO SEARCH ────────────────────────────────────────────────────
+// ── FEEDBACK ──────────────────────────────────────────────────────────────────
+let _feedbackType = 'other';
+function openFeedbackModal(){
+  _feedbackType = 'other';
+  document.querySelectorAll('.feedback-type-btn').forEach(b=>b.classList.remove('border-[#FFBF00]/50','text-[#FFE2AB]'));
+  document.getElementById('feedback-text').value='';
+  document.getElementById('feedback-email').value='';
+  document.getElementById('feedback-modal-overlay').style.display='flex';
+}
+function closeFeedbackModal(){
+  document.getElementById('feedback-modal-overlay').style.display='none';
+}
+async function submitFeedback(){
+  const text = document.getElementById('feedback-text').value.trim();
+  if(!text){showToast('Please write something first');return;}
+  const btn = document.querySelector('#feedback-modal-overlay button[onclick="submitFeedback()"]');
+  if(btn){btn.textContent='Sending…';btn.disabled=true;}
+  try{
+    await sb.from('feedback').insert({
+      type: _feedbackType,
+      message: text,
+      email: document.getElementById('feedback-email').value.trim()||null,
+      user_id: S.user?.id||null,
+      app_version: '1.0',
+      url: location.href,
+      created_at: new Date().toISOString(),
+    });
+    closeFeedbackModal();
+    showToast('Thanks — feedback received!');
+  }catch(e){
+    // Table may not exist yet — log to Sentry and show friendly message
+    if(typeof Sentry!=='undefined') Sentry.captureException(e);
+    showToast('Sent! ('+e.message+')');
+    closeFeedbackModal();
+  }finally{
+    if(btn){btn.textContent='Send Feedback';btn.disabled=false;}
+  }
+}
+
 function openRequestModal(){
   document.getElementById('request-modal-overlay').style.display='flex';
 }
@@ -1256,6 +1281,12 @@ async function init(){
   document.getElementById('modal-close-btn').addEventListener('click',closeModal);
   document.getElementById('modal-overlay').addEventListener('click',e=>{if(e.target===document.getElementById('modal-overlay'))closeModal();});
   document.getElementById('request-modal-overlay').addEventListener('click',e=>{if(e.target===document.getElementById('request-modal-overlay'))closeRequestModal();});
+  document.getElementById('feedback-modal-overlay').addEventListener('click',e=>{if(e.target===document.getElementById('feedback-modal-overlay'))closeFeedbackModal();});
+  document.querySelectorAll('.feedback-type-btn').forEach(b=>b.addEventListener('click',()=>{
+    _feedbackType=b.dataset.type;
+    document.querySelectorAll('.feedback-type-btn').forEach(x=>x.classList.remove('border-[#FFBF00]/50','text-[#FFE2AB]'));
+    b.classList.add('border-[#FFBF00]/50','text-[#FFE2AB]');
+  }));
   document.getElementById('submit-checkin-btn').addEventListener('click',submitCheckin);
   document.querySelectorAll('#modal-stars .star-btn').forEach(s=>s.addEventListener('click',()=>{S.modalRating=+s.dataset.v;updateMStars();}));
 
