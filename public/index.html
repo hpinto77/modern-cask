@@ -97,17 +97,25 @@ body{min-height:100dvh;}
     </button>
     <p class="text-[#504532] text-[9px] text-center mt-6 uppercase tracking-wider">Private &amp; synced across devices</p>
   </div>
+  <div id="auth-loading" class="hidden absolute inset-0 flex flex-col items-center justify-center bg-[#131313]">
+    <div class="w-10 h-10 border-2 border-[#FFBF00] border-t-transparent rounded-full animate-spin mb-4"></div>
+    <p class="text-[#FFE2AB] text-sm font-semibold">Signing in...</p>
+    <p class="text-[#504532] text-[9px] mt-2 uppercase tracking-wider">Verifying with Google</p>
+  </div>
 </div>
 
 <!-- TOP BAR -->
-<header class="fixed top-0 w-full z-50 bg-[#131313]/90 backdrop-blur-xl flex justify-between items-center px-5 h-14 border-b border-[#504532]/20">
-  <h1 class="text-[13px] font-black uppercase tracking-[0.22em] text-[#FFE2AB] font-headline">The Modern Cask</h1>
-  <div class="flex items-center gap-3">
-    <button id="search-open-btn" class="text-[#9c8f78] hover:text-[#FFE2AB] transition-colors flex items-center gap-1.5 bg-[#1c1b1b] px-3 py-1.5 rounded-full border border-[#504532]/30">
+<header class="fixed top-0 w-full z-50 bg-[#131313]/95 backdrop-blur-xl border-b border-[#504532]/15" style="height:56px">
+  <div class="flex items-center justify-between px-4 h-full gap-3">
+    <!-- Name → home -->
+    <button id="home-btn" class="font-headline font-black uppercase tracking-[0.2em] text-[#FFE2AB] text-[11px] shrink-0 hover:opacity-70 transition-opacity">TMC</button>
+    <!-- Search — prominent, centered, pill shaped -->
+    <button id="search-open-btn" class="flex-1 flex items-center gap-2 rounded-full px-4 py-2 border border-[#504532]/40 text-[#504532] hover:border-[#FFE2AB]/30 hover:text-[#9c8f78] transition-all" style="background:rgba(28,27,27,0.8)">
       <span class="material-symbols-outlined text-[16px]">search</span>
-      <span class="text-[10px] font-semibold uppercase tracking-wider">Search</span>
+      <span class="text-[12px] tracking-wide">Search whiskies…</span>
     </button>
-    <div id="avatar-btn" class="w-7 h-7 rounded-full amber-glow flex items-center justify-center text-[#402d00] text-[10px] font-black cursor-pointer select-none">?</div>
+    <!-- Avatar -->
+    <div id="avatar-btn" class="w-8 h-8 rounded-full amber-glow flex items-center justify-center text-[#402d00] text-[10px] font-black cursor-pointer select-none shrink-0">?</div>
   </div>
 </header>
 
@@ -207,29 +215,23 @@ body{min-height:100dvh;}
 <!-- MAIN VIEWS -->
 <div id="app" class="pt-14 pb-[72px]">
 
-  <!-- DISCOVER -->
+  <!-- DISCOVER — card scroll feed -->
   <div class="view active" id="view-discover">
-    <div class="px-5 pt-7 pb-4">
-      <p class="text-[#D4C5AB] text-[9px] uppercase tracking-[0.22em] mb-1 font-semibold">Single Malt Discovery</p>
-      <h2 class="font-headline text-[44px] font-extrabold tracking-tight leading-none text-[#e5e2e1]">Discover.</h2>
+    <!-- Filter pills -->
+    <div class="flex gap-2 px-4 pt-4 pb-3 overflow-x-auto" style="scrollbar-width:none;">
+      <button class="filter-pill shrink-0 px-4 py-2 rounded-full text-[10px] uppercase tracking-wider font-bold border border-[#504532]/40 text-[#9c8f78] transition-all" data-f="all">All</button>
+      <button class="filter-pill shrink-0 px-4 py-2 rounded-full text-[10px] uppercase tracking-wider font-bold border border-[#504532]/40 text-[#9c8f78] transition-all" data-f="scotland">Scotland</button>
+      <button class="filter-pill shrink-0 px-4 py-2 rounded-full text-[10px] uppercase tracking-wider font-bold border border-[#504532]/40 text-[#9c8f78] transition-all" data-f="japan">Japan</button>
+      <button class="filter-pill shrink-0 px-4 py-2 rounded-full text-[10px] uppercase tracking-wider font-bold border border-[#504532]/40 text-[#9c8f78] transition-all" data-f="peated">Peated</button>
+      <button class="filter-pill shrink-0 px-4 py-2 rounded-full text-[10px] uppercase tracking-wider font-bold border border-[#504532]/40 text-[#9c8f78] transition-all" data-f="sherry">Sherry</button>
+      <button class="filter-pill shrink-0 px-4 py-2 rounded-full text-[10px] uppercase tracking-wider font-bold border border-[#504532]/40 text-[#9c8f78] transition-all" data-f="cask-strength">Cask Str.</button>
     </div>
-    <div class="flex gap-2 px-5 overflow-x-auto pb-3" style="scrollbar-width:none;">
-      <button class="filter-pill shrink-0 px-3.5 py-1.5 rounded-full text-[9px] uppercase tracking-wider font-bold border border-[#504532]/40 text-[#9c8f78]" data-f="all">All</button>
-      <button class="filter-pill shrink-0 px-3.5 py-1.5 rounded-full text-[9px] uppercase tracking-wider font-bold border border-[#504532]/40 text-[#9c8f78]" data-f="scotland">Scotland</button>
-      <button class="filter-pill shrink-0 px-3.5 py-1.5 rounded-full text-[9px] uppercase tracking-wider font-bold border border-[#504532]/40 text-[#9c8f78]" data-f="japan">Japan</button>
-      <button class="filter-pill shrink-0 px-3.5 py-1.5 rounded-full text-[9px] uppercase tracking-wider font-bold border border-[#504532]/40 text-[#9c8f78]" data-f="peated">Peated</button>
-      <button class="filter-pill shrink-0 px-3.5 py-1.5 rounded-full text-[9px] uppercase tracking-wider font-bold border border-[#504532]/40 text-[#9c8f78]" data-f="sherry">Sherry</button>
-      <button class="filter-pill shrink-0 px-3.5 py-1.5 rounded-full text-[9px] uppercase tracking-wider font-bold border border-[#504532]/40 text-[#9c8f78]" data-f="cask-strength">Cask Str.</button>
-    </div>
-    <div id="api-status" class="mx-5 mb-3 px-3 py-1.5 rounded-lg text-[9px] hidden"></div>
-    <div id="whisky-list" class="px-3 divide-y divide-[#504532]/15">
-      <div class="skeleton h-[72px] mx-2 my-2"></div>
-      <div class="skeleton h-[72px] mx-2 my-2" style="animation-delay:.1s"></div>
-      <div class="skeleton h-[72px] mx-2 my-2" style="animation-delay:.2s"></div>
-      <div class="skeleton h-[72px] mx-2 my-2" style="animation-delay:.3s"></div>
-    </div>
-    <div id="load-more-wrap" class="px-5 py-5 hidden">
-      <button id="load-more-btn" class="w-full py-3 border border-[#504532]/40 rounded-xl text-[9px] uppercase tracking-widest text-[#9c8f78] hover:text-primary transition-all font-bold">Load More</button>
+    <div id="api-status" class="mx-4 mb-2 px-3 py-1.5 rounded-lg text-[9px] hidden"></div>
+    <!-- Card feed — full width scroll -->
+    <div id="whisky-list" class="px-4 space-y-4 pb-4">
+      <div class="skeleton rounded-2xl" style="height:420px"></div>
+      <div class="skeleton rounded-2xl" style="height:420px;animation-delay:.1s"></div>
+      <div class="skeleton rounded-2xl" style="height:420px;animation-delay:.2s"></div>
     </div>
   </div>
 
@@ -311,10 +313,10 @@ body{min-height:100dvh;}
   </div>
 
   <!-- DETAIL -->
-  <div class="view" id="view-detail">
+  <div class="view" id="view-detail" style="padding-top:0">
     <div class="flex items-center justify-between px-5 pt-3 pb-1">
-      <button id="back-btn" class="flex items-center gap-1 text-[#9c8f78] hover:text-primary transition-colors text-sm"><span class="material-symbols-outlined" style="font-size:18px;">arrow_back</span><span class="font-semibold">Back</span></button>
-      <button id="detail-checkin-btn" class="text-[9px] uppercase tracking-widest font-bold text-primary border border-primary/30 px-4 py-2 rounded-full hover:bg-primary/10 transition-all">Check In</button>
+      <button id="back-btn" class="flex items-center gap-1.5 text-[#9c8f78] hover:text-primary transition-colors"><span class="material-symbols-outlined" style="font-size:20px;">arrow_back</span></button>
+      <button id="detail-checkin-btn" class="hidden">Check In</button>
     </div>
     <div id="detail-content" class="px-5 pb-6"></div>
   </div>
@@ -370,7 +372,12 @@ const IS_NETLIFY = window.location.hostname.endsWith('.netlify.app');
 
 // ── SUPABASE ─────────────────────────────────────────────────────
 const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON, {
-  auth: { detectSessionInUrl: true, flowType: 'implicit' }
+  auth: {
+    detectSessionInUrl: true,
+    flowType: 'pkce',
+    autoRefreshToken: true,
+    persistSession: true,
+  }
 });
 
 // ── STATE ─────────────────────────────────────────────────────────
@@ -447,6 +454,15 @@ function bigBottleImg(w){
   }
   return bSVG(m.region,90,158);
 }
+function heroBottleImg(w){
+  const slug=w?.slug||String(w?.id||'');
+  const m=w?.metadata||{};
+  if(BOTTLE_IMAGES[slug]){
+    return `<img src="${BOTTLE_IMAGES[slug]}" style="height:280px;max-width:160px;object-fit:contain;object-position:bottom" loading="lazy"/>`;
+  }
+  // Large SVG for hero
+  return bSVG(m.region,110,192);
+}
 function bottleImg(w,small=false){const slug=w?.slug||String(w?.id||'');if(BOTTLE_IMAGES[slug]){const sz=small?'width:32px;height:56px':'width:120px;height:180px';return `<img src="${BOTTLE_IMAGES[slug]}" style="${sz};object-fit:contain;flex-shrink:0" loading="lazy"/>`;}return bSVG(w?.metadata?.region,small?32:52,small?56:91);}
 function rBadge(r=''){const v=(r||'').toLowerCase();let cls='region-other';if(v.includes('islay'))cls='region-islay';else if(v.includes('speyside'))cls='region-speyside';else if(v.includes('highland')||v.includes('orkney'))cls='region-highland';else if(v.includes('lowland'))cls='region-lowland';else if(v.includes('campbeltown'))cls='region-campbeltown';else if(v.includes('island'))cls='region-islands';else if(v.includes('japan'))cls='region-japan';else if(v.includes('ireland'))cls='region-ireland';return `<span class="${cls} text-[8px] uppercase tracking-wider font-bold px-2 py-0.5 rounded-full">${r||'Unknown'}</span>`;}
 function avgR(w){const m=w?.rating?.marcel,s=w?.rating?.sascha;if(m&&s)return((m+s)/2).toFixed(1);if(m)return m.toFixed(1);return'—';}
@@ -503,6 +519,8 @@ function hideAuth(){document.getElementById('auth-overlay').style.display='none'
 function onSignedIn(user){
   S.user=user;
   hideAuth();
+  const loadingEl = document.getElementById('auth-loading');
+  if (loadingEl) loadingEl.classList.add('hidden');
   const ini2=ini(user.email);
   document.getElementById('avatar-btn').textContent=ini2;
   document.getElementById('cellar-avatar').textContent=ini2;
@@ -543,6 +561,7 @@ function setAPIStatus(ok){
 
 // ── RENDER ─────────────────────────────────────────────────────────
 function whiskyRow(w,clickFn){
+  // Used in search results — keep as compact row
   const m=w.metadata||{};
   const isC=S.checkins.some(c=>String(c.whisky_id)===String(w.id||w.slug));
   const score=avgR(w);
@@ -564,10 +583,45 @@ function whiskyRow(w,clickFn){
     </div>
   </div>`;
 }
+
+function whiskyCard(w){
+  // Discover feed — full card with big bottle image, same language as detail page
+  const m=w.metadata||{};
+  const isC=S.checkins.some(c=>String(c.whisky_id)===String(w.id||w.slug));
+  const score=avgR(w);
+  const slug=w.slug||String(w.id||'');
+  return `<div class="rounded-2xl overflow-hidden cursor-pointer active:scale-[0.98] transition-transform" style="background:#1a1a1a;border:0.5px solid rgba(80,69,50,0.25)" onclick="showDetail('${slug}')">
+    <!-- Bottle image zone -->
+    <div class="relative flex items-end justify-center overflow-hidden" style="height:240px;background:linear-gradient(160deg,${bGradientDark(m.region)}18 0%,#111 100%)">
+      <div class="absolute inset-0" style="background:radial-gradient(ellipse 80% 90% at 50% 80%,${bGradientLight(m.region)}28 0%,transparent 65%)"></div>
+      <div class="relative z-10 pb-3" style="filter:drop-shadow(0 16px 40px rgba(0,0,0,0.85))">
+        ${BOTTLE_IMAGES[slug]
+          ? `<img src="${BOTTLE_IMAGES[slug]}" style="height:220px;max-width:150px;object-fit:contain;object-position:bottom" loading="lazy"/>`
+          : bSVG(m.region,100,175)
+        }
+      </div>
+      <!-- Checked-in badge -->
+      ${isC?`<div class="absolute top-3 right-3 flex items-center gap-1 px-2 py-1 rounded-full" style="background:rgba(255,191,0,0.15);border:1px solid rgba(255,191,0,0.3)"><span class="material-symbols-outlined text-[#FFBF00]" style="font-size:12px;font-variation-settings:'FILL' 1">check_circle</span><span class="text-[9px] font-bold text-[#FFBF00] uppercase tracking-wider">In Cellar</span></div>`:''}
+      <!-- Score badge -->
+      ${score!=='—'?`<div class="absolute top-3 left-3 px-2.5 py-1 rounded-full" style="background:rgba(19,19,19,0.75);backdrop-filter:blur(8px);border:1px solid rgba(255,191,0,0.2)"><span class="font-headline font-black text-[#FFBF00] text-[13px]">${score}</span></div>`:''}
+    </div>
+    <!-- Info zone -->
+    <div class="px-4 pt-3 pb-4">
+      <p class="text-[9px] uppercase tracking-[0.18em] mb-1 font-semibold" style="color:#9c8f78">${(m.region||m.country||'').toUpperCase()}${m.distillery?' · '+m.distillery.toUpperCase():''}</p>
+      <p class="font-headline font-extrabold leading-tight mb-3" style="font-size:clamp(18px,5vw,22px);color:#e5e2e1">${w.name}</p>
+      <div class="flex items-center gap-4">
+        ${m.age?`<div><p class="text-[8px] uppercase tracking-wider mb-0.5" style="color:#504532">Age</p><p class="font-headline font-bold text-[15px]" style="color:#FFBF00">${m.age}<span style="font-size:10px">yr</span></p></div>`:''}
+        ${m.abv?`<div><p class="text-[8px] uppercase tracking-wider mb-0.5" style="color:#504532">ABV</p><p class="font-headline font-bold text-[15px]" style="color:#FFBF00">${m.abv}<span style="font-size:10px">%</span></p></div>`:''}
+        ${m.flavour?`<div class="ml-auto">${rBadge(m.flavour)}</div>`:''}
+      </div>
+    </div>
+  </div>`;
+}
 function renderList(list){
   const el=document.getElementById('whisky-list');
   if(!list.length){el.innerHTML=emptyEl();return;}
-  el.innerHTML=list.map(w=>whiskyRow(w)).join('<div class="border-t border-[#504532]/15"></div>');
+  // Cards in discover feed — no dividers
+  el.innerHTML=list.map(w=>whiskyCard(w)).join('');
 }
 function filteredList(){
   let list=[...S.whiskies];
@@ -698,36 +752,57 @@ async function showDetail(slugOrId){
   else{btn.textContent='Check In';btn.className='text-[9px] uppercase tracking-widest font-bold text-primary border border-primary/30 px-4 py-2 rounded-full hover:bg-primary/10 transition-all';}
   const userNote=S.checkins.find(c=>String(c.whisky_id)===String(w.id||w.slug));
   document.getElementById('detail-content').innerHTML=`
-    <div class="text-center pt-4 pb-6">
-      <div class="relative flex justify-center items-end mb-6" style="height:220px">
-        <div class="absolute inset-0 rounded-2xl overflow-hidden" style="background:radial-gradient(ellipse 70% 80% at 50% 60%,${bGradientLight(m.region)} 0%,transparent 70%);opacity:0.5"></div>
-        <div class="absolute inset-0 rounded-2xl" style="background:linear-gradient(180deg,${bGradientDark(m.region)} 0%,transparent 100%);opacity:0.15"></div>
-        <div class="relative z-10 flex items-end justify-center h-full pb-4" style="filter:drop-shadow(0 12px 32px rgba(0,0,0,0.7))">
-          ${bigBottleImg(w)}
-        </div>
+    <!-- HERO — full bleed bottle image matching reference design -->
+    <div class="relative overflow-hidden" style="height:300px;margin:-56px -20px 0;width:calc(100% + 40px)">
+      <div class="absolute inset-0" style="background:linear-gradient(180deg,#0d0d0d 0%,${bGradientDark(m.region)}18 40%,#0d0d0d 100%)"></div>
+      <div class="absolute inset-0" style="background:radial-gradient(ellipse 75% 85% at 50% 75%,${bGradientLight(m.region)}2a 0%,transparent 68%)"></div>
+      <div class="absolute inset-0 flex items-end justify-center pb-2" style="filter:drop-shadow(0 20px 48px rgba(0,0,0,0.9))">
+        ${heroBottleImg(w)}
       </div>
-      <p class="text-[9px] uppercase tracking-widest text-[#9c8f78] mb-1">${m.distillery||''}</p>
-      <h2 class="font-headline text-2xl font-extrabold tracking-tight mb-3">${w.name}</h2>
-      <div class="flex justify-center gap-1.5 flex-wrap mb-3">
-        ${rBadge(m.region||m.country||'')}
-        ${m.age?`<span class="text-[8px] uppercase tracking-wider font-bold px-2 py-0.5 rounded-full bg-[#353535] text-[#9c8f78]">${m.age} Yr</span>`:''}
-        ${m.abv?`<span class="text-[8px] uppercase tracking-wider font-bold px-2 py-0.5 rounded-full bg-[#353535] text-[#9c8f78]">${m.abv}% ABV</span>`:''}
-        ${m.flavour?`<span class="text-[8px] uppercase tracking-wider font-bold px-2 py-0.5 rounded-full bg-[#353535] text-[#9c8f78]">${m.flavour}</span>`:''}
-      </div>
-      ${score!=='—'?`<div><span class="font-headline font-black text-[#FFBF00] text-[52px] leading-none">${score}</span><span class="text-[#9c8f78] text-sm ml-1">/100</span></div>`:''}
+      <!-- top fade to blend with header -->
+      <div class="absolute inset-x-0 top-0 h-20" style="background:linear-gradient(180deg,#131313 0%,transparent 100%)"></div>
     </div>
-    ${w.description?`<div class="bg-surface-container-low rounded-xl p-4 mb-4"><p class="text-[#9c8f78] text-sm leading-relaxed italic">"${w.description}"</p></div>`:''}
-    ${notes.nose||notes.palate||notes.finish?`<div class="space-y-3 mb-4">
-      <h3 class="font-headline text-base font-bold text-[#FFE2AB]">The Tasting Experience</h3>
-      ${notes.nose?`<div class="bg-surface-container-low p-4 rounded-xl"><span class="text-[8px] uppercase tracking-widest text-[#FFBF00] font-bold mb-1.5 block">Nose</span><p class="text-on-surface text-sm">${notes.nose}</p></div>`:''}
-      ${notes.palate?`<div class="bg-surface-container-low p-4 rounded-xl"><span class="text-[8px] uppercase tracking-widest text-[#FFBF00] font-bold mb-1.5 block">Palate</span><p class="text-on-surface text-sm">${notes.palate}</p></div>`:''}
-      ${notes.finish?`<div class="bg-surface-container-low p-4 rounded-xl"><span class="text-[8px] uppercase tracking-widest text-[#FFBF00] font-bold mb-1.5 block">Finish</span><p class="text-on-surface text-sm">${notes.finish}</p></div>`:''}
-    </div>`:''}
-    ${m.abv?`<div class="bg-surface-container-low rounded-xl p-4 mb-4"><div class="flex justify-between text-[9px] mb-1.5"><span class="text-[#9c8f78] uppercase">ABV</span><span class="text-[#FFBF00] font-bold">${m.abv}%</span></div><div class="h-1 bg-[#353535] rounded-full overflow-hidden"><div class="h-full amber-glow" style="width:${Math.min(m.abv,100)}%"></div></div></div>`:''}
-    ${userNote?`<div class="bg-surface-container-low rounded-xl p-4 mb-4 border border-[#FFBF00]/12"><div class="flex items-center gap-2 mb-2"><span class="text-[8px] uppercase tracking-widest text-[#FFBF00] font-bold">Your Note</span><div class="ml-auto flex">${starsHTML(userNote.rating,5,13)}</div></div>${userNote.notes?`<p class="text-[#9c8f78] text-sm italic">"${userNote.notes}"</p>`:''}</div>`:''}
-    ${!BOTTLE_IMAGES[String(w.id||w.slug)] ? `<button class="request-photo-btn w-full mt-3 py-3 border border-[#504532]/40 rounded-xl text-[9px] uppercase tracking-widest text-[#9c8f78] hover:text-primary hover:border-primary/30 transition-all font-bold flex items-center justify-center gap-2" data-slug="${w.slug||w.id}" data-name="${(w.name||'').replace(/"/g,'')}" data-region="${m.region||''}"><span class="material-symbols-outlined text-[14px]">add_photo_alternate</span>📷 Request Bottle Photo</button>` : ''}
-    <button class="w-full amber-glow text-[#402d00] font-headline font-bold py-4 rounded-xl uppercase tracking-widest text-[11px] hover:opacity-90 active:scale-[0.98] transition-all mt-2" onclick="openModal()">${isC?'Update Check-in':'Check In This Dram'}</button>
-  `;
+
+    <!-- CONTENT -->
+    <div class="pt-6">
+      <!-- Category label -->
+      <p class="text-[10px] uppercase tracking-[0.2em] font-semibold mb-2" style="color:#9c8f78">${(m.region||m.country||'Single Malt').toUpperCase()}${m.flavour?' · '+m.flavour.toUpperCase():''}</p>
+
+      <!-- Big editorial title — matches reference weight/size -->
+      <h1 class="font-headline font-extrabold leading-[1.05] text-[#e5e2e1] mb-5" style="font-size:clamp(26px,8vw,36px)">${w.name}</h1>
+
+      <!-- Stats row: Age / Strength / Score — exactly like reference -->
+      <div class="flex gap-5 mb-6 flex-wrap">
+        ${m.age?`<div><p class="text-[9px] uppercase tracking-wider mb-1" style="color:#9c8f78">Age</p><p class="font-headline font-bold leading-none" style="font-size:22px;color:#FFBF00">${m.age}<span style="font-size:13px">Yrs</span></p></div>`:''}
+        ${m.abv?`<div><p class="text-[9px] uppercase tracking-wider mb-1" style="color:#9c8f78">Strength</p><p class="font-headline font-bold leading-none" style="font-size:22px;color:#FFBF00">${m.abv}<span style="font-size:13px">%</span></p></div>`:''}
+        ${score!=='—'?`<div><p class="text-[9px] uppercase tracking-wider mb-1" style="color:#9c8f78">Score</p><p class="font-headline font-bold leading-none" style="font-size:22px;color:#FFBF00">${score}<span style="font-size:13px">/100</span></p></div>`:''}
+        ${m.distillery?`<div class="ml-auto text-right"><p class="text-[9px] uppercase tracking-wider mb-1" style="color:#9c8f78">Distillery</p><p class="font-semibold leading-tight" style="font-size:13px;color:#e5e2e1;max-width:120px">${m.distillery}</p></div>`:''}
+      </div>
+
+      <div class="h-px mb-5" style="background:rgba(80,69,50,0.2)"></div>
+
+      <!-- Description -->
+      ${w.description?`<p class="text-sm leading-relaxed mb-5" style="color:#9c8f78">${w.description}</p>`:''}
+
+      <!-- Tasting notes — left-border accent style -->
+      ${notes.nose||notes.palate||notes.finish?`<p class="text-[10px] uppercase tracking-[0.18em] font-semibold mb-3" style="color:#9c8f78">Tasting Notes</p>
+      <div class="space-y-3 mb-5">
+        ${notes.nose?`<div class="p-4 rounded-xl" style="background:#1c1b1b;border-left:2px solid rgba(255,191,0,0.6)"><p class="text-[9px] uppercase tracking-widest font-bold mb-1.5" style="color:#FFBF00">Nose</p><p class="text-sm leading-relaxed" style="color:#d4c5ab">${notes.nose}</p></div>`:''}
+        ${notes.palate?`<div class="p-4 rounded-xl" style="background:#1c1b1b;border-left:2px solid rgba(255,191,0,0.35)"><p class="text-[9px] uppercase tracking-widest font-bold mb-1.5" style="color:#FFBF00">Palate</p><p class="text-sm leading-relaxed" style="color:#d4c5ab">${notes.palate}</p></div>`:''}
+        ${notes.finish?`<div class="p-4 rounded-xl" style="background:#1c1b1b;border-left:2px solid rgba(255,191,0,0.15)"><p class="text-[9px] uppercase tracking-widest font-bold mb-1.5" style="color:#FFBF00">Finish</p><p class="text-sm leading-relaxed" style="color:#d4c5ab">${notes.finish}</p></div>`:''}
+      </div>`:''}
+
+      <!-- User's note -->
+      ${userNote?`<div class="p-4 rounded-xl mb-5" style="background:#1c1b1b;border:1px solid rgba(255,191,0,0.12)"><div class="flex items-center justify-between mb-2"><span class="text-[9px] uppercase tracking-widest font-bold" style="color:#FFBF00">Your Note</span><div class="flex">${starsHTML(userNote.rating,5,13)}</div></div>${userNote.notes?`<p class="text-sm italic leading-relaxed" style="color:#9c8f78">"${userNote.notes}"</p>`:''}</div>`:''}
+      <!-- ABV bar -->
+      ${m.abv?`<div class="mb-5"><div class="flex justify-between text-[9px] mb-2"><span class="uppercase tracking-wider" style="color:#9c8f78">ABV</span><span class="font-bold" style="color:#FFBF00">${m.abv}%</span></div><div class="h-0.5 rounded-full overflow-hidden" style="background:#2a2a2a"><div class="h-full rounded-full" style="width:${Math.min((m.abv/70)*100,100)}%;background:linear-gradient(90deg,#FFBF00,#FFE2AB)"></div></div></div>`:''}
+      <!-- Action buttons — primary + secondary like reference -->
+      <div class="flex gap-3 pb-8 mt-3">
+        <button class="flex-1 font-headline font-bold py-4 rounded-2xl text-[12px] uppercase tracking-widest transition-all active:scale-[0.98] amber-glow" style="color:#402d00" onclick="openModal()">${isC?'✓ Checked In':'Add to Cellar'}</button>
+        <button class="px-5 py-4 rounded-2xl text-[11px] font-bold transition-all ${!BOTTLE_IMAGES[String(w.id||w.slug)] ? 'request-photo-btn' : ''}" style="color:#9c8f78;background:#1c1b1b;border:1px solid rgba(80,69,50,0.4)" ${!BOTTLE_IMAGES[String(w.id||w.slug)] ? `data-slug="${w.slug||w.id}" data-name="${(w.name||'').replace(/"/g,'')}" data-region="${m.region||''}"` : ''}>Compare</button>
+      </div>
+    </div>
+`;
   showView('detail',false);
 }
 
@@ -890,6 +965,15 @@ function goBack(){
 
 // ── INIT ─────────────────────────────────────────────────────────────
 async function init(){
+  // 0. Show loading if returning from Google OAuth (PKCE code in URL)
+  if (new URLSearchParams(window.location.search).get('code')) {
+    const ov = document.getElementById('auth-overlay');
+    ov.style.display = 'flex';
+    document.getElementById('auth-loading').classList.remove('hidden');
+    const formDiv = ov.querySelector('.w-full.max-w-sm');
+    if (formDiv) formDiv.style.display = 'none';
+  }
+
   // 1. Wire auth forms
   document.getElementById('form-signin').addEventListener('submit',signIn);
   document.getElementById('form-signup').addEventListener('submit',signUp);
@@ -901,6 +985,7 @@ async function init(){
   // 2. Wire navigation
   document.querySelectorAll('.nav-btn').forEach(b=>b.addEventListener('click',()=>showView(b.dataset.v)));
   document.getElementById('avatar-btn').addEventListener('click',()=>showView('cellar'));
+  document.getElementById('home-btn').addEventListener('click',()=>showView('discover'));
   document.getElementById('back-btn').addEventListener('click',goBack);
   document.getElementById('detail-checkin-btn').addEventListener('click',openModal);
 
@@ -961,14 +1046,19 @@ async function init(){
   // 12. Start whisky load IMMEDIATELY — no auth dependency
   const whiskyLoadPromise = Promise.all([loadBottleImages(), loadWhiskies()]);
 
-  // 13. Auth in parallel — never blocks whisky loading
-  sb.auth.onAuthStateChange((event,session)=>{
-    if(session?.user)onSignedIn(session.user);
-    else if(event==='SIGNED_OUT'){S.user=null;S.checkins=[];S.manualNotes=[];showAuth();}
+  // 13. Auth — PKCE flow, non-blocking
+  sb.auth.onAuthStateChange((event, session) => {
+    if (session?.user) {
+      onSignedIn(session.user);
+    } else if (event === 'SIGNED_OUT') {
+      S.user = null; S.checkins = []; S.manualNotes = [];
+      showAuth();
+    } else if (event === 'INITIAL_SESSION' && !session?.user) {
+      showAuth();
+    }
   });
-  sb.auth.getSession().then(({data:{session}})=>{
-    if(session?.user)onSignedIn(session.user);
-    else showAuth();
+  sb.auth.getSession().then(({data:{session}}) => {
+    if (session?.user) onSignedIn(session.user);
   });
 
   await whiskyLoadPromise;
