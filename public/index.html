@@ -630,6 +630,15 @@ function filteredList(){
   else if(S.filter==='peated')list=list.filter(w=>(w.metadata?.flavour||w.name||'').toLowerCase().includes('peat'));
   else if(S.filter==='sherry')list=list.filter(w=>(w.metadata?.flavour||w.name||'').toLowerCase().includes('sherry'));
   else if(S.filter==='cask-strength')list=list.filter(w=>(w.metadata?.abv||0)>=55);
+  // Sort: images first, then by score descending
+  list.sort((a,b)=>{
+    const aImg = !!BOTTLE_IMAGES[a.slug||String(a.id||'')];
+    const bImg = !!BOTTLE_IMAGES[b.slug||String(b.id||'')];
+    if(aImg !== bImg) return aImg ? -1 : 1;
+    const aScore = parseFloat(avgR(a)) || 0;
+    const bScore = parseFloat(avgR(b)) || 0;
+    return bScore - aScore;
+  });
   return list;
 }
 function setFilter(f){
