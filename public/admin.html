@@ -16,6 +16,7 @@
   .drop-zone.over { border-color:#FFBF00; background:rgba(255,191,0,0.05); }
   input[type=file] { display:none; }
 </style>
+<script src="https://js-de.sentry-cdn.com/b9a540d51bfee4b8d51e19b7c03598a8.min.js" crossorigin="anonymous"></script>
 </head>
 <body class="min-h-screen p-6">
 
@@ -108,6 +109,14 @@
 const SUPABASE_URL  = 'https://nluezhsmgwuqdryarrmd.supabase.co';
 const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5sdWV6aHNtZ3d1cWRyeWFycm1kIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU0MDMyODMsImV4cCI6MjA5MDk3OTI4M30.61Gt5y8k46nIBjtlpyu3n2B4RVcHpPYI1WBRoqnTOYM';
 const { createClient } = supabase;
+if(typeof Sentry !== 'undefined'){
+  Sentry.init({
+    dsn: 'https://b9a540d51bfee4b8d51e19b7c03598a8@js-de.sentry-cdn.com/0',
+    environment: 'admin',
+    tracesSampleRate: 0,
+  });
+}
+
 const sb = createClient(SUPABASE_URL, SUPABASE_ANON);
 
 let manualFileData = null;
@@ -221,17 +230,70 @@ function autoSlug(name) {
   if (slugEl && !slugEl.dataset.manualOverride) slugEl.value = slug;
 }
 function setManualFile(file) {
-  const reader = new FileReader();
-  reader.onload = e => {
-    manualFileData = e.target.result.split(',')[1];
-    manualFileType = file.type;
+  const originalSize = file.size;
+  const sizeEl = document.getElementById('manual-preview-size');
+  if (sizeEl) sizeEl.textContent = 'Optimising…';
+  optimiseImage(file).then(({ base64, contentType, width, height, newSize }) => {
+    manualFileData = base64;
+    manualFileType = contentType;
+    const dataUrl = `data:${contentType};base64,${base64}`;
     document.getElementById('manual-preview').classList.remove('hidden');
-    document.getElementById('manual-preview-img').src = e.target.result;
-    document.getElementById('manual-preview-name').textContent = file.name;
-    document.getElementById('manual-preview-size').textContent = `${(file.size/1024).toFixed(0)}KB`;
+    document.getElementById('manual-preview-img').src = dataUrl;
+    document.getElementById('manual-preview-name').textContent = file.name + ' → WebP';
+    const saved = Math.round((1 - newSize/originalSize) * 100);
+    if (sizeEl) sizeEl.textContent = `${(originalSize/1024).toFixed(0)}KB → ${(newSize/1024).toFixed(0)}KB (${saved}% saved)`;
     document.getElementById('manual-drop').style.display = 'none';
-  };
-  reader.readAsDataURL(file);
+  }).catch(err => {
+    console.error('Image optimise failed, using original', err);
+    // Fallback to original file
+    const reader = new FileReader();
+    reader.onload = e => {
+      manualFileData = e.target.result.split(',')[1];
+      manualFileType = file.type;
+      document.getElementById('manual-preview').classList.remove('hidden');
+      document.getElementById('manual-preview-img').src = e.target.result;
+      document.getElementById('manual-preview-name').textContent = file.name;
+      if (sizeEl) sizeEl.textContent = `${(file.size/1024).toFixed(0)}KB (unoptimised)`;
+      document.getElementById('manual-drop').style.display = 'none';
+    };
+    reader.readAsDataURL(file);
+  });
+}
+
+// Canvas-based image optimisation — 600×900 WebP, transparent bg, EXIF stripped
+function optimiseImage(file) {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    const url = URL.createObjectURL(file);
+    img.onload = () => {
+      URL.revokeObjectURL(url);
+      const TARGET_W = 600, TARGET_H = 900;
+      const canvas = document.createElement('canvas');
+      canvas.width = TARGET_W;
+      canvas.height = TARGET_H;
+      const ctx = canvas.getContext('2d');
+      // Transparent background (for PNG bottles)
+      ctx.clearRect(0, 0, TARGET_W, TARGET_H);
+      // Scale to fit inside 600×900, centred, preserve aspect ratio
+      const scale = Math.min(TARGET_W / img.width, TARGET_H / img.height);
+      const dw = img.width * scale;
+      const dh = img.height * scale;
+      const dx = (TARGET_W - dw) / 2;
+      const dy = (TARGET_H - dh) / 2;
+      ctx.drawImage(img, dx, dy, dw, dh);
+      canvas.toBlob(blob => {
+        if (!blob) return reject(new Error('Canvas toBlob failed'));
+        const reader = new FileReader();
+        reader.onload = e => {
+          const base64 = e.target.result.split(',')[1];
+          resolve({ base64, contentType: 'image/webp', width: TARGET_W, height: TARGET_H, newSize: blob.size });
+        };
+        reader.readAsDataURL(blob);
+      }, 'image/webp', 0.85);
+    };
+    img.onerror = reject;
+    img.src = url;
+  });
 }
 
 function clearManualFile() {
@@ -290,7 +352,8 @@ async function rejectRequest(id) {
 
 // ── SUPABASE STORAGE ─────────────────────────────────────────────────────────
 async function uploadToStorage(slug, base64Data, contentType) {
-  const ext = contentType.includes('png') ? 'png' : contentType.includes('webp') ? 'webp' : 'jpg';
+  // Always store as webp (optimiseImage converts before upload)
+  const ext = contentType.includes('webp') ? 'webp' : contentType.includes('png') ? 'png' : 'jpg';
   const path = `whiskies/${slug}.${ext}`;
   const binary = atob(base64Data);
   const bytes = new Uint8Array(binary.length);
