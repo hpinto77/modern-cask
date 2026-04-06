@@ -412,27 +412,40 @@ const FALLBACK = [
 ];
 
 // ── HELPERS ───────────────────────────────────────────────────────
-function bColour(r=''){const v=(r||'').toLowerCase();if(v.includes('islay'))return['#4a7a8a','#2a5a6a'];if(v.includes('speyside'))return['#5a8a4a','#3a6a2a'];if(v.includes('highland')||v.includes('orkney'))return['#8a6a3a','#6a4a1a'];if(v.includes('lowland'))return['#6a8a5a','#4a6a3a'];if(v.includes('campbeltown'))return['#8a5a4a','#6a3a2a'];if(v.includes('japan'))return['#8a5a5a','#6a3a3a'];if(v.includes('ireland'))return['#4a8a5a','#2a6a3a'];return['#6a7a8a','#4a5a6a'];}
+function bColour(r=''){const v=(r||'').toLowerCase();if(v.includes('islay'))return['#7ab4cc','#4a8aaa'];if(v.includes('speyside'))return['#9abe88','#6a9a58'];if(v.includes('highland')||v.includes('orkney'))return['#c49a6e','#a47a4e'];if(v.includes('lowland'))return['#a8c496','#78a466'];if(v.includes('campbeltown'))return['#b88870','#987050'];if(v.includes('japan'))return['#d49898','#b47878'];if(v.includes('ireland'))return['#82c882','#529a52'];return['#b8a898','#887868'];}
 function bSVG(region,w=32,h=56){const[c1,c2]=bColour(region);const label=(region||'').split(' ')[0].substring(0,6).toUpperCase();return `<svg width="${w}" height="${h}" viewBox="0 0 40 70" fill="none"><rect x="15" y="0" width="10" height="5" rx="1" fill="#2a2624"/><path d="M17 5L17 14L13 18L13 65C13 67 15 69 20 69C25 69 27 67 27 65L27 18L23 14L23 5Z" fill="${c1}" opacity=".9"/><rect x="17" y="5" width="6" height="8" fill="${c1}"/><rect x="13.5" y="29" width="13" height="6" rx="1" fill="${c2}" opacity=".95"/><text x="20" y="34" font-family="Arial,sans-serif" font-size="3.5" font-weight="700" fill="#ffffff" text-anchor="middle">${label}</text><rect x="14" y="38" width="12" height="13" rx="1" fill="#f5f0e8" opacity=".95"/><path d="M14 52L14 65C14 66.5 16 68 20 68C24 68 26 66.5 26 65L26 52Z" fill="${c2}" opacity=".4"/><path d="M15 18L15 62L16 62L16 18Z" fill="white" opacity=".1"/></svg>`;}
-function bGradient(region=''){
+function bGradientLight(region=''){
   const v=(region||'').toLowerCase();
-  if(v.includes('islay'))return '#4a7a8a,#2a5a6a';
-  if(v.includes('speyside'))return '#5a8a4a,#3a6a2a';
-  if(v.includes('highland')||v.includes('orkney'))return '#8a6a3a,#6a4a1a';
-  if(v.includes('lowland'))return '#6a8a5a,#4a6a3a';
-  if(v.includes('campbeltown'))return '#8a5a4a,#6a3a2a';
-  if(v.includes('japan'))return '#8a5a5a,#6a3a3a';
-  if(v.includes('ireland'))return '#4a8a5a,#2a6a3a';
-  return '#6a7a8a,#4a5a6a';
+  if(v.includes('islay'))return '#7ab4cc';
+  if(v.includes('speyside'))return '#9abe88';
+  if(v.includes('highland')||v.includes('orkney'))return '#c49a6e';
+  if(v.includes('lowland'))return '#a8c496';
+  if(v.includes('campbeltown'))return '#b88870';
+  if(v.includes('japan'))return '#d49898';
+  if(v.includes('ireland'))return '#82c882';
+  return '#b8a898';
+}
+function bGradientDark(region=''){
+  const v=(region||'').toLowerCase();
+  if(v.includes('islay'))return '#4a7a8a';
+  if(v.includes('speyside'))return '#5a8a4a';
+  if(v.includes('highland')||v.includes('orkney'))return '#8a6a3a';
+  if(v.includes('lowland'))return '#6a8a5a';
+  if(v.includes('campbeltown'))return '#8a5a4a';
+  if(v.includes('japan'))return '#8a5a5a';
+  if(v.includes('ireland'))return '#4a8a5a';
+  return '#6a7a8a';
+}
+function bGradient(region=''){
+  return bGradientLight(region);
 }
 function bigBottleImg(w){
   const slug=w?.slug||String(w?.id||'');
   const m=w?.metadata||{};
   if(BOTTLE_IMAGES[slug]){
-    return `<img src="${BOTTLE_IMAGES[slug]}" style="height:200px;max-width:140px;object-fit:contain;filter:drop-shadow(0 8px 24px rgba(0,0,0,0.6))" loading="lazy"/>`;
+    return `<img src="${BOTTLE_IMAGES[slug]}" style="height:200px;max-width:140px;object-fit:contain" loading="lazy"/>`;
   }
-  // Bigger SVG with enhanced detail
-  return bSVG(m.region,80,140);
+  return bSVG(m.region,90,158);
 }
 function bottleImg(w,small=false){const slug=w?.slug||String(w?.id||'');if(BOTTLE_IMAGES[slug]){const sz=small?'width:32px;height:56px':'width:120px;height:180px';return `<img src="${BOTTLE_IMAGES[slug]}" style="${sz};object-fit:contain;flex-shrink:0" loading="lazy"/>`;}return bSVG(w?.metadata?.region,small?32:52,small?56:91);}
 function rBadge(r=''){const v=(r||'').toLowerCase();let cls='region-other';if(v.includes('islay'))cls='region-islay';else if(v.includes('speyside'))cls='region-speyside';else if(v.includes('highland')||v.includes('orkney'))cls='region-highland';else if(v.includes('lowland'))cls='region-lowland';else if(v.includes('campbeltown'))cls='region-campbeltown';else if(v.includes('island'))cls='region-islands';else if(v.includes('japan'))cls='region-japan';else if(v.includes('ireland'))cls='region-ireland';return `<span class="${cls} text-[8px] uppercase tracking-wider font-bold px-2 py-0.5 rounded-full">${r||'Unknown'}</span>`;}
@@ -687,8 +700,9 @@ async function showDetail(slugOrId){
   document.getElementById('detail-content').innerHTML=`
     <div class="text-center pt-4 pb-6">
       <div class="relative flex justify-center items-end mb-6" style="height:220px">
-        <div class="absolute inset-0 rounded-2xl overflow-hidden" style="background:linear-gradient(160deg,${bGradient(m.region)} 0%,#131313 100%);opacity:0.35"></div>
-        <div class="relative z-10 flex items-end justify-center h-full pb-2">
+        <div class="absolute inset-0 rounded-2xl overflow-hidden" style="background:radial-gradient(ellipse 70% 80% at 50% 60%,${bGradientLight(m.region)} 0%,transparent 70%);opacity:0.5"></div>
+        <div class="absolute inset-0 rounded-2xl" style="background:linear-gradient(180deg,${bGradientDark(m.region)} 0%,transparent 100%);opacity:0.15"></div>
+        <div class="relative z-10 flex items-end justify-center h-full pb-4" style="filter:drop-shadow(0 12px 32px rgba(0,0,0,0.7))">
           ${bigBottleImg(w)}
         </div>
       </div>
