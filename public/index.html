@@ -1398,7 +1398,6 @@ async function init(){
   document.querySelectorAll('#modal-stars .star-btn').forEach(s=>s.addEventListener('click',()=>{S.modalRating=+s.dataset.v;updateMStars();}));
 
   // 4. Wire notes
-  document.getElementById('save-note-btn').addEventListener('click',saveNote);
   document.querySelectorAll('#note-stars .star-btn').forEach(s=>s.addEventListener('click',()=>{S.noteRating=+s.dataset.v;updateNStars();}));
 
   // 5. Wire search
@@ -1436,8 +1435,6 @@ async function init(){
   document.getElementById('photo-drop-zone').addEventListener('click',()=>document.getElementById('photo-file-input').click());
   document.getElementById('photo-file-input').addEventListener('change',e=>handlePhotoSearch(e.target));
   document.getElementById('clear-photo-btn').addEventListener('click',clearPhotoSearch);
-  document.getElementById('save-gemini-btn')?.addEventListener('click',saveGeminiKey);
-  document.getElementById('clear-gemini-btn')?.addEventListener('click',clearGeminiKey);
 
   // 11. Event delegation for request-photo buttons
   document.addEventListener('click', e => {
