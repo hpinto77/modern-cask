@@ -55,8 +55,9 @@ tailwind.config={darkMode:"class",theme:{extend:{colors:{"primary":"#ffe2ab","on
 .img-drop-zone{border:2px dashed rgba(80,69,50,0.4);border-radius:12px;padding:32px;text-align:center;cursor:pointer;transition:border-color 0.2s;}
 body{min-height:100dvh;}
 .cellar-row{position:relative;overflow:hidden;border-radius:12px;touch-action:pan-y;}
-.cellar-row-inner{position:relative;background:var(--row-bg,#1c1b1b);border-radius:12px;transition:transform 0.15s ease;will-change:transform;z-index:1;}
-.cellar-row-actions{position:absolute;right:0;top:0;bottom:0;display:flex;align-items:center;}
+.cellar-row-inner{position:relative;background:var(--row-bg,#1c1b1b);border-radius:12px;transition:transform 0.2s ease;will-change:transform;z-index:2;}
+.cellar-row-inner.revealed{z-index:0;}
+.cellar-row-actions{position:absolute;right:0;z-index:3;top:0;bottom:0;display:flex;align-items:center;}
 .cellar-del-btn{height:100%;padding:0 20px;background:#c0392b;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;cursor:pointer;border-radius:0 12px 12px 0;}
 .cellar-del-btn span{font-size:18px;color:#fff;}
 .cellar-del-btn p{font-size:8px;font-weight:700;color:#fff;text-transform:uppercase;letter-spacing:.05em;}
@@ -123,6 +124,10 @@ body{min-height:100dvh;}
     <button id="search-open-btn" class="flex-1 flex items-center gap-2 rounded-full px-4 py-2 border border-[#504532]/40 text-[#504532] hover:border-[#FFE2AB]/30 hover:text-[#9c8f78] transition-all" style="background:rgba(28,27,27,0.8)">
       <span class="material-symbols-outlined text-[16px]">search</span>
       <span class="text-[12px] tracking-wide">Search whiskies…</span>
+    </button>
+    <!-- Request button -->
+    <button onclick="openRequestModal()" class="shrink-0 w-8 h-8 rounded-full flex items-center justify-center border border-[#504532]/40 hover:border-[#FFE2AB]/30 transition-all" style="background:rgba(28,27,27,0.8)" title="Request a whisky">
+      <span class="material-symbols-outlined" style="font-size:16px;color:#9c8f78">add</span>
     </button>
     <!-- Avatar -->
     <div id="avatar-btn" class="w-8 h-8 rounded-full amber-glow flex items-center justify-center text-[#402d00] text-[10px] font-black cursor-pointer select-none shrink-0">?</div>
@@ -366,6 +371,49 @@ body{min-height:100dvh;}
 </div>
 
 <div id="toast"></div>
+
+<!-- Request a Whisky Modal -->
+<div id="request-modal-overlay" style="position:fixed;inset:0;background:rgba(0,0,0,0.88);backdrop-filter:blur(6px);display:none;align-items:flex-end;justify-content:center;z-index:500">
+  <div style="width:100%;max-width:480px;max-height:88vh;background:#1c1b1b;border-radius:16px 16px 0 0;overflow-y:auto;animation:slideUp 0.35s cubic-bezier(0.22,1,0.36,1)">
+    <div class="w-8 h-1 bg-[#504532]/50 rounded-full mx-auto mt-3"></div>
+    <div class="flex justify-between items-center px-5 py-3 border-b border-[#504532]/15">
+      <h3 class="font-headline font-bold text-base">Request a Whisky</h3>
+      <button onclick="closeRequestModal()" class="text-[#9c8f78] hover:text-primary"><span class="material-symbols-outlined" style="font-size:22px">close</span></button>
+    </div>
+    <div class="px-5 py-4 space-y-4">
+      <p class="text-[#9c8f78] text-sm">Tell us what's missing and we'll add it to the database.</p>
+      <div>
+        <label class="block text-[9px] uppercase tracking-[0.22em] text-[#9c8f78] mb-1.5">Whisky Name *</label>
+        <input id="req-whisky-name" type="text" placeholder="e.g. GlenDronach 21 Parliament" class="w-full bg-[#2a2a2a] border border-[#504532]/30 rounded-xl py-3 px-4 text-[#e5e2e1] placeholder:text-[#504532] focus:border-[#FFBF00]/40 focus:outline-none text-[16px]"/>
+      </div>
+      <div>
+        <label class="block text-[9px] uppercase tracking-[0.22em] text-[#9c8f78] mb-1.5">Distillery</label>
+        <input id="req-distillery" type="text" placeholder="e.g. GlenDronach" class="w-full bg-[#2a2a2a] border border-[#504532]/30 rounded-xl py-3 px-4 text-[#e5e2e1] placeholder:text-[#504532] focus:border-[#FFBF00]/40 focus:outline-none text-[16px]"/>
+      </div>
+      <div class="grid grid-cols-2 gap-3">
+        <div>
+          <label class="block text-[9px] uppercase tracking-[0.22em] text-[#9c8f78] mb-1.5">Region</label>
+          <select id="req-region" class="w-full bg-[#2a2a2a] border border-[#504532]/30 rounded-xl py-3 px-4 text-[#e5e2e1] focus:border-[#FFBF00]/40 focus:outline-none text-[14px]">
+            <option value="">Unknown</option>
+            <option>Islay</option><option>Speyside</option><option>Highland</option>
+            <option>Lowland</option><option>Campbeltown</option><option>Islands</option>
+            <option>Orkney</option><option>Japan</option><option>Ireland</option><option>World</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-[9px] uppercase tracking-[0.22em] text-[#9c8f78] mb-1.5">Approx Age</label>
+          <input id="req-age" type="text" placeholder="e.g. 21" class="w-full bg-[#2a2a2a] border border-[#504532]/30 rounded-xl py-3 px-4 text-[#e5e2e1] placeholder:text-[#504532] focus:border-[#FFBF00]/40 focus:outline-none text-[16px]"/>
+        </div>
+      </div>
+      <div>
+        <label class="block text-[9px] uppercase tracking-[0.22em] text-[#9c8f78] mb-1.5">Any other info (optional)</label>
+        <textarea id="req-notes" placeholder="Cask type, vintage, bottler, where you've seen it…" rows="2" class="w-full bg-[#2a2a2a] border border-[#504532]/30 rounded-xl py-3 px-4 text-[#e5e2e1] placeholder:text-[#504532] focus:border-[#FFBF00]/40 focus:outline-none text-[14px] resize-none"></textarea>
+      </div>
+      <button onclick="submitWhiskyRequest()" class="w-full amber-glow text-[#402d00] font-headline font-bold py-4 rounded-xl uppercase tracking-widest text-[11px] hover:opacity-90 active:scale-[0.98] transition-all">Submit Request</button>
+      <div class="h-2"></div>
+    </div>
+  </div>
+</div>
 
 <script>
 // ═══════════════════════════════════════════════════════════════
@@ -871,18 +919,18 @@ function renderCellar(){
     const w=S.whiskies.find(x=>String(x.id||x.slug)===String(ci.whisky_id));
     const name=w?.name||ci.whisky_name||'Unknown';
     const region=w?.metadata?.region||'';
-    return `<div class="cellar-row mb-2" data-id="${ci.id}">
+    return `<div class="cellar-row mb-2" data-id="${ci.id}" data-whisky-id="${ci.whisky_id}">
       <div class="cellar-row-actions">
-        <div class="cellar-edit-btn" onclick="editCheckin('${ci.id}')">
+        <div class="cellar-edit-btn" data-action="edit" data-id="${ci.id}">
           <span class="material-symbols-outlined">edit</span>
           <p>Edit</p>
         </div>
-        <div class="cellar-del-btn" onclick="deleteCheckin('${ci.id}')">
+        <div class="cellar-del-btn" data-action="delete" data-id="${ci.id}">
           <span class="material-symbols-outlined">delete</span>
           <p>Delete</p>
         </div>
       </div>
-      <div class="cellar-row-inner flex items-center gap-3 p-3 cursor-pointer" onclick="showDetail('${ci.whisky_id}')">
+      <div class="cellar-row-inner flex items-center gap-3 p-3 cursor-pointer" data-action="detail" data-whisky-id="${ci.whisky_id}">
         <div class="shrink-0">${bSVG(region,24,42)}</div>
         <div class="flex-1 min-w-0">
           <p class="text-[13px] font-semibold truncate">${name}</p>
@@ -896,44 +944,75 @@ function renderCellar(){
 }
 
 function initSwipe(){
+  const list = document.getElementById('cellar-list');
+  if(!list) return;
+
+  // ── Event delegation: handle all taps on cellar rows ──
+  // Unbind previous to avoid duplicates
+  if(list._delegated){ list.removeEventListener('click', list._delegated); }
+  list._delegated = function(e){
+    const editBtn = e.target.closest('[data-action="edit"]');
+    const delBtn  = e.target.closest('[data-action="delete"]');
+    const detBtn  = e.target.closest('[data-action="detail"]');
+    if(editBtn){ editCheckin(editBtn.dataset.id); return; }
+    if(delBtn){  deleteCheckin(delBtn.dataset.id); return; }
+    // Only navigate if row is not swiped open
+    if(detBtn){
+      const row = detBtn.closest('.cellar-row');
+      if(row && row.dataset.swiped === '1') return;
+      showDetail(detBtn.dataset.whiskyId);
+    }
+  };
+  list.addEventListener('click', list._delegated);
+
+  // ── Swipe on each row ──
   document.querySelectorAll('.cellar-row').forEach(row=>{
-    const inner=row.querySelector('.cellar-row-inner');
-    const actions=row.querySelector('.cellar-row-actions');
-    let startX=0,startY=0,curX=0,dragging=false,revealed=false;
-    const ACTION_W=160; // edit+delete combined width
-    inner.addEventListener('touchstart',e=>{
-      startX=e.touches[0].clientX;
-      startY=e.touches[0].clientY;
-      curX=revealed?-ACTION_W:0;
-      dragging=true;
+    const inner = row.querySelector('.cellar-row-inner');
+    if(!inner || row._swipeInit) return;
+    row._swipeInit = true;
+    const W = 160;
+    let x0=0, revealed=false;
+
+    inner.addEventListener('touchstart', e=>{
+      x0 = e.touches[0].clientX;
       inner.style.transition='none';
-    },{passive:true});
-    inner.addEventListener('touchmove',e=>{
-      if(!dragging)return;
-      const dx=e.touches[0].clientX-startX;
-      const dy=e.touches[0].clientY-startY;
-      if(!revealed&&Math.abs(dy)>Math.abs(dx))return; // vertical scroll
-      const target=Math.min(0,Math.max(-ACTION_W,(revealed?-ACTION_W:0)+dx));
-      inner.style.transform=`translateX(${target}px)`;
-    },{passive:true});
-    inner.addEventListener('touchend',e=>{
-      if(!dragging)return;
-      dragging=false;
-      const dx=e.changedTouches[0].clientX-startX;
-      const total=revealed?-ACTION_W+dx:dx;
-      inner.style.transition='transform 0.2s ease';
-      if(total<-60){inner.style.transform=`translateX(-${ACTION_W}px)`;revealed=true;}
-      else{inner.style.transform='translateX(0)';revealed=false;}
-    });
-    // Tap anywhere else to close
-    document.addEventListener('touchstart',e=>{
-      if(revealed&&!row.contains(e.target)){
-        inner.style.transition='transform 0.2s ease';
-        inner.style.transform='translateX(0)';
-        revealed=false;
+    }, {passive:true});
+
+    inner.addEventListener('touchmove', e=>{
+      const dx = e.touches[0].clientX - x0;
+      const base = revealed ? -W : 0;
+      const pos = Math.min(0, Math.max(-W, base + dx));
+      inner.style.transform = `translateX(${pos}px)`;
+    }, {passive:true});
+
+    inner.addEventListener('touchend', e=>{
+      const dx = e.changedTouches[0].clientX - x0;
+      const base = revealed ? -W : 0;
+      const final = base + dx;
+      inner.style.transition = 'transform 0.2s ease';
+      if(final < -W/2){
+        inner.style.transform = `translateX(-${W}px)`;
+        inner.classList.add('revealed');
+        row.dataset.swiped = '1';
+        revealed = true;
+      } else {
+        inner.style.transform = 'translateX(0)';
+        inner.classList.remove('revealed');
+        row.dataset.swiped = '0';
+        revealed = false;
       }
-    },{passive:true});
+    }, {passive:true});
   });
+
+  // Close all rows on tap outside the list
+  document.addEventListener('touchstart', e=>{
+    if(!list.contains(e.target)){
+      document.querySelectorAll('.cellar-row').forEach(row=>{
+        const inner = row.querySelector('.cellar-row-inner');
+        if(inner){ inner.style.transition='transform 0.2s ease'; inner.style.transform='translateX(0)'; inner.classList.remove('revealed'); row.dataset.swiped='0'; }
+      });
+    }
+  }, {passive:true});
 }
 
 async function deleteCheckin(id){
@@ -1029,6 +1108,56 @@ async function requestImage(slug, name, region) {
 }
 
 // ── PHOTO SEARCH ────────────────────────────────────────────────────
+function openRequestModal(){
+  document.getElementById('request-modal-overlay').style.display='flex';
+}
+function closeRequestModal(){
+  document.getElementById('request-modal-overlay').style.display='none';
+  ['req-whisky-name','req-distillery','req-age','req-notes'].forEach(id=>{
+    const el=document.getElementById(id); if(el) el.value='';
+  });
+  document.getElementById('req-region').value='';
+}
+async function submitWhiskyRequest(){
+  const name=document.getElementById('req-whisky-name').value.trim();
+  if(!name){showToast('Please enter a whisky name');return;}
+  const btn=document.querySelector('#request-modal-overlay button[onclick="submitWhiskyRequest()"]');
+  if(btn){btn.textContent='Submitting…';btn.disabled=true;}
+  try{
+    const payload={
+      whisky_name: name,
+      distillery: document.getElementById('req-distillery').value.trim()||null,
+      region: document.getElementById('req-region').value||null,
+      age_statement: document.getElementById('req-age').value.trim()||null,
+      notes: document.getElementById('req-notes').value.trim()||null,
+      requested_by: S.user?.id||null,
+      status: 'pending',
+      requested_at: new Date().toISOString(),
+    };
+    // Generate a slug from the name
+    const slug = name.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');
+    payload.whisky_slug = slug;
+    const {error}=await sb.from('whisky_requests').insert(payload);
+    if(error&&error.code==='42P01'){
+      // Table doesn't exist yet — fall back to image_requests table with a note
+      await sb.from('image_requests').insert({
+        whisky_slug: slug,
+        whisky_name: name + (payload.region?' ('+payload.region+')':''),
+        region: payload.region||'Unknown',
+        status: 'user_request',
+        requested_by: S.user?.id||null,
+        requested_at: payload.requested_at,
+      });
+    } else if(error) throw error;
+    closeRequestModal();
+    showToast('Added to queue: '+name);
+  } catch(e){
+    showToast('Failed: '+e.message);
+  } finally{
+    if(btn){btn.textContent='Submit Request';btn.disabled=false;}
+  }
+}
+
 function handlePhotoSearch(input){
   if(!input.files?.[0])return;
   const file=input.files[0];
@@ -1126,6 +1255,7 @@ async function init(){
   // 3. Wire modal
   document.getElementById('modal-close-btn').addEventListener('click',closeModal);
   document.getElementById('modal-overlay').addEventListener('click',e=>{if(e.target===document.getElementById('modal-overlay'))closeModal();});
+  document.getElementById('request-modal-overlay').addEventListener('click',e=>{if(e.target===document.getElementById('request-modal-overlay'))closeRequestModal();});
   document.getElementById('submit-checkin-btn').addEventListener('click',submitCheckin);
   document.querySelectorAll('#modal-stars .star-btn').forEach(s=>s.addEventListener('click',()=>{S.modalRating=+s.dataset.v;updateMStars();}));
 
