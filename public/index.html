@@ -4,6 +4,11 @@
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport"/>
 <meta name="theme-color" content="#131313"/>
+<link rel="manifest" href="/manifest.json"/>
+<link rel="apple-touch-icon" href="/icon-192.png"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+<meta name="apple-mobile-web-app-title" content="The Modern Cask"/>
 <title>The Modern Cask</title>
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
 <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@200;400;600;700;800&family=Inter:wght@300;400;500;600&family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&display=swap" rel="stylesheet"/>
@@ -48,6 +53,10 @@ tailwind.config={darkMode:"class",theme:{extend:{colors:{"primary":"#ffe2ab","on
 .adv-input:focus{border-color:rgba(255,191,0,0.4);}
 .img-drop-zone{border:2px dashed rgba(80,69,50,0.4);border-radius:12px;padding:32px;text-align:center;cursor:pointer;transition:border-color 0.2s;}
 body{min-height:100dvh;}
+@supports(padding-bottom: env(safe-area-inset-bottom)){
+  nav.fixed.bottom-0{padding-bottom:calc(8px + env(safe-area-inset-bottom));}
+  #auth-overlay{padding-bottom:env(safe-area-inset-bottom);}
+}
 </style>
 </head>
 <body class="bg-surface text-on-surface font-body overflow-x-hidden">
@@ -65,17 +74,17 @@ body{min-height:100dvh;}
     </div>
     <form id="form-signin" class="space-y-4">
       <div><label class="block text-[9px] uppercase tracking-wider text-[#9c8f78] mb-1.5">Email</label>
-        <input id="signin-email" type="email" required placeholder="you@example.com" class="w-full bg-[#1c1b1b] border border-[#504532]/40 rounded-xl py-3 px-4 text-on-surface placeholder:text-[#504532] focus:border-[#FFBF00]/50 focus:outline-none text-sm"/></div>
+        <input id="signin-email" type="email" required placeholder="you@example.com" class="w-full bg-[#1c1b1b] border border-[#504532]/40 rounded-xl py-3.5 px-4 text-on-surface placeholder:text-[#504532] focus:border-[#FFBF00]/50 focus:outline-none text-[16px]"/></div>
       <div><label class="block text-[9px] uppercase tracking-wider text-[#9c8f78] mb-1.5">Password</label>
-        <input id="signin-password" type="password" required placeholder="••••••••" class="w-full bg-[#1c1b1b] border border-[#504532]/40 rounded-xl py-3 px-4 text-on-surface placeholder:text-[#504532] focus:border-[#FFBF00]/50 focus:outline-none text-sm"/></div>
+        <input id="signin-password" type="password" required placeholder="••••••••" class="w-full bg-[#1c1b1b] border border-[#504532]/40 rounded-xl py-3.5 px-4 text-on-surface placeholder:text-[#504532] focus:border-[#FFBF00]/50 focus:outline-none text-[16px]"/></div>
       <p id="signin-error" class="text-red-400 text-[10px] hidden"></p>
       <button type="submit" class="w-full amber-glow text-[#402d00] font-headline font-bold py-3.5 rounded-xl uppercase tracking-widest text-[11px] hover:opacity-90 transition-all">Sign In</button>
     </form>
     <form id="form-signup" class="space-y-4 hidden">
       <div><label class="block text-[9px] uppercase tracking-wider text-[#9c8f78] mb-1.5">Email</label>
-        <input id="signup-email" type="email" required placeholder="you@example.com" class="w-full bg-[#1c1b1b] border border-[#504532]/40 rounded-xl py-3 px-4 text-on-surface placeholder:text-[#504532] focus:border-[#FFBF00]/50 focus:outline-none text-sm"/></div>
+        <input id="signup-email" type="email" required placeholder="you@example.com" class="w-full bg-[#1c1b1b] border border-[#504532]/40 rounded-xl py-3.5 px-4 text-on-surface placeholder:text-[#504532] focus:border-[#FFBF00]/50 focus:outline-none text-[16px]"/></div>
       <div><label class="block text-[9px] uppercase tracking-wider text-[#9c8f78] mb-1.5">Password</label>
-        <input id="signup-password" type="password" required placeholder="Min 6 characters" class="w-full bg-[#1c1b1b] border border-[#504532]/40 rounded-xl py-3 px-4 text-on-surface placeholder:text-[#504532] focus:border-[#FFBF00]/50 focus:outline-none text-sm"/></div>
+        <input id="signup-password" type="password" required placeholder="Min 6 characters" class="w-full bg-[#1c1b1b] border border-[#504532]/40 rounded-xl py-3.5 px-4 text-on-surface placeholder:text-[#504532] focus:border-[#FFBF00]/50 focus:outline-none text-[16px]"/></div>
       <p id="signup-error" class="text-red-400 text-[10px] hidden"></p>
       <button type="submit" class="w-full amber-glow text-[#402d00] font-headline font-bold py-3.5 rounded-xl uppercase tracking-widest text-[11px] hover:opacity-90 transition-all">Create Account</button>
     </form>
@@ -313,7 +322,7 @@ body{min-height:100dvh;}
 </div>
 
 <!-- BOTTOM NAV -->
-<nav class="fixed bottom-0 left-0 w-full flex justify-around items-center h-[68px] px-2 pb-2 bg-[#1C1B1B]/93 backdrop-blur-lg z-50 rounded-t-2xl shadow-[0_-8px_28px_rgba(0,0,0,0.5)] border-t border-[#504532]/15">
+<nav class="fixed bottom-0 left-0 w-full flex justify-around items-center h-[68px] px-2 pb-safe bg-[#1C1B1B]/93 backdrop-blur-lg z-50 rounded-t-2xl shadow-[0_-8px_28px_rgba(0,0,0,0.5)] border-t border-[#504532]/15">
   <button class="nav-btn flex flex-col items-center justify-center px-4 py-1 rounded-xl" data-v="discover"><span class="material-symbols-outlined nav-icon" style="font-size:22px;">explore</span><span class="text-[8px] font-bold uppercase tracking-tight mt-0.5">Discover</span></button>
   <button class="nav-btn flex flex-col items-center justify-center px-4 py-1 rounded-xl" data-v="library"><span class="material-symbols-outlined nav-icon" style="font-size:22px;">shelves</span><span class="text-[8px] font-bold uppercase tracking-tight mt-0.5">Library</span></button>
   <button class="nav-btn flex flex-col items-center justify-center px-4 py-1 rounded-xl" data-v="notes"><span class="material-symbols-outlined nav-icon" style="font-size:22px;">edit_note</span><span class="text-[8px] font-bold uppercase tracking-tight mt-0.5">Notes</span></button>
@@ -405,6 +414,26 @@ const FALLBACK = [
 // ── HELPERS ───────────────────────────────────────────────────────
 function bColour(r=''){const v=(r||'').toLowerCase();if(v.includes('islay'))return['#4a7a8a','#2a5a6a'];if(v.includes('speyside'))return['#5a8a4a','#3a6a2a'];if(v.includes('highland')||v.includes('orkney'))return['#8a6a3a','#6a4a1a'];if(v.includes('lowland'))return['#6a8a5a','#4a6a3a'];if(v.includes('campbeltown'))return['#8a5a4a','#6a3a2a'];if(v.includes('japan'))return['#8a5a5a','#6a3a3a'];if(v.includes('ireland'))return['#4a8a5a','#2a6a3a'];return['#6a7a8a','#4a5a6a'];}
 function bSVG(region,w=32,h=56){const[c1,c2]=bColour(region);const label=(region||'').split(' ')[0].substring(0,6).toUpperCase();return `<svg width="${w}" height="${h}" viewBox="0 0 40 70" fill="none"><rect x="15" y="0" width="10" height="5" rx="1" fill="#2a2624"/><path d="M17 5L17 14L13 18L13 65C13 67 15 69 20 69C25 69 27 67 27 65L27 18L23 14L23 5Z" fill="${c1}" opacity=".9"/><rect x="17" y="5" width="6" height="8" fill="${c1}"/><rect x="13.5" y="29" width="13" height="6" rx="1" fill="${c2}" opacity=".95"/><text x="20" y="34" font-family="Arial,sans-serif" font-size="3.5" font-weight="700" fill="#ffffff" text-anchor="middle">${label}</text><rect x="14" y="38" width="12" height="13" rx="1" fill="#f5f0e8" opacity=".95"/><path d="M14 52L14 65C14 66.5 16 68 20 68C24 68 26 66.5 26 65L26 52Z" fill="${c2}" opacity=".4"/><path d="M15 18L15 62L16 62L16 18Z" fill="white" opacity=".1"/></svg>`;}
+function bGradient(region=''){
+  const v=(region||'').toLowerCase();
+  if(v.includes('islay'))return '#4a7a8a,#2a5a6a';
+  if(v.includes('speyside'))return '#5a8a4a,#3a6a2a';
+  if(v.includes('highland')||v.includes('orkney'))return '#8a6a3a,#6a4a1a';
+  if(v.includes('lowland'))return '#6a8a5a,#4a6a3a';
+  if(v.includes('campbeltown'))return '#8a5a4a,#6a3a2a';
+  if(v.includes('japan'))return '#8a5a5a,#6a3a3a';
+  if(v.includes('ireland'))return '#4a8a5a,#2a6a3a';
+  return '#6a7a8a,#4a5a6a';
+}
+function bigBottleImg(w){
+  const slug=w?.slug||String(w?.id||'');
+  const m=w?.metadata||{};
+  if(BOTTLE_IMAGES[slug]){
+    return `<img src="${BOTTLE_IMAGES[slug]}" style="height:200px;max-width:140px;object-fit:contain;filter:drop-shadow(0 8px 24px rgba(0,0,0,0.6))" loading="lazy"/>`;
+  }
+  // Bigger SVG with enhanced detail
+  return bSVG(m.region,80,140);
+}
 function bottleImg(w,small=false){const slug=w?.slug||String(w?.id||'');if(BOTTLE_IMAGES[slug]){const sz=small?'width:32px;height:56px':'width:120px;height:180px';return `<img src="${BOTTLE_IMAGES[slug]}" style="${sz};object-fit:contain;flex-shrink:0" loading="lazy"/>`;}return bSVG(w?.metadata?.region,small?32:52,small?56:91);}
 function rBadge(r=''){const v=(r||'').toLowerCase();let cls='region-other';if(v.includes('islay'))cls='region-islay';else if(v.includes('speyside'))cls='region-speyside';else if(v.includes('highland')||v.includes('orkney'))cls='region-highland';else if(v.includes('lowland'))cls='region-lowland';else if(v.includes('campbeltown'))cls='region-campbeltown';else if(v.includes('island'))cls='region-islands';else if(v.includes('japan'))cls='region-japan';else if(v.includes('ireland'))cls='region-ireland';return `<span class="${cls} text-[8px] uppercase tracking-wider font-bold px-2 py-0.5 rounded-full">${r||'Unknown'}</span>`;}
 function avgR(w){const m=w?.rating?.marcel,s=w?.rating?.sascha;if(m&&s)return((m+s)/2).toFixed(1);if(m)return m.toFixed(1);return'—';}
@@ -417,10 +446,14 @@ function skel(){return '<div class="skeleton h-14 rounded-xl my-2"></div><div cl
 // ── AUTH ──────────────────────────────────────────────────────────
 async function signIn(e){
   e.preventDefault();
-  const email=document.getElementById('signin-email').value;
+  const btn=e.target.querySelector('button[type="submit"]');
+  const email=document.getElementById('signin-email').value.trim();
   const pass=document.getElementById('signin-password').value;
   const errEl=document.getElementById('signin-error');
+  if(!email||!pass){errEl.textContent='Please enter email and password';errEl.classList.remove('hidden');return;}
+  if(btn){btn.textContent='Signing in…';btn.disabled=true;}
   const {error}=await sb.auth.signInWithPassword({email,password:pass});
+  if(btn){btn.textContent='Sign In';btn.disabled=false;}
   if(error){errEl.textContent=error.message;errEl.classList.remove('hidden');}
   else errEl.classList.add('hidden');
 }
@@ -433,8 +466,15 @@ async function signUp(e){
   if(error){errEl.textContent=error.message;errEl.classList.remove('hidden');}
   else{errEl.classList.add('hidden');showToast('Check your email to confirm your account');}
 }
-async function googleSignIn(){
-  await sb.auth.signInWithOAuth({provider:'google',options:{redirectTo:window.location.origin}});
+function googleSignIn(){
+  // Must be synchronous — async breaks mobile Safari popup policy
+  sb.auth.signInWithOAuth({
+    provider: 'google',
+    options: {
+      redirectTo: window.location.origin,
+      queryParams: { prompt: 'select_account' }
+    }
+  });
 }
 async function signOut(){
   await sb.auth.signOut();
@@ -645,8 +685,13 @@ async function showDetail(slugOrId){
   else{btn.textContent='Check In';btn.className='text-[9px] uppercase tracking-widest font-bold text-primary border border-primary/30 px-4 py-2 rounded-full hover:bg-primary/10 transition-all';}
   const userNote=S.checkins.find(c=>String(c.whisky_id)===String(w.id||w.slug));
   document.getElementById('detail-content').innerHTML=`
-    <div class="text-center py-6">
-      <div class="flex justify-center mb-5">${bottleImg(w,false)}</div>
+    <div class="text-center pt-4 pb-6">
+      <div class="relative flex justify-center items-end mb-6" style="height:220px">
+        <div class="absolute inset-0 rounded-2xl overflow-hidden" style="background:linear-gradient(160deg,${bGradient(m.region)} 0%,#131313 100%);opacity:0.35"></div>
+        <div class="relative z-10 flex items-end justify-center h-full pb-2">
+          ${bigBottleImg(w)}
+        </div>
+      </div>
       <p class="text-[9px] uppercase tracking-widest text-[#9c8f78] mb-1">${m.distillery||''}</p>
       <h2 class="font-headline text-2xl font-extrabold tracking-tight mb-3">${w.name}</h2>
       <div class="flex justify-center gap-1.5 flex-wrap mb-3">
@@ -893,7 +938,16 @@ async function init(){
   document.getElementById('save-gemini-btn').addEventListener('click',saveGeminiKey);
   document.getElementById('clear-gemini-btn').addEventListener('click',clearGeminiKey);
 
-  // 11. Auth — check session (non-blocking)
+  // 11. Event delegation for request-photo buttons
+  document.addEventListener('click', e => {
+    const btn = e.target.closest('.request-photo-btn');
+    if (btn) requestImage(btn.dataset.slug, btn.dataset.name, btn.dataset.region);
+  });
+
+  // 12. Start whisky load IMMEDIATELY — no auth dependency
+  const whiskyLoadPromise = Promise.all([loadBottleImages(), loadWhiskies()]);
+
+  // 13. Auth in parallel — never blocks whisky loading
   sb.auth.onAuthStateChange((event,session)=>{
     if(session?.user)onSignedIn(session.user);
     else if(event==='SIGNED_OUT'){S.user=null;S.checkins=[];S.manualNotes=[];showAuth();}
@@ -903,13 +957,9 @@ async function init(){
     else showAuth();
   });
 
-  // Event delegation for dynamically rendered request-photo buttons
-  document.addEventListener('click', e => {
-    const btn = e.target.closest('.request-photo-btn');
-    if (btn) requestImage(btn.dataset.slug, btn.dataset.name, btn.dataset.region);
-  });
-
-  // 12. Load bottle images and whiskies in parallel
+  await whiskyLoadPromise;
+  return; // everything below moved to whiskyLoadPromise
+  // 12. Load bottle image (legacy label - replaced above)s and whiskies in parallel
   await Promise.all([loadBottleImages(),loadWhiskies()]);
 }
 
