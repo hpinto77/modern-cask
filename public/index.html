@@ -986,8 +986,8 @@ async function init(){
   document.querySelectorAll('.nav-btn').forEach(b=>b.addEventListener('click',()=>showView(b.dataset.v)));
   document.getElementById('avatar-btn').addEventListener('click',()=>showView('cellar'));
   document.getElementById('home-btn').addEventListener('click',()=>showView('discover'));
-  document.getElementById('back-btn').addEventListener('click',goBack);
-  document.getElementById('detail-checkin-btn').addEventListener('click',openModal);
+  document.getElementById('back-btn')?.addEventListener('click',goBack);
+  document.getElementById('detail-checkin-btn')?.addEventListener('click',openModal);
 
   // 3. Wire modal
   document.getElementById('modal-close-btn').addEventListener('click',closeModal);
@@ -1034,8 +1034,8 @@ async function init(){
   document.getElementById('photo-drop-zone').addEventListener('click',()=>document.getElementById('photo-file-input').click());
   document.getElementById('photo-file-input').addEventListener('change',e=>handlePhotoSearch(e.target));
   document.getElementById('clear-photo-btn').addEventListener('click',clearPhotoSearch);
-  document.getElementById('save-gemini-btn').addEventListener('click',saveGeminiKey);
-  document.getElementById('clear-gemini-btn').addEventListener('click',clearGeminiKey);
+  document.getElementById('save-gemini-btn')?.addEventListener('click',saveGeminiKey);
+  document.getElementById('clear-gemini-btn')?.addEventListener('click',clearGeminiKey);
 
   // 11. Event delegation for request-photo buttons
   document.addEventListener('click', e => {
@@ -1046,25 +1046,31 @@ async function init(){
   // 12. Start whisky load IMMEDIATELY — no auth dependency
   const whiskyLoadPromise = Promise.all([loadBottleImages(), loadWhiskies()]);
 
-  // 13. Auth — PKCE flow, non-blocking
+  // 13. Auth — PKCE flow
+  // IMPORTANT: With PKCE, INITIAL_SESSION fires while ?code is being exchanged
+  // so we must NOT show auth on INITIAL_SESSION — only on explicit SIGNED_OUT
+  // or after getSession() confirms no session
   sb.auth.onAuthStateChange((event, session) => {
     if (session?.user) {
       onSignedIn(session.user);
     } else if (event === 'SIGNED_OUT') {
       S.user = null; S.checkins = []; S.manualNotes = [];
       showAuth();
-    } else if (event === 'INITIAL_SESSION' && !session?.user) {
-      showAuth();
     }
+    // Never show auth on INITIAL_SESSION — getSession() handles the initial state
   });
+  // getSession() is the single source of truth for initial state
   sb.auth.getSession().then(({data:{session}}) => {
-    if (session?.user) onSignedIn(session.user);
+    if (session?.user) {
+      onSignedIn(session.user);
+    } else {
+      // Only show auth if no ?code param (PKCE exchange not in progress)
+      const hasCode = new URLSearchParams(window.location.search).has('code');
+      if (!hasCode) showAuth();
+    }
   });
 
   await whiskyLoadPromise;
-  return; // everything below moved to whiskyLoadPromise
-  // 12. Load bottle image (legacy label - replaced above)s and whiskies in parallel
-  await Promise.all([loadBottleImages(),loadWhiskies()]);
 }
 
 document.addEventListener('DOMContentLoaded',init);
