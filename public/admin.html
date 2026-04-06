@@ -97,6 +97,17 @@ body{background:#0a0a0a;color:#e5e2e1;font-family:system-ui,sans-serif;margin:0}
       <button class="nav-item" data-page="config" onclick="switchTab('config')">
         <span style="font-size:14px">⚙️</span> Config
       </button>
+
+      <p class="text-[9px] text-gray-600 uppercase tracking-widest px-3 pb-1 pt-3">Tools</p>
+      <button class="nav-item" data-page="analytics" onclick="switchTab('analytics')">
+        <span style="font-size:14px">📊</span> Analytics
+      </button>
+      <button class="nav-item" data-page="slug-audit" onclick="switchTab('slug-audit')">
+        <span style="font-size:14px">🔗</span> Slug Audit
+      </button>
+      <button class="nav-item" data-page="whisky-browser" onclick="switchTab('whisky-browser')">
+        <span style="font-size:14px">🔍</span> DB Browser
+      </button>
     </nav>
 
     <!-- User -->
@@ -262,6 +273,95 @@ body{background:#0a0a0a;color:#e5e2e1;font-family:system-ui,sans-serif;margin:0}
           <button onclick="testSentry()" class="text-xs border border-gray-700 px-4 py-2 rounded-lg text-gray-400 hover:text-yellow-300 hover:border-yellow-300/30 transition-all">Test Sentry (fire test error)</button>
           <p id="sentry-test-result" class="text-xs text-gray-600"></p>
         </div>
+      </div>
+    </div>
+
+
+    <!-- PAGE: ANALYTICS -->
+    <div id="page-analytics" class="page-panel">
+      <div class="flex items-center justify-between mb-5">
+        <h2 class="text-lg font-bold text-white">Analytics</h2>
+        <button onclick="loadAnalytics()" class="text-xs text-gray-500 hover:text-yellow-300 border border-gray-700 px-3 py-1.5 rounded-lg">↻ Refresh</button>
+      </div>
+      <!-- Summary stats -->
+      <div class="grid grid-cols-4 gap-3 mb-5">
+        <div class="card p-4 text-center"><p class="text-2xl font-bold text-yellow-400" id="an-total-checkins">–</p><p class="text-[10px] text-gray-500 uppercase tracking-wider mt-1">Total Check-ins</p></div>
+        <div class="card p-4 text-center"><p class="text-2xl font-bold text-green-400" id="an-total-users">–</p><p class="text-[10px] text-gray-500 uppercase tracking-wider mt-1">Active Users</p></div>
+        <div class="card p-4 text-center"><p class="text-2xl font-bold text-blue-400" id="an-avg-per-user">–</p><p class="text-[10px] text-gray-500 uppercase tracking-wider mt-1">Avg per User</p></div>
+        <div class="card p-4 text-center"><p class="text-2xl font-bold text-purple-400" id="an-images-pct">–</p><p class="text-[10px] text-gray-500 uppercase tracking-wider mt-1">With Images</p></div>
+      </div>
+      <div class="grid grid-cols-2 gap-4 mb-4">
+        <!-- Top whiskies -->
+        <div class="card p-4">
+          <h3 class="text-xs font-bold text-yellow-300 uppercase tracking-wider mb-3">Most Checked-in</h3>
+          <div id="an-top-whiskies" class="space-y-2"><p class="text-gray-600 text-xs text-center py-4">Loading…</p></div>
+        </div>
+        <!-- Top regions -->
+        <div class="card p-4">
+          <h3 class="text-xs font-bold text-yellow-300 uppercase tracking-wider mb-3">Top Regions</h3>
+          <div id="an-top-regions" class="space-y-2"><p class="text-gray-600 text-xs text-center py-4">Loading…</p></div>
+        </div>
+      </div>
+      <!-- Recent activity -->
+      <div class="card p-4">
+        <h3 class="text-xs font-bold text-yellow-300 uppercase tracking-wider mb-3">Recent Check-ins (last 20)</h3>
+        <div id="an-recent" class="space-y-1"><p class="text-gray-600 text-xs text-center py-4">Loading…</p></div>
+      </div>
+    </div>
+
+    <!-- PAGE: SLUG AUDIT -->
+    <div id="page-slug-audit" class="page-panel">
+      <div class="flex items-center justify-between mb-5">
+        <h2 class="text-lg font-bold text-white">Slug Audit</h2>
+        <button onclick="loadSlugAudit()" class="text-xs text-gray-500 hover:text-yellow-300 border border-gray-700 px-3 py-1.5 rounded-lg">↻ Refresh</button>
+      </div>
+      <p class="text-sm text-gray-500 mb-5">Compare stored image slugs against API slugs to catch mismatches. Whiskies without images are listed for prioritisation.</p>
+      <div class="grid grid-cols-2 gap-4 mb-4">
+        <div class="card p-4">
+          <h3 class="text-xs font-bold text-yellow-300 uppercase tracking-wider mb-3">⚠ Potential Mismatches</h3>
+          <div id="slug-mismatches" class="space-y-2"><p class="text-gray-600 text-xs text-center py-4">Loading…</p></div>
+        </div>
+        <div class="card p-4">
+          <h3 class="text-xs font-bold text-yellow-300 uppercase tracking-wider mb-3">✓ Matched Images</h3>
+          <div id="slug-matched" class="space-y-1 max-h-80 overflow-y-auto"><p class="text-gray-600 text-xs text-center py-4">Loading…</p></div>
+        </div>
+      </div>
+      <div class="card p-4">
+        <h3 class="text-xs font-bold text-yellow-300 uppercase tracking-wider mb-3">Priority Upload List (no image yet)</h3>
+        <div class="flex gap-2 mb-3">
+          <select id="slug-region-filter" onchange="filterPriorityList()" class="text-xs bg-black/40 border border-gray-700 rounded px-2 py-1.5 text-gray-400 outline-none">
+            <option value="">All regions</option>
+            <option>Islay</option><option>Speyside</option><option>Highland</option>
+            <option>Lowland</option><option>Campbeltown</option><option>Islands</option>
+            <option>Orkney</option><option>Japan</option><option>Ireland</option>
+          </select>
+        </div>
+        <div id="slug-missing" class="space-y-1 max-h-96 overflow-y-auto"><p class="text-gray-600 text-xs text-center py-4">Loading…</p></div>
+      </div>
+    </div>
+
+    <!-- PAGE: WHISKY BROWSER -->
+    <div id="page-whisky-browser" class="page-panel">
+      <div class="flex items-center justify-between mb-5">
+        <h2 class="text-lg font-bold text-white">DB Browser</h2>
+      </div>
+      <p class="text-sm text-gray-500 mb-4">Search the live WHISKY:EDITION API. See which whiskies have images and request photos directly.</p>
+      <div class="card p-4 mb-4">
+        <div class="flex gap-3">
+          <input id="browser-search" type="text" placeholder="Search by name, distillery, region…"
+            class="flex-1 bg-black/40 border border-gray-700 rounded-lg px-4 py-2.5 text-sm outline-none focus:border-yellow-500/50"
+            oninput="debounceSearch(this.value)"/>
+          <select id="browser-region" onchange="runBrowserSearch()" class="bg-black/40 border border-gray-700 rounded-lg px-3 py-2.5 text-sm text-gray-400 outline-none">
+            <option value="">All regions</option>
+            <option>Islay</option><option>Speyside</option><option>Highland</option>
+            <option>Lowland</option><option>Campbeltown</option><option>Islands</option>
+            <option>Orkney</option><option>Japan</option><option>Ireland</option>
+          </select>
+        </div>
+      </div>
+      <div class="card p-4">
+        <div id="browser-count" class="text-xs text-gray-600 mb-3">Enter a search term above</div>
+        <div id="browser-results" class="space-y-2"></div>
       </div>
     </div>
 
@@ -578,6 +678,9 @@ function switchTab(tab){
   if(tab==='feedback') loadFeedback();
   if(tab==='users') loadUsers();
   if(tab==='config') renderConfig();
+  if(tab==='analytics') loadAnalytics();
+  if(tab==='slug-audit') loadSlugAudit();
+  if(tab==='whisky-browser') document.getElementById('browser-search')?.focus();
 }
 
 async function loadFeedback(){
@@ -847,6 +950,14 @@ async function auditReopen(id, slug) {
 }
 
 // ── SUPABASE STORAGE ─────────────────────────────────────────────────────────
+async function requestImageForSlug(slug,name,region){
+  const {error}=await sb.from('image_requests').upsert({
+    whisky_slug:slug,whisky_name:name,region:region||'',
+    status:'pending',requested_at:new Date().toISOString()
+  },{onConflict:'whisky_slug'});
+  showAdminToast(error?'Already in queue':'📷 Added: '+name);
+}
+
 async function uploadToStorage(slug, base64Data, contentType) {
   // Always store as webp (optimiseImage converts before upload)
   const ext = contentType.includes('webp') ? 'webp' : contentType.includes('png') ? 'png' : 'jpg';
