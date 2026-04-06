@@ -799,7 +799,7 @@ async function showDetail(slugOrId){
       <!-- Action buttons — primary + secondary like reference -->
       <div class="flex gap-3 pb-8 mt-3">
         <button class="flex-1 font-headline font-bold py-4 rounded-2xl text-[12px] uppercase tracking-widest transition-all active:scale-[0.98] amber-glow" style="color:#402d00" onclick="openModal()">${isC?'✓ Checked In':'Add to Cellar'}</button>
-        <button class="px-5 py-4 rounded-2xl text-[11px] font-bold transition-all ${!BOTTLE_IMAGES[String(w.id||w.slug)] ? 'request-photo-btn' : ''}" style="color:#9c8f78;background:#1c1b1b;border:1px solid rgba(80,69,50,0.4)" ${!BOTTLE_IMAGES[String(w.id||w.slug)] ? `data-slug="${w.slug||w.id}" data-name="${(w.name||'').replace(/"/g,'')}" data-region="${m.region||''}"` : ''}>Compare</button>
+        <button class="request-photo-btn px-5 py-4 rounded-2xl text-[11px] font-bold transition-all flex items-center gap-1.5" style="color:#9c8f78;background:#1c1b1b;border:1px solid rgba(80,69,50,0.4)" data-slug="${w.slug||w.id}" data-name="${(w.name||'').replace(/"/g,'')}" data-region="${m.region||''}"><span class="material-symbols-outlined" style="font-size:14px">add_photo_alternate</span>Get Photo</button>
       </div>
     </div>
 `;
