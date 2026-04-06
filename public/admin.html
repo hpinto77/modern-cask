@@ -117,21 +117,29 @@
         </div>
         <div id="queue-list" class="space-y-3"><p class="text-gray-600 text-sm text-center py-8">Loading…</p></div>
       </div>
-      <div class="card p-5">
+      <div class="card p-5 mb-5">
         <div class="flex items-center justify-between mb-4">
-          <h2 class="text-sm font-bold text-yellow-300 uppercase tracking-wider">All Requests</h2>
+          <h2 class="text-sm font-bold text-yellow-300 uppercase tracking-wider">All Photo Requests</h2>
           <div class="flex gap-2">
             <select id="req-filter" onchange="loadAllRequests()" class="text-xs text-gray-400 bg-black/40 border border-gray-700 rounded px-2 py-1 outline-none">
               <option value="all">All</option>
               <option value="pending">Pending</option>
               <option value="done">Done</option>
               <option value="rejected">Rejected</option>
-              <option value="user_request">User Requests</option>
             </select>
             <button onclick="loadAllRequests()" class="text-xs text-gray-500 hover:text-yellow-300 border border-gray-700 px-3 py-1 rounded-lg">↻</button>
           </div>
         </div>
         <div id="all-requests-list" class="space-y-2"><p class="text-gray-600 text-sm text-center py-4">Select filter above…</p></div>
+      </div>
+
+      <div class="card p-5">
+        <div class="flex items-center justify-between mb-4">
+          <h2 class="text-sm font-bold text-yellow-300 uppercase tracking-wider">User Whisky Requests</h2>
+          <button onclick="loadWhiskyRequests()" class="text-xs text-gray-500 hover:text-yellow-300 border border-gray-700 px-3 py-1 rounded-lg">↻ Refresh</button>
+        </div>
+        <p class="text-xs text-gray-600 mb-3">Whiskies users want added to the database.</p>
+        <div id="whisky-requests-list" class="space-y-2"><p class="text-gray-600 text-sm text-center py-4">Loading…</p></div>
       </div>
     </div>
 
@@ -284,7 +292,10 @@ async function loadQueue() {
             <input type="file" id="file-${r.id}" accept="image/*" 
               onchange="handleQueueFile(this,'${r.id}','${r.whisky_slug}','${r.whisky_name}')"/>
           </div>
-          <button onclick="rejectRequest('${r.id}')" class="text-xs text-gray-600 hover:text-red-400 border border-gray-800 px-2 py-1 rounded-lg">✕</button>
+          <div class="flex flex-col gap-1">
+            <button onclick="skipRequest('${r.id}')" class="text-[10px] text-gray-600 hover:text-yellow-400 border border-gray-800 px-2 py-1 rounded-lg whitespace-nowrap">↓ Skip</button>
+            <button onclick="deleteRequest('${r.id}')" class="text-[10px] text-gray-600 hover:text-red-400 border border-gray-800 px-2 py-1 rounded-lg whitespace-nowrap">✕ Delete</button>
+          </div>
         </div>
       ` : r.image_url ? `<img src="${r.image_url}" class="w-10 h-14 object-contain rounded"/>` : ''}
     </div>
@@ -500,7 +511,7 @@ function switchTab(tab){
   document.querySelectorAll('.admin-tab-panel').forEach(p=>p.classList.add('hidden'));
   document.getElementById('tab-'+tab)?.classList.remove('hidden');
   if(tab==='images') loadAudit();
-  if(tab==='requests'){loadQueue();loadAllRequests();}
+  if(tab==='requests'){loadQueue();loadAllRequests();loadWhiskyRequests();}
   if(tab==='feedback') loadFeedback();
   if(tab==='config') renderConfig();
 }
@@ -566,9 +577,85 @@ async function loadFeedbackCount(){
   if(el) el.textContent=count||0;
 }
 
-async function rejectRequest(id) {
-  await sb.from('image_requests').update({ status: 'rejected' }).eq('id', id);
+async function loadWhiskyRequests(){
+  const el=document.getElementById('whisky-requests-list');
+  if(!el)return;
+  el.innerHTML='<p class="text-gray-600 text-sm text-center py-4">Loading…</p>';
+  const {data,error}=await sb.from('whisky_requests')
+    .select('id,whisky_name,distillery,region,age_statement,notes,status,requested_at')
+    .order('requested_at',{ascending:false}).limit(100);
+  if(error){
+    if(error.code==='42P01'){
+      el.innerHTML='<p class="text-yellow-400 text-xs text-center py-4">Table not created yet — run create_whisky_requests_table.sql in Supabase</p>';
+    } else {
+      el.innerHTML=`<p class="text-red-400 text-xs text-center py-4">${error.message}</p>`;
+    }
+    return;
+  }
+  if(!data?.length){el.innerHTML='<p class="text-gray-500 text-sm text-center py-4">No requests yet.</p>';return;}
+  const statusCol={pending:'text-yellow-400',added:'text-green-400',rejected:'text-red-400'};
+  el.innerHTML=data.map(r=>`
+    <div class="bg-black/30 rounded-lg p-3 border border-gray-800">
+      <div class="flex items-start justify-between gap-2">
+        <div class="flex-1 min-w-0">
+          <p class="text-sm font-semibold text-gray-200">${r.whisky_name}</p>
+          <p class="text-xs text-gray-500">${[r.distillery,r.region,r.age_statement?r.age_statement+'yr':null].filter(Boolean).join(' · ')||'No details'}</p>
+          ${r.notes?`<p class="text-xs text-gray-600 mt-1 italic">"${r.notes}"</p>`:''}
+        </div>
+        <div class="flex flex-col items-end gap-1 shrink-0">
+          <span class="${statusCol[r.status]||'text-gray-400'} text-[10px] font-bold uppercase">${r.status}</span>
+          <span class="text-[10px] text-gray-600">${new Date(r.requested_at).toLocaleDateString('en-GB',{day:'numeric',month:'short'})}</span>
+        </div>
+      </div>
+      ${r.status==='pending'?`<div class="flex gap-2 mt-2">
+        <button onclick="updateWhiskyReq(${r.id},'added')" class="text-[10px] text-green-400 border border-green-400/30 px-2 py-1 rounded hover:bg-green-400/10">✓ Mark Added</button>
+        <button onclick="rejectWhiskyReq(${r.id})" class="text-[10px] text-red-400 border border-red-400/30 px-2 py-1 rounded hover:bg-red-400/10">✕ Reject</button>
+      </div>`:''}
+    </div>`).join('');
+}
+
+async function updateWhiskyReq(id, status, admin_note) {
+  const update = { status };
+  if (admin_note) update.admin_note = admin_note;
+  await sb.from('whisky_requests').update(update).eq('id', id);
+  loadWhiskyRequests();
+}
+
+async function rejectWhiskyReq(id) {
+  const note = prompt('Reason for rejecting? (shown to user — optional):', 'Not available in our data source yet');
+  if (note === null) return; // cancelled
+  await updateWhiskyReq(id, 'rejected', note || null);
+  showAdminToast('Request rejected');
+}
+
+async function skipRequest(id) {
+  // Move to bottom of queue by updating requested_at to now (sorts last)
+  await sb.from('image_requests')
+    .update({ requested_at: new Date(Date.now() + 9999999999).toISOString() })
+    .eq('id', id);
   loadQueue(); loadStats();
+  showAdminToast('Moved to bottom of queue');
+}
+
+async function deleteRequest(id) {
+  if (!confirm('Delete this request permanently?')) return;
+  await sb.from('image_requests').delete().eq('id', id);
+  loadQueue(); loadAllRequests(); loadStats();
+  showAdminToast('Request deleted');
+}
+
+function showAdminToast(msg) {
+  let t = document.getElementById('admin-toast');
+  if (!t) {
+    t = document.createElement('div');
+    t.id = 'admin-toast';
+    t.style.cssText = 'position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#facc15;color:#1a1a1a;padding:8px 18px;border-radius:99px;font-size:12px;font-weight:700;z-index:999;transition:opacity .3s;pointer-events:none';
+    document.body.appendChild(t);
+  }
+  t.textContent = msg;
+  t.style.opacity = '1';
+  clearTimeout(t._timer);
+  t._timer = setTimeout(() => t.style.opacity = '0', 2000);
 }
 
 async function loadAudit() {
