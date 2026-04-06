@@ -567,13 +567,10 @@ async function uploadQueueFile(file, requestId, slug, name) {
 
 function switchTab(tab){
   document.querySelectorAll('.nav-item').forEach(b=>{
-    const active = b.dataset.page === tab;
-    b.classList.toggle('bg-white/5', active);
-    b.classList.toggle('text-white', active);
-    b.classList.toggle('text-gray-500', !active);
+    b.classList.toggle('active', b.dataset.page === tab);
   });
-  document.querySelectorAll('.page-panel').forEach(p=>p.classList.add('hidden'));
-  document.getElementById('page-'+tab)?.classList.remove('hidden');
+  document.querySelectorAll('.page-panel').forEach(p=>p.classList.remove('active'));
+  document.getElementById('page-'+tab)?.classList.add('active');
   if(tab==='images') loadAudit();
   if(tab==='queue') loadQueue();
   if(tab==='all-requests') loadAllRequests();
