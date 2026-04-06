@@ -6,190 +6,258 @@
 <title>Modern Cask — Admin</title>
 <script src="https://cdn.tailwindcss.com"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<style>
-  body { background:#0f0f0f; color:#e5e2e1; font-family:system-ui,sans-serif; }
-  .card { background:#1c1b1b; border:1px solid #2a2a2a; border-radius:12px; }
-  .badge-pending  { background:rgba(255,191,0,0.15); color:#FFD700; }
-  .badge-done     { background:rgba(76,175,80,0.15);  color:#4CAF50; }
-  .badge-rejected { background:rgba(244,67,54,0.15);  color:#f44336; }
-  .drop-zone { border:2px dashed #504532; border-radius:10px; transition:all 0.2s; }
-  .drop-zone.over { border-color:#FFBF00; background:rgba(255,191,0,0.05); }
-  input[type=file] { display:none; }
-</style>
 <script src="https://js-de.sentry-cdn.com/b9a540d51bfee4b8d51e19b7c03598a8.min.js" crossorigin="anonymous"></script>
+<style>
+body{background:#0a0a0a;color:#e5e2e1;font-family:system-ui,sans-serif;margin:0}
+.card{background:#1c1b1b;border:1px solid #2a2a2a;border-radius:12px}
+.badge-pending{background:rgba(255,191,0,0.15);color:#FFD700}
+.badge-done{background:rgba(76,175,80,0.15);color:#4CAF50}
+.badge-rejected{background:rgba(244,67,54,0.15);color:#f44336}
+.drop-zone{border:2px dashed #504532;border-radius:10px;transition:all 0.2s}
+.drop-zone.over{border-color:#FFBF00;background:rgba(255,191,0,0.05)}
+.drop-zone input[type=file]{display:none}
+.nav-item{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:8px;cursor:pointer;font-size:13px;font-weight:500;transition:all 0.15s;border:none;background:none;color:#6b7280;width:100%;text-align:left}
+.nav-item:hover{background:rgba(255,255,255,0.04);color:#e5e2e1}
+.nav-item.active{background:rgba(255,191,0,0.1);color:#FFE2AB}
+.page-panel{display:none}
+.page-panel.active{display:block}
+.stat-card{background:#1c1b1b;border:1px solid #2a2a2a;border-radius:10px;padding:14px;text-align:center}
+</style>
 </head>
-<body class="min-h-screen p-6">
+<body>
 
-<div class="max-w-4xl mx-auto">
-  <!-- Header -->
-  <div class="flex items-center justify-between mb-8">
-    <div>
-      <h1 class="text-2xl font-bold text-yellow-300">Modern Cask Admin</h1>
-      <p class="text-gray-500 text-sm mt-1">Bottle image upload queue</p>
-    </div>
-    <div class="flex items-center gap-3">
-      <span id="admin-email" class="text-gray-400 text-sm"></span>
-      <button onclick="signOut()" class="text-xs text-gray-500 hover:text-red-400 border border-gray-700 px-3 py-1.5 rounded-lg">Sign out</button>
-    </div>
-  </div>
-
-  <!-- Auth gate -->
-  <div id="auth-gate" class="card p-8 max-w-sm mx-auto hidden">
-    <h2 class="text-lg font-bold mb-4">Admin Sign In</h2>
+<!-- AUTH GATE — shown before login -->
+<div id="auth-gate" class="min-h-screen flex items-center justify-center p-6">
+  <div class="card p-8 w-full max-w-sm">
+    <h1 class="text-xl font-bold text-yellow-300 mb-1">Modern Cask</h1>
+    <p class="text-gray-500 text-sm mb-6">Admin panel</p>
     <input id="admin-email-input" type="email" placeholder="Email" class="w-full bg-black/40 border border-gray-700 rounded-lg px-4 py-2.5 text-sm mb-3 outline-none focus:border-yellow-500/50"/>
     <input id="admin-pass-input" type="password" placeholder="Password" class="w-full bg-black/40 border border-gray-700 rounded-lg px-4 py-2.5 text-sm mb-4 outline-none focus:border-yellow-500/50"/>
     <button onclick="adminSignIn()" class="w-full bg-yellow-400 text-black font-bold py-2.5 rounded-lg text-sm hover:bg-yellow-300 transition-all">Sign In</button>
     <p id="auth-error" class="text-red-400 text-xs mt-2 hidden"></p>
   </div>
+</div>
 
-  <!-- Main content -->
-  <div id="main-content" class="hidden">
+<!-- MAIN LAYOUT — sidebar + content -->
+<div id="main-content" class="hidden min-h-screen flex">
 
-    <!-- Stats bar -->
-    <div class="grid grid-cols-4 gap-3 mb-5">
-      <div class="card p-3 text-center"><p class="text-2xl font-bold text-yellow-400" id="stat-pending">–</p><p class="text-[10px] text-gray-500 uppercase tracking-wider mt-1">Pending</p></div>
-      <div class="card p-3 text-center"><p class="text-2xl font-bold text-green-400" id="stat-done">–</p><p class="text-[10px] text-gray-500 uppercase tracking-wider mt-1">Fulfilled</p></div>
-      <div class="card p-3 text-center"><p class="text-2xl font-bold text-blue-400" id="stat-images">–</p><p class="text-[10px] text-gray-500 uppercase tracking-wider mt-1">Images</p></div>
-      <div class="card p-3 text-center"><p class="text-2xl font-bold text-purple-400" id="stat-feedback">–</p><p class="text-[10px] text-gray-500 uppercase tracking-wider mt-1">Feedback</p></div>
+  <!-- SIDEBAR -->
+  <aside class="w-52 shrink-0 border-r border-gray-800 flex flex-col" style="background:#111;min-height:100vh">
+    <!-- Logo -->
+    <div class="px-4 py-5 border-b border-gray-800">
+      <p class="text-yellow-300 font-bold text-sm tracking-wider uppercase">Modern Cask</p>
+      <p class="text-gray-600 text-[10px] mt-0.5">Admin</p>
     </div>
 
-    <!-- Tabs -->
-    <div class="flex gap-1 mb-5 border-b border-gray-800 overflow-x-auto" style="scrollbar-width:none">
-      <button class="admin-tab active px-4 py-2.5 text-xs font-bold uppercase tracking-wider whitespace-nowrap" data-tab="images" onclick="switchTab('images')">📷 Images</button>
-      <button class="admin-tab px-4 py-2.5 text-xs font-bold uppercase tracking-wider whitespace-nowrap text-gray-500" data-tab="requests" onclick="switchTab('requests')">📋 Requests</button>
-      <button class="admin-tab px-4 py-2.5 text-xs font-bold uppercase tracking-wider whitespace-nowrap text-gray-500" data-tab="feedback" onclick="switchTab('feedback')">💬 Feedback</button>
-      <button class="admin-tab px-4 py-2.5 text-xs font-bold uppercase tracking-wider whitespace-nowrap text-gray-500" data-tab="config" onclick="switchTab('config')">⚙️ Config</button>
+    <!-- Stats pills -->
+    <div class="px-3 py-3 border-b border-gray-800 grid grid-cols-2 gap-2">
+      <div class="bg-black/40 rounded-lg p-2 text-center">
+        <p class="text-yellow-400 font-bold text-lg leading-none" id="stat-pending">–</p>
+        <p class="text-[9px] text-gray-600 uppercase tracking-wider mt-0.5">Pending</p>
+      </div>
+      <div class="bg-black/40 rounded-lg p-2 text-center">
+        <p class="text-green-400 font-bold text-lg leading-none" id="stat-done">–</p>
+        <p class="text-[9px] text-gray-600 uppercase tracking-wider mt-0.5">Done</p>
+      </div>
+      <div class="bg-black/40 rounded-lg p-2 text-center">
+        <p class="text-blue-400 font-bold text-lg leading-none" id="stat-images">–</p>
+        <p class="text-[9px] text-gray-600 uppercase tracking-wider mt-0.5">Images</p>
+      </div>
+      <div class="bg-black/40 rounded-lg p-2 text-center">
+        <p class="text-purple-400 font-bold text-lg leading-none" id="stat-feedback">–</p>
+        <p class="text-[9px] text-gray-600 uppercase tracking-wider mt-0.5">Feedback</p>
+      </div>
     </div>
 
-    <!-- TAB: IMAGES -->
-    <div id="tab-images" class="admin-tab-panel">
+    <!-- Nav -->
+    <nav class="flex-1 px-2 py-3 space-y-0.5">
+      <p class="text-[9px] text-gray-600 uppercase tracking-widest px-3 pb-1 pt-1">Images</p>
+      <button class="nav-item active" data-page="images" onclick="switchTab('images')">
+        <span style="font-size:14px">📷</span> Upload
+      </button>
+      <button class="nav-item" data-page="queue" onclick="switchTab('queue')">
+        <span style="font-size:14px">📋</span> Photo Queue
+      </button>
+      <button class="nav-item" data-page="all-requests" onclick="switchTab('all-requests')">
+        <span style="font-size:14px">🗂</span> All Requests
+      </button>
 
-      <!-- Upload any image manually -->
+      <p class="text-[9px] text-gray-600 uppercase tracking-widest px-3 pb-1 pt-3">Community</p>
+      <button class="nav-item" data-page="whisky-requests" onclick="switchTab('whisky-requests')">
+        <span style="font-size:14px">🥃</span> Whisky Requests
+      </button>
+      <button class="nav-item" data-page="users" onclick="switchTab('users')">
+        <span style="font-size:14px">👤</span> Users
+      </button>
+      <button class="nav-item" data-page="feedback" onclick="switchTab('feedback')">
+        <span style="font-size:14px">💬</span> Feedback
+      </button>
+
+      <p class="text-[9px] text-gray-600 uppercase tracking-widest px-3 pb-1 pt-3">System</p>
+      <button class="nav-item" data-page="config" onclick="switchTab('config')">
+        <span style="font-size:14px">⚙️</span> Config
+      </button>
+    </nav>
+
+    <!-- User -->
+    <div class="px-3 py-3 border-t border-gray-800">
+      <p id="admin-email" class="text-gray-500 text-[10px] truncate mb-2"></p>
+      <button onclick="signOut()" class="text-[10px] text-gray-600 hover:text-red-400 transition-colors">Sign out</button>
+    </div>
+  </aside>
+
+  <!-- CONTENT AREA -->
+  <main class="flex-1 overflow-y-auto p-6" style="min-height:100vh">
+
+    <!-- PAGE: IMAGES (Upload + Audit) -->
+    <div id="page-images" class="page-panel active">
+      <h2 class="text-lg font-bold text-white mb-5">Upload Image</h2>
       <div class="card p-5 mb-5">
-        <h2 class="text-sm font-bold text-yellow-300 uppercase tracking-wider mb-4">Upload Image</h2>
         <div class="grid grid-cols-2 gap-3 mb-3">
           <div>
-            <label class="block text-xs text-gray-500 mb-1">Slug <span class="text-gray-600">(auto-filled from DB)</span></label>
-            <input id="manual-slug" type="text" placeholder="auto-filled when you pick a whisky" readonly
-              class="w-full bg-black/40 border border-gray-700 rounded-lg px-3 py-2 text-sm outline-none text-gray-400 cursor-default"
-              style="opacity:0.7"/>
-            <input id="manual-slug-override" type="checkbox" class="hidden"/>
+            <label class="block text-xs text-gray-500 mb-1">Whisky Name</label>
+            <div style="position:relative">
+              <input id="manual-name" type="text" placeholder="Type to search DB…" autocomplete="off"
+                class="w-full bg-black/40 border border-gray-700 rounded-lg px-3 py-2 text-sm outline-none focus:border-yellow-500/50"
+                oninput="searchWhiskyName(this.value)"/>
+              <span id="name-match-badge" class="hidden absolute right-2 top-1/2 -translate-y-1/2 text-[10px] text-green-400 font-bold">✓</span>
+              <div id="name-dropdown" style="position:absolute;top:100%;left:0;right:0;z-index:50;background:#1a1a1a;border:1px solid #374151;border-radius:8px;max-height:220px;overflow-y:auto;display:none;margin-top:2px;box-shadow:0 8px 24px rgba(0,0,0,0.6)"></div>
+            </div>
           </div>
-          <div style="position:relative">
-            <label class="block text-xs text-gray-500 mb-1">Whisky Name <span id="name-match-badge" class="hidden text-[10px] text-green-400 font-bold ml-1">✓ matched</span></label>
-            <input id="manual-name" type="text" placeholder="Type to search DB…" autocomplete="off"
-              class="w-full bg-black/40 border border-gray-700 rounded-lg px-3 py-2 text-sm outline-none focus:border-yellow-500/50"
-              oninput="searchWhiskyName(this.value)"/>
-            <div id="name-dropdown" style="position:absolute;top:100%;left:0;right:0;z-index:50;background:#1a1a1a;border:1px solid #374151;border-radius:8px;max-height:220px;overflow-y:auto;display:none;margin-top:2px;box-shadow:0 8px 24px rgba(0,0,0,0.6)"></div>
+          <div>
+            <label class="block text-xs text-gray-500 mb-1">Slug <span class="text-gray-700">(auto)</span></label>
+            <input id="manual-slug" type="text" placeholder="auto-filled from DB" readonly
+              class="w-full bg-black/40 border border-gray-700 rounded-lg px-3 py-2 text-sm outline-none text-gray-500 cursor-default"/>
           </div>
         </div>
-        <div id="manual-drop" class="drop-zone p-8 text-center cursor-pointer mb-3" onclick="document.getElementById('manual-file').click()" ondragover="dragOver(event,'manual-drop')" ondragleave="dragLeave('manual-drop')" ondrop="dropFile(event,'manual')">
-          <p class="text-gray-400 text-sm">📷 Drag & drop bottle image, or click to browse</p>
+        <div id="manual-drop" class="drop-zone p-8 text-center cursor-pointer mb-3"
+          onclick="document.getElementById('manual-file').click()"
+          ondragover="dragOver(event,'manual-drop')" ondragleave="dragLeave('manual-drop')" ondrop="dropFile(event,'manual')">
+          <p class="text-gray-400 text-sm">📷 Drag & drop or click to browse</p>
           <p class="text-gray-600 text-xs mt-1">Any format → auto-converted to 600×900 WebP</p>
           <input type="file" id="manual-file" accept="image/*" onchange="handleManualFile(this)"/>
         </div>
         <div id="manual-preview" class="hidden mb-3 flex items-center gap-3">
           <img id="manual-preview-img" class="w-16 h-24 object-contain bg-black/20 rounded-lg"/>
           <div><p id="manual-preview-name" class="text-sm font-semibold"></p><p id="manual-preview-size" class="text-xs text-gray-500"></p></div>
-          <button onclick="clearManualFile()" class="ml-auto text-gray-500 hover:text-red-400 text-xs">✕</button>
+          <button onclick="clearManualFile()" class="ml-auto text-gray-500 hover:text-red-400 text-xs">✕ Clear</button>
         </div>
         <button onclick="uploadManual()" class="bg-yellow-400 text-black font-bold px-6 py-2.5 rounded-lg text-sm hover:bg-yellow-300 transition-all">Upload</button>
         <p id="manual-status" class="text-xs mt-2 text-gray-500"></p>
       </div>
 
-      <!-- Image Audit -->
       <div class="card p-5">
         <div class="flex items-center justify-between mb-4">
-          <h2 class="text-sm font-bold text-yellow-300 uppercase tracking-wider">Uploaded Images</h2>
+          <h3 class="text-sm font-bold text-yellow-300 uppercase tracking-wider">Uploaded Images</h3>
           <button onclick="loadAudit()" class="text-xs text-gray-500 hover:text-yellow-300 border border-gray-700 px-3 py-1 rounded-lg">↻ Refresh</button>
         </div>
-        <p class="text-xs text-gray-600 mb-3">Fix slugs or delete and re-upload wrong images.</p>
+        <p class="text-xs text-gray-600 mb-3">Fix slugs or delete and re-upload incorrect images.</p>
         <div id="audit-list" class="space-y-2"><p class="text-gray-600 text-sm text-center py-4">Loading…</p></div>
       </div>
     </div>
 
-    <!-- TAB: REQUESTS -->
-    <div id="tab-requests" class="admin-tab-panel hidden">
-      <div class="card p-5 mb-5">
-        <div class="flex items-center justify-between mb-4">
-          <h2 class="text-sm font-bold text-yellow-300 uppercase tracking-wider">Photo Request Queue</h2>
-          <button onclick="loadQueue()" class="text-xs text-gray-500 hover:text-yellow-300 border border-gray-700 px-3 py-1 rounded-lg">↻ Refresh</button>
-        </div>
+    <!-- PAGE: PHOTO QUEUE -->
+    <div id="page-queue" class="page-panel">
+      <div class="flex items-center justify-between mb-5">
+        <h2 class="text-lg font-bold text-white">Photo Request Queue</h2>
+        <button onclick="loadQueue()" class="text-xs text-gray-500 hover:text-yellow-300 border border-gray-700 px-3 py-1.5 rounded-lg">↻ Refresh</button>
+      </div>
+      <div class="card p-5">
         <div id="queue-list" class="space-y-3"><p class="text-gray-600 text-sm text-center py-8">Loading…</p></div>
       </div>
-      <div class="card p-5 mb-5">
-        <div class="flex items-center justify-between mb-4">
-          <h2 class="text-sm font-bold text-yellow-300 uppercase tracking-wider">All Photo Requests</h2>
-          <div class="flex gap-2">
-            <select id="req-filter" onchange="loadAllRequests()" class="text-xs text-gray-400 bg-black/40 border border-gray-700 rounded px-2 py-1 outline-none">
-              <option value="all">All</option>
-              <option value="pending">Pending</option>
-              <option value="done">Done</option>
-              <option value="rejected">Rejected</option>
-            </select>
-            <button onclick="loadAllRequests()" class="text-xs text-gray-500 hover:text-yellow-300 border border-gray-700 px-3 py-1 rounded-lg">↻</button>
-          </div>
-        </div>
-        <div id="all-requests-list" class="space-y-2"><p class="text-gray-600 text-sm text-center py-4">Select filter above…</p></div>
-      </div>
+    </div>
 
-      <div class="card p-5">
-        <div class="flex items-center justify-between mb-4">
-          <h2 class="text-sm font-bold text-yellow-300 uppercase tracking-wider">User Whisky Requests</h2>
-          <button onclick="loadWhiskyRequests()" class="text-xs text-gray-500 hover:text-yellow-300 border border-gray-700 px-3 py-1 rounded-lg">↻ Refresh</button>
+    <!-- PAGE: ALL REQUESTS -->
+    <div id="page-all-requests" class="page-panel">
+      <div class="flex items-center justify-between mb-5">
+        <h2 class="text-lg font-bold text-white">All Photo Requests</h2>
+        <div class="flex gap-2">
+          <select id="req-filter" onchange="loadAllRequests()" class="text-xs text-gray-400 bg-black/40 border border-gray-700 rounded px-2 py-1.5 outline-none">
+            <option value="all">All statuses</option>
+            <option value="pending">Pending</option>
+            <option value="done">Done</option>
+            <option value="rejected">Rejected</option>
+          </select>
+          <button onclick="loadAllRequests()" class="text-xs text-gray-500 hover:text-yellow-300 border border-gray-700 px-3 py-1.5 rounded-lg">↻ Refresh</button>
         </div>
-        <p class="text-xs text-gray-600 mb-3">Whiskies users want added to the database.</p>
+      </div>
+      <div class="card p-5">
+        <div id="all-requests-list" class="space-y-2"><p class="text-gray-600 text-sm text-center py-4">Select a filter above…</p></div>
+      </div>
+    </div>
+
+    <!-- PAGE: WHISKY REQUESTS -->
+    <div id="page-whisky-requests" class="page-panel">
+      <div class="flex items-center justify-between mb-5">
+        <h2 class="text-lg font-bold text-white">Whisky Requests</h2>
+        <button onclick="loadWhiskyRequests()" class="text-xs text-gray-500 hover:text-yellow-300 border border-gray-700 px-3 py-1.5 rounded-lg">↻ Refresh</button>
+      </div>
+      <p class="text-sm text-gray-500 mb-5">Whiskies users want added to the database.</p>
+      <div class="card p-5">
         <div id="whisky-requests-list" class="space-y-2"><p class="text-gray-600 text-sm text-center py-4">Loading…</p></div>
       </div>
     </div>
 
-    <!-- TAB: FEEDBACK -->
-    <div id="tab-feedback" class="admin-tab-panel hidden">
+    <!-- PAGE: USERS -->
+    <div id="page-users" class="page-panel">
+      <div class="flex items-center justify-between mb-5">
+        <h2 class="text-lg font-bold text-white">Users</h2>
+        <button onclick="loadUsers()" class="text-xs text-gray-500 hover:text-yellow-300 border border-gray-700 px-3 py-1.5 rounded-lg">↻ Refresh</button>
+      </div>
+      <p class="text-sm text-gray-500 mb-5">Users ranked by check-in activity.</p>
       <div class="card p-5">
-        <div class="flex items-center justify-between mb-4">
-          <h2 class="text-sm font-bold text-yellow-300 uppercase tracking-wider">User Feedback</h2>
-          <div class="flex gap-2">
-            <select id="feedback-filter" onchange="loadFeedback()" class="text-xs text-gray-400 bg-black/40 border border-gray-700 rounded px-2 py-1 outline-none">
-              <option value="all">All</option>
-              <option value="bug">🐛 Bugs</option>
-              <option value="idea">💡 Ideas</option>
-              <option value="praise">⭐ Praise</option>
-              <option value="other">💬 Other</option>
-            </select>
-            <button onclick="loadFeedback()" class="text-xs text-gray-500 hover:text-yellow-300 border border-gray-700 px-3 py-1 rounded-lg">↻</button>
-          </div>
+        <div id="users-list" class="space-y-2"><p class="text-gray-600 text-sm text-center py-4">Loading…</p></div>
+      </div>
+    </div>
+
+    <!-- PAGE: FEEDBACK -->
+    <div id="page-feedback" class="page-panel">
+      <div class="flex items-center justify-between mb-5">
+        <h2 class="text-lg font-bold text-white">User Feedback</h2>
+        <div class="flex gap-2">
+          <select id="feedback-filter" onchange="loadFeedback()" class="text-xs text-gray-400 bg-black/40 border border-gray-700 rounded px-2 py-1.5 outline-none">
+            <option value="all">All types</option>
+            <option value="bug">🐛 Bugs</option>
+            <option value="idea">💡 Ideas</option>
+            <option value="praise">⭐ Praise</option>
+            <option value="other">💬 Other</option>
+          </select>
+          <button onclick="loadFeedback()" class="text-xs text-gray-500 hover:text-yellow-300 border border-gray-700 px-3 py-1.5 rounded-lg">↻ Refresh</button>
         </div>
+      </div>
+      <div class="card p-5">
         <div id="feedback-list" class="space-y-3"><p class="text-gray-600 text-sm text-center py-8">Loading…</p></div>
       </div>
     </div>
 
-    <!-- TAB: CONFIG -->
-    <div id="tab-config" class="admin-tab-panel hidden">
+    <!-- PAGE: CONFIG -->
+    <div id="page-config" class="page-panel">
+      <h2 class="text-lg font-bold text-white mb-5">Configuration</h2>
       <div class="card p-5 mb-4">
-        <h2 class="text-sm font-bold text-yellow-300 uppercase tracking-wider mb-4">Configuration</h2>
-        <p class="text-xs text-gray-500 mb-4">Read-only view. Edit these in the source code CFG block or Netlify environment variables.</p>
-        <div class="space-y-3" id="config-display"></div>
+        <h3 class="text-sm font-bold text-yellow-300 uppercase tracking-wider mb-4">Current Config</h3>
+        <p class="text-xs text-gray-500 mb-4">Read-only. Edit in the CFG block at the top of index.html.</p>
+        <div class="space-y-2" id="config-display"></div>
       </div>
       <div class="card p-5 mb-4">
-        <h2 class="text-sm font-bold text-yellow-300 uppercase tracking-wider mb-3">Netlify Env Variables</h2>
-        <p class="text-xs text-gray-500 mb-3">Keys that must be set in Netlify dashboard → Site config → Environment variables:</p>
+        <h3 class="text-sm font-bold text-yellow-300 uppercase tracking-wider mb-3">Netlify Env Variables</h3>
+        <p class="text-xs text-gray-500 mb-3">Set in Netlify dashboard → Site config → Environment variables:</p>
         <div class="space-y-2">
-          <div class="flex justify-between items-center bg-black/30 rounded-lg px-3 py-2">
-            <div><p class="text-xs font-mono text-yellow-300">GEMINI_API_KEY</p><p class="text-[10px] text-gray-500">Gemini Vision API — for photo label search</p></div>
+          <div class="flex justify-between items-center bg-black/30 rounded-lg px-3 py-2.5">
+            <div><p class="text-xs font-mono text-yellow-300">GEMINI_API_KEY</p><p class="text-[10px] text-gray-500 mt-0.5">Gemini Vision — photo label search</p></div>
             <a href="https://aistudio.google.com/app/apikey" target="_blank" class="text-[10px] text-blue-400 hover:underline">Get key ↗</a>
           </div>
-          <div class="flex justify-between items-center bg-black/30 rounded-lg px-3 py-2">
-            <div><p class="text-xs font-mono text-yellow-300">SUPABASE_SERVICE_KEY</p><p class="text-[10px] text-gray-500">Server-side admin operations (if needed)</p></div>
+          <div class="flex justify-between items-center bg-black/30 rounded-lg px-3 py-2.5">
+            <div><p class="text-xs font-mono text-yellow-300">SUPABASE_SERVICE_KEY</p><p class="text-[10px] text-gray-500 mt-0.5">Server-side admin operations</p></div>
             <a href="https://supabase.com/dashboard/project/nluezhsmgwuqdryarrmd/settings/api" target="_blank" class="text-[10px] text-blue-400 hover:underline">Dashboard ↗</a>
           </div>
         </div>
       </div>
       <div class="card p-5">
-        <h2 class="text-sm font-bold text-yellow-300 uppercase tracking-wider mb-3">Sentry Error Monitoring</h2>
+        <h3 class="text-sm font-bold text-yellow-300 uppercase tracking-wider mb-3">Sentry</h3>
         <div class="space-y-2">
-          <div class="flex justify-between items-center bg-black/30 rounded-lg px-3 py-2">
-            <div><p class="text-xs text-gray-300">Dashboard</p><p class="text-[10px] text-gray-500" id="sentry-dsn-display">DSN loaded from CFG</p></div>
-            <a href="https://sentry.io" target="_blank" class="text-[10px] text-blue-400 hover:underline">Open Sentry ↗</a>
+          <div class="flex justify-between items-center bg-black/30 rounded-lg px-3 py-2.5">
+            <div><p class="text-xs text-gray-300">Error monitoring dashboard</p><p class="text-[10px] text-gray-600" id="sentry-dsn-display">DSN: b9a540d5…</p></div>
+            <a href="https://sentry.io" target="_blank" class="text-[10px] text-blue-400 hover:underline">Open ↗</a>
           </div>
           <button onclick="testSentry()" class="text-xs border border-gray-700 px-4 py-2 rounded-lg text-gray-400 hover:text-yellow-300 hover:border-yellow-300/30 transition-all">Test Sentry (fire test error)</button>
           <p id="sentry-test-result" class="text-xs text-gray-600"></p>
@@ -197,14 +265,8 @@
       </div>
     </div>
 
-  </div>
-
-<style>
-.admin-tab{border-bottom:2px solid transparent;color:#6b7280;transition:all .2s;}
-.admin-tab.active{border-bottom-color:#facc15;color:#fde047;}
-.admin-tab-panel{display:block;}
-.admin-tab-panel.hidden{display:none;}
-</style>
+  </main>
+</div>
 
 <script>
 const SUPABASE_URL  = 'https://nluezhsmgwuqdryarrmd.supabase.co';
@@ -241,12 +303,12 @@ async function signOut() {
 
 sb.auth.onAuthStateChange((event, session) => {
   if (session?.user) {
-    document.getElementById('auth-gate').classList.add('hidden');
+    document.getElementById('auth-gate').style.display='none';
     document.getElementById('main-content').classList.remove('hidden');
     document.getElementById('admin-email').textContent = session.user.email;
     loadStats(); loadFeedbackCount(); loadAudit(); loadQueue();
   } else {
-    document.getElementById('auth-gate').classList.remove('hidden');
+    document.getElementById('auth-gate').style.display='';
     document.getElementById('main-content').classList.add('hidden');
   }
 });
@@ -504,15 +566,20 @@ async function uploadQueueFile(file, requestId, slug, name) {
 }
 
 function switchTab(tab){
-  document.querySelectorAll('.admin-tab').forEach(b=>{
-    b.classList.toggle('active', b.dataset.tab===tab);
-    b.classList.toggle('text-gray-500', b.dataset.tab!==tab);
+  document.querySelectorAll('.nav-item').forEach(b=>{
+    const active = b.dataset.page === tab;
+    b.classList.toggle('bg-white/5', active);
+    b.classList.toggle('text-white', active);
+    b.classList.toggle('text-gray-500', !active);
   });
-  document.querySelectorAll('.admin-tab-panel').forEach(p=>p.classList.add('hidden'));
-  document.getElementById('tab-'+tab)?.classList.remove('hidden');
+  document.querySelectorAll('.page-panel').forEach(p=>p.classList.add('hidden'));
+  document.getElementById('page-'+tab)?.classList.remove('hidden');
   if(tab==='images') loadAudit();
-  if(tab==='requests'){loadQueue();loadAllRequests();loadWhiskyRequests();}
+  if(tab==='queue') loadQueue();
+  if(tab==='all-requests') loadAllRequests();
+  if(tab==='whisky-requests') loadWhiskyRequests();
   if(tab==='feedback') loadFeedback();
+  if(tab==='users') loadUsers();
   if(tab==='config') renderConfig();
 }
 
@@ -542,6 +609,44 @@ async function loadFeedback(){
       ${f.url?`<p class="text-[10px] text-gray-600 mt-0.5 truncate">${f.url}</p>`:''}
     </div>`).join('');
   document.getElementById('stat-feedback').textContent=data.length;
+}
+
+async function loadUsers(){
+  const el=document.getElementById('users-list');
+  if(!el)return;
+  el.innerHTML='<p class="text-gray-600 text-sm text-center py-4">Loading…</p>';
+  try{
+    const {data,error}=await sb.from('checkins')
+      .select('user_id, whisky_name, date')
+      .order('date',{ascending:false});
+    if(error) throw error;
+    // Group by user_id
+    const users={};
+    (data||[]).forEach(r=>{
+      if(!r.user_id) return;
+      if(!users[r.user_id]) users[r.user_id]={id:r.user_id,count:0,last:r.date};
+      users[r.user_id].count++;
+      if(r.date>users[r.user_id].last) users[r.user_id].last=r.date;
+    });
+    const list=Object.values(users).sort((a,b)=>b.count-a.count);
+    if(!list.length){el.innerHTML='<p class="text-gray-500 text-sm text-center py-8">No user activity yet.</p>';return;}
+    el.innerHTML=list.map((u,i)=>`
+      <div class="flex items-center gap-3 bg-black/20 rounded-lg px-4 py-3 border border-gray-800">
+        <div class="w-8 h-8 rounded-full bg-yellow-400/10 border border-yellow-400/20 flex items-center justify-center text-yellow-400 text-xs font-bold shrink-0">${i+1}</div>
+        <div class="flex-1 min-w-0">
+          <p class="text-xs font-mono text-gray-400 truncate">${u.id}</p>
+          <p class="text-[10px] text-gray-600">Last active: ${new Date(u.last).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'})}</p>
+        </div>
+        <div class="text-right shrink-0">
+          <p class="text-lg font-bold text-yellow-400">${u.count}</p>
+          <p class="text-[10px] text-gray-600">check-ins</p>
+        </div>
+      </div>`).join('');
+    // Update stat
+    document.getElementById('stat-users').textContent=list.length;
+  }catch(e){
+    el.innerHTML=`<p class="text-red-400 text-sm text-center py-4">${e.message}</p>`;
+  }
 }
 
 function renderConfig(){
@@ -760,5 +865,6 @@ async function uploadToStorage(slug, base64Data, contentType) {
   return data.publicUrl;
 }
 </script>
+</body>
 </body>
 </html>
