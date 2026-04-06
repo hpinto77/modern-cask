@@ -606,26 +606,36 @@ function switchAuthTab(tab){
 function showAuth(){document.getElementById('auth-overlay').style.display='flex';}
 function hideAuth(){document.getElementById('auth-overlay').style.display='none';}
 function onSignedIn(user){
+  if(S.user?.id===user.id) return; // already signed in, skip
   S.user=user;
   hideAuth();
-  const loadingEl = document.getElementById('auth-loading');
-  if (loadingEl) loadingEl.classList.add('hidden');
-  const ini2=ini(user.email);
-  document.getElementById('avatar-btn').textContent=ini2;
-  document.getElementById('cellar-avatar').textContent=ini2;
-  document.getElementById('cellar-email').textContent=user.email;
+  const loadingEl=document.getElementById('auth-loading');
+  if(loadingEl) loadingEl.classList.add('hidden');
+  const initials=ini(user.email);
+  const avatarBtn=document.getElementById('avatar-btn');
+  if(avatarBtn) avatarBtn.textContent=initials;
   loadUserData();
 }
 
 // ── USER DATA ──────────────────────────────────────────────────────
 async function loadUserData(){
   if(!S.user) return;
-  const[{data:ci},{data:mn}]=await Promise.all([
-    sb.from('checkins').select('*').eq('user_id',S.user.id).order('date',{ascending:false}),
-    sb.from('manual_notes').select('*').eq('user_id',S.user.id).order('date',{ascending:false})
-  ]);
-  S.checkins=ci||[];S.manualNotes=mn||[];
-  renderLibrary();renderCellar();
+  try{
+    const[{data:ci,error:e1},{data:mn,error:e2}]=await Promise.all([
+      sb.from('checkins').select('*').eq('user_id',S.user.id).order('date',{ascending:false}),
+      sb.from('manual_notes').select('*').eq('user_id',S.user.id).order('date',{ascending:false}),
+    ]);
+    if(e1) console.warn('checkins:',e1.message);
+    if(e2) console.warn('manual_notes:',e2.message);
+    S.checkins=ci||[];
+    S.manualNotes=mn||[];
+    renderLibrary();
+    renderCellar();
+    if(document.getElementById('view-profile')?.classList.contains('active')) renderProfile();
+  }catch(err){
+    console.error('loadUserData:',err);
+    if(typeof Sentry!=='undefined') Sentry.captureException(err);
+  }
 }
 async function loadBottleImages(){
   try{
@@ -1442,6 +1452,7 @@ async function init(){
   // IMPORTANT: With PKCE, INITIAL_SESSION fires while ?code is being exchanged
   // so we must NOT show auth on INITIAL_SESSION — only on explicit SIGNED_OUT
   // or after getSession() confirms no session
+  // Auth — single clean bootstrap, no race conditions
   sb.auth.onAuthStateChange((event, session) => {
     if (session?.user) {
       onSignedIn(session.user);
@@ -1449,16 +1460,12 @@ async function init(){
       S.user = null; S.checkins = []; S.manualNotes = [];
       showAuth();
     }
-    // Never show auth on INITIAL_SESSION — getSession() handles the initial state
   });
-  // getSession() is the single source of truth for initial state
-  sb.auth.getSession().then(({data:{session}}) => {
+  sb.auth.getSession().then(({ data: { session } }) => {
     if (session?.user) {
       onSignedIn(session.user);
-    } else {
-      // Only show auth if no ?code param (PKCE exchange not in progress)
-      const hasCode = new URLSearchParams(window.location.search).has('code');
-      if (!hasCode) showAuth();
+    } else if (!new URLSearchParams(location.search).has('code')) {
+      showAuth();
     }
   });
 
