@@ -92,13 +92,44 @@
     </div>
 
     <!-- Request queue -->
-    <div class="card p-5">
+    <div class="card p-5 mb-6">
       <div class="flex items-center justify-between mb-4">
         <h2 class="text-sm font-bold text-yellow-300 uppercase tracking-wider">Photo Requests Queue</h2>
         <button onclick="loadQueue()" class="text-xs text-gray-500 hover:text-yellow-300 border border-gray-700 px-3 py-1 rounded-lg">↻ Refresh</button>
       </div>
       <div id="queue-list" class="space-y-3">
         <p class="text-gray-600 text-sm text-center py-8">Loading queue…</p>
+      </div>
+    </div>
+
+    <!-- Image Audit panel -->
+    <div class="card p-5 mb-6">
+      <div class="flex items-center justify-between mb-4">
+        <h2 class="text-sm font-bold text-yellow-300 uppercase tracking-wider">Image Audit</h2>
+        <button onclick="loadAudit()" class="text-xs text-gray-500 hover:text-yellow-300 border border-gray-700 px-3 py-1 rounded-lg">↻ Refresh</button>
+      </div>
+      <p class="text-xs text-gray-500 mb-4">All uploaded images. Fix slugs that don't match the API, or delete and re-upload wrong ones.</p>
+      <div id="audit-list" class="space-y-2">
+        <p class="text-gray-600 text-sm text-center py-4">Click Refresh to audit…</p>
+      </div>
+    </div>
+
+    <!-- All requests (including done/rejected) -->
+    <div class="card p-5">
+      <div class="flex items-center justify-between mb-4">
+        <h2 class="text-sm font-bold text-yellow-300 uppercase tracking-wider">All Requests</h2>
+        <div class="flex gap-2">
+          <select id="req-filter" onchange="loadAllRequests()" class="text-xs text-gray-400 bg-black/40 border border-gray-700 rounded px-2 py-1 outline-none">
+            <option value="all">All</option>
+            <option value="pending">Pending</option>
+            <option value="done">Done</option>
+            <option value="rejected">Rejected</option>
+          </select>
+          <button onclick="loadAllRequests()" class="text-xs text-gray-500 hover:text-yellow-300 border border-gray-700 px-3 py-1 rounded-lg">↻ Refresh</button>
+        </div>
+      </div>
+      <div id="all-requests-list" class="space-y-2">
+        <p class="text-gray-600 text-sm text-center py-4">Select a filter above…</p>
       </div>
     </div>
 
@@ -143,7 +174,7 @@ sb.auth.onAuthStateChange((event, session) => {
     document.getElementById('auth-gate').classList.add('hidden');
     document.getElementById('main-content').classList.remove('hidden');
     document.getElementById('admin-email').textContent = session.user.email;
-    loadQueue(); loadStats();
+    loadQueue(); loadStats(); loadAudit(); loadAllRequests();
   } else {
     document.getElementById('auth-gate').classList.remove('hidden');
     document.getElementById('main-content').classList.add('hidden');
@@ -350,6 +381,92 @@ async function uploadQueueFile(file, requestId, slug, name) {
 async function rejectRequest(id) {
   await sb.from('image_requests').update({ status: 'rejected' }).eq('id', id);
   loadQueue(); loadStats();
+}
+
+async function loadAudit() {
+  const el = document.getElementById('audit-list');
+  el.innerHTML = '<p class="text-gray-600 text-sm text-center py-4">Loading…</p>';
+  const { data: images } = await sb.from('bottle_images').select('id,slug,whisky_name,image_url').order('slug');
+  if (!images?.length) { el.innerHTML = '<p class="text-gray-500 text-sm text-center py-4">No images uploaded yet.</p>'; return; }
+  el.innerHTML = images.map(img => {
+    const url = img.image_url || '';
+    const ext = url.includes('.') ? url.split('.').pop().split('?')[0].toUpperCase() : '??';
+    const isWebP = ext === 'WEBP';
+    const isAVIF = ext === 'AVIF';
+    const extBadge = isWebP
+      ? '<span class="text-green-400 text-[10px] font-bold uppercase">WebP ✓</span>'
+      : isAVIF
+        ? '<span class="text-blue-400 text-[10px] font-bold uppercase">AVIF ✓</span>'
+        : `<span class="text-yellow-400 text-[10px] font-bold uppercase">${ext}</span>`;
+    return `<div class="bg-black/30 rounded-lg p-3 border border-gray-800">
+      <div class="flex items-center gap-3">
+        <img src="${url}" class="w-8 h-14 object-contain bg-black/20 rounded flex-shrink-0" onerror="this.style.opacity=0.2;this.src=''"/>
+        <div class="flex-1 min-w-0">
+          <div class="flex items-center gap-2 mb-1">
+            ${extBadge}
+            <span class="text-gray-400 text-[10px]">${img.slug}</span>
+          </div>
+          <p class="text-gray-300 text-xs truncate">${img.whisky_name || '—'}</p>
+          <p class="text-gray-600 text-[10px] truncate">${url.substring(url.lastIndexOf('/')+1)}</p>
+        </div>
+        <div class="flex flex-col gap-1.5 flex-shrink-0">
+          <button onclick="auditFixSlug(${img.id},'${img.slug}','${(img.whisky_name||'').replace(/'/g,"\'")}','${url}')"
+            class="text-[10px] text-yellow-400 border border-yellow-400/30 px-2 py-1 rounded hover:bg-yellow-400/10">Fix Slug</button>
+          <button onclick="auditDelete(${img.id},'${img.slug}')"
+            class="text-[10px] text-red-400 border border-red-400/30 px-2 py-1 rounded hover:bg-red-400/10">Delete</button>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+async function auditFixSlug(id, currentSlug, name, imageUrl) {
+  const newSlug = prompt(`Fix slug for "${name}":
+Current: ${currentSlug}
+Enter correct slug (e.g. lagavulin-16):`, currentSlug);
+  if (!newSlug || newSlug === currentSlug) return;
+  const { error } = await sb.from('bottle_images').update({ slug: newSlug }).eq('id', id);
+  if (error) { alert('Error: ' + error.message); return; }
+  // Also update matching image_requests
+  await sb.from('image_requests').update({ whisky_slug: newSlug }).eq('whisky_slug', currentSlug);
+  alert(`✓ Slug updated to: ${newSlug}`);
+  loadAudit();
+}
+
+async function auditDelete(id, slug) {
+  if (!confirm(`Delete image for "${slug}"? This removes it from the database (not Storage).`)) return;
+  await sb.from('bottle_images').delete().eq('id', id);
+  // Reset the image_request back to pending so it can be re-uploaded
+  await sb.from('image_requests').update({ status: 'pending', image_url: null }).eq('whisky_slug', slug);
+  loadAudit(); loadStats(); loadQueue();
+}
+
+async function loadAllRequests() {
+  const el = document.getElementById('all-requests-list');
+  const filter = document.getElementById('req-filter')?.value || 'all';
+  el.innerHTML = '<p class="text-gray-600 text-sm text-center py-4">Loading…</p>';
+  let query = sb.from('image_requests').select('id,whisky_slug,whisky_name,status,image_url,requested_at').order('requested_at', { ascending: false }).limit(200);
+  if (filter !== 'all') query = query.eq('status', filter);
+  const { data } = await query;
+  if (!data?.length) { el.innerHTML = '<p class="text-gray-500 text-sm text-center py-4">No requests found.</p>'; return; }
+  const statusColor = { pending: 'text-yellow-400', done: 'text-green-400', rejected: 'text-red-400' };
+  el.innerHTML = data.map(r => `
+    <div class="flex items-center gap-3 bg-black/20 rounded-lg px-3 py-2.5 border border-gray-800/50">
+      <span class="${statusColor[r.status]||'text-gray-400'} text-[10px] font-bold uppercase w-14 flex-shrink-0">${r.status}</span>
+      <div class="flex-1 min-w-0">
+        <p class="text-gray-300 text-xs font-medium truncate">${r.whisky_name||r.whisky_slug}</p>
+        <p class="text-gray-600 text-[10px]">${r.whisky_slug}</p>
+      </div>
+      ${r.status==='done'?`<button onclick="auditReopen('${r.id}','${r.whisky_slug}')" class="text-[10px] text-yellow-400 border border-yellow-400/30 px-2 py-1 rounded hover:bg-yellow-400/10 flex-shrink-0">Re-open</button>`:''}
+      ${r.status==='pending'?`<button onclick="rejectRequest('${r.id}')" class="text-[10px] text-red-400 border border-red-400/30 px-2 py-1 rounded flex-shrink-0">Reject</button>`:''}
+    </div>`).join('');
+}
+
+async function auditReopen(id, slug) {
+  await sb.from('image_requests').update({ status: 'pending', image_url: null, fulfilled_at: null }).eq('id', id);
+  // Remove from bottle_images so it shows as missing again
+  await sb.from('bottle_images').delete().eq('slug', slug);
+  loadAllRequests(); loadStats(); loadQueue();
 }
 
 // ── SUPABASE STORAGE ─────────────────────────────────────────────────────────
