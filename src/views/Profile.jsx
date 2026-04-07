@@ -79,7 +79,7 @@ function GoogleIcon() {
   )
 }
 
-function AddWhiskyModal({ open, onClose, onSubmit }) {
+export function AddWhiskyModal({ open, onClose, onSubmit }) {
   const toast = useToast()
   const { user } = useAuth()
   const [photo, setPhoto] = useState(null)
