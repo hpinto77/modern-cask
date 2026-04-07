@@ -21,7 +21,10 @@ export function AuthProvider({ children }) {
   const signInWithGoogle = () =>
     supabase.auth.signInWithOAuth({
       provider: 'google',
-      options: { redirectTo: window.location.origin }
+      options: {
+        redirectTo: 'https://modern-cask.netlify.app',
+        queryParams: { access_type: 'offline', prompt: 'select_account' }
+      }
     })
 
   const signOut = () => supabase.auth.signOut()
