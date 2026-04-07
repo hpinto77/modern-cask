@@ -1,7 +1,7 @@
 import { useState } from 'react'
-import { AuthProvider } from './hooks/useAuth'
-import { useAuth } from './hooks/useAuth'
+import { AuthProvider, useAuth } from './hooks/useAuth'
 import { Toast } from './components/UI'
+import { AddWhiskyModal } from './components/AddWhiskyModal'
 import Discover from './views/Discover'
 import Journal from './views/Journal'
 import Detail from './views/Detail'
@@ -51,22 +51,23 @@ function AppInner() {
       {view === 'discover' && <Discover onSelect={handleSelect} />}
       {view === 'journal'  && <Journal  onSelect={handleSelect} />}
       {view === 'detail'   && selected && <Detail whisky={selected} onBack={handleBack} />}
-      {view === 'profile'  && <Profile onAddOpen={() => setAddOpen(true)} addOpen={addOpen} onAddClose={() => setAddOpen(false)} />}
+      {view === 'profile'  && <Profile />}
+
+      <AddWhiskyModal open={addOpen} onClose={() => setAddOpen(false)} onSubmit={() => {}} />
 
       {view !== 'detail' && (
         <nav style={{ position: 'fixed', bottom: 0, left: 0, right: 0, height: 68, background: 'rgba(26,25,23,.96)', backdropFilter: 'blur(20px)', borderTop: '.5px solid rgba(80,72,64,.3)', display: 'flex', justifyContent: 'space-around', alignItems: 'center', zIndex: 300, paddingBottom: 'env(safe-area-inset-bottom)' }}>
           {NAV.map(n => {
             const active = view === n.id
             return (
-              <button key={n.id} onClick={() => { navigate(n.id); setSelected(null) }} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 2, padding: '6px 16px', borderRadius: 12, color: active ? '#ffe2ab' : '#504840', transition: 'color .15s', cursor: 'pointer', border: 'none', background: 'none' }}>
+              <button key={n.id} onClick={() => { navigate(n.id); setSelected(null) }} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 2, padding: '6px 14px', borderRadius: 12, color: active ? '#ffe2ab' : '#504840', transition: 'color .15s', cursor: 'pointer', border: 'none', background: 'none' }}>
                 <span className="ms" style={{ fontSize: 22, fontVariationSettings: `'FILL' ${active ? 1 : 0}` }}>{n.icon}</span>
                 <span style={{ fontSize: 9, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '.06em' }}>{n.label}</span>
               </button>
             )
           })}
-          {/* Add button — centre, prominent */}
-          <button onClick={() => { navigate('profile'); setTimeout(() => setAddOpen(true), 100) }} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 2, padding: '6px 16px', borderRadius: 12, color: '#ffe2ab', cursor: 'pointer', border: 'none', background: 'none', order: -1 }}>
-            <span className="ms" style={{ fontSize: 28 }}>add_circle</span>
+          <button onClick={() => setAddOpen(true)} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 2, padding: '6px 14px', borderRadius: 12, color: '#ffe2ab', cursor: 'pointer', border: 'none', background: 'none' }}>
+            <span className="ms" style={{ fontSize: 26 }}>add_circle</span>
             <span style={{ fontSize: 9, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '.06em' }}>Add</span>
           </button>
         </nav>
