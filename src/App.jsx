@@ -4,11 +4,13 @@ import { Toast } from './components/UI'
 import { AddWhiskyModal } from './components/AddWhiskyModal'
 import Discover from './views/Discover'
 import Journal from './views/Journal'
+import Cellar from './views/Cellar'
 import Detail from './views/Detail'
 import Profile from './views/Profile'
 
 const NAV = [
   { id: 'discover', label: 'Discover', icon: 'explore' },
+  { id: 'cellar',   label: 'Cellar',   icon: 'liquor' },
   { id: 'journal',  label: 'Journal',  icon: 'menu_book' },
   { id: 'profile',  label: 'Profile',  icon: 'person' },
 ]
@@ -49,6 +51,7 @@ function AppInner() {
       </header>
 
       {view === 'discover' && <Discover onSelect={handleSelect} />}
+      {view === 'cellar'   && <Cellar   onSelect={handleSelect} />}
       {view === 'journal'  && <Journal  onSelect={handleSelect} />}
       {view === 'detail'   && selected && <Detail whisky={selected} onBack={handleBack} />}
       {view === 'profile'  && <Profile />}
@@ -60,13 +63,13 @@ function AppInner() {
           {NAV.map(n => {
             const active = view === n.id
             return (
-              <button key={n.id} onClick={() => { navigate(n.id); setSelected(null) }} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 2, padding: '6px 14px', borderRadius: 12, color: active ? '#ffe2ab' : '#504840', transition: 'color .15s', cursor: 'pointer', border: 'none', background: 'none' }}>
+              <button key={n.id} onClick={() => { navigate(n.id); setSelected(null) }} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 2, padding: '6px 12px', borderRadius: 12, color: active ? '#ffe2ab' : '#504840', transition: 'color .15s', cursor: 'pointer', border: 'none', background: 'none' }}>
                 <span className="ms" style={{ fontSize: 22, fontVariationSettings: `'FILL' ${active ? 1 : 0}` }}>{n.icon}</span>
                 <span style={{ fontSize: 9, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '.06em' }}>{n.label}</span>
               </button>
             )
           })}
-          <button onClick={() => setAddOpen(true)} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 2, padding: '6px 14px', borderRadius: 12, color: '#ffe2ab', cursor: 'pointer', border: 'none', background: 'none' }}>
+          <button onClick={() => setAddOpen(true)} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 2, padding: '6px 12px', borderRadius: 12, color: '#ffe2ab', cursor: 'pointer', border: 'none', background: 'none' }}>
             <span className="ms" style={{ fontSize: 26 }}>add_circle</span>
             <span style={{ fontSize: 9, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '.06em' }}>Add</span>
           </button>

@@ -2,8 +2,7 @@ import { useState } from 'react'
 import { useAuth } from '../hooks/useAuth'
 import { useCheckins } from '../hooks/useCheckins'
 import { supabase } from '../lib/supabase'
-import { GoldButton, Input, Textarea, Select, BottomSheet } from '../components/UI'
-import { useToast } from '../components/UI'
+import { GoldButton, Input, Textarea, Select, BottomSheet, useToast } from '../components/UI'
 
 const REGIONS = [
   {id:'islay',label:'Islay',country:'Scotland',min:3},
@@ -52,12 +51,13 @@ const TITLES = [
 function passportStats(checkins) {
   const counts = {}
   const countries = {}
+  // Use all check-in occasions
   checkins.forEach(c => {
-    const region = (c.region || c.whisky_region || '').toLowerCase()
-    const country = (c.country || c.whisky_country || '').toLowerCase()
+    const region = (c.whisky_region || '').toLowerCase()
+    const country = (c.whisky_country || '').toLowerCase()
     if (country) countries[country] = 1
     REGIONS.forEach(r => {
-      if (region.includes(r.id) || region.includes(r.label.toLowerCase())) {
+      if (region && (region.includes(r.id) || region === r.label.toLowerCase())) {
         counts[r.id] = (counts[r.id] || 0) + 1
       }
     })
@@ -66,6 +66,22 @@ function passportStats(checkins) {
   counts._regions = regionsVisited
   counts._countries = Object.keys(countries).length
   return counts
+}
+
+function insightStats(checkins) {
+  // Favourite region
+  const regionCounts = {}
+  const flavourCounts = {}
+  const scores = []
+  checkins.forEach(c => {
+    const r = c.whisky_region
+    if (r) regionCounts[r] = (regionCounts[r] || 0) + 1
+    if (c.rating) scores.push(c.rating)
+  })
+  const topRegion = Object.entries(regionCounts).sort((a,b) => b[1]-a[1])[0]
+  const avgScore = scores.length ? (scores.reduce((a,b)=>a+b,0)/scores.length).toFixed(1) : null
+  const fiveStars = checkins.filter(c => c.rating === 5)
+  return { topRegion: topRegion?.[0], avgScore, fiveStars }
 }
 
 function GoogleIcon() {
@@ -79,87 +95,9 @@ function GoogleIcon() {
   )
 }
 
-export function AddWhiskyModal({ open, onClose, onSubmit }) {
-  const toast = useToast()
-  const { user } = useAuth()
-  const [photo, setPhoto] = useState(null)
-  const [name, setName] = useState('')
-  const [distillery, setDistillery] = useState('')
-  const [age, setAge] = useState('')
-  const [abv, setAbv] = useState('')
-  const [region, setRegion] = useState('')
-  const [country, setCountry] = useState('')
-  const [description, setDescription] = useState('')
-  const [saving, setSaving] = useState(false)
-
-  const handlePhoto = (e) => {
-    const file = e.target.files[0]; if (!file) return
-    const reader = new FileReader()
-    reader.onload = ev => setPhoto(ev.target.result)
-    reader.readAsDataURL(file)
-  }
-
-  const submit = async () => {
-    if (!name || !distillery) { toast('Name and distillery are required'); return }
-    setSaving(true)
-    const row = { id: Date.now(), name, distillery, age: age || null, abv: abv || null, region: region || null, country: country || null, description: description || null, has_photo: !!photo, status: 'pending', submitted_by: user?.email || 'anonymous', date: new Date().toISOString() }
-    await supabase.from('whisky_requests').insert(row)
-    onSubmit(row)
-    setSaving(false)
-    toast('Submitted — thank you!')
-    onClose()
-    setName(''); setDistillery(''); setAge(''); setAbv(''); setRegion(''); setCountry(''); setDescription(''); setPhoto(null)
-  }
-
-  return (
-    <BottomSheet open={open} onClose={onClose} title="Add Whisky">
-      <div style={{ display: 'grid', gap: 14 }}>
-        {!photo ? (
-          <label style={{ background: '#1a1917', border: '1.5px dashed rgba(80,72,64,.5)', borderRadius: 14, padding: 28, textAlign: 'center', cursor: 'pointer', display: 'block' }}>
-            <span className="ms" style={{ fontSize: 36, color: '#504840', display: 'block', marginBottom: 8 }}>photo_camera</span>
-            <p style={{ fontSize: 13, fontWeight: 500, color: '#7a7060', marginBottom: 4 }}>Take or upload a photo</p>
-            <p style={{ fontSize: 10, color: '#504840' }}>Tap to capture the label</p>
-            <input type="file" accept="image/*" capture="environment" onChange={handlePhoto} style={{ display: 'none' }} />
-          </label>
-        ) : (
-          <div style={{ position: 'relative' }}>
-            <img src={photo} alt="" style={{ width: '100%', height: 180, objectFit: 'cover', borderRadius: 12 }} />
-            <button onClick={() => setPhoto(null)} style={{ position: 'absolute', top: 8, right: 8, background: 'rgba(0,0,0,.65)', border: 'none', borderRadius: '50%', width: 28, height: 28, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', color: '#fff' }}>
-              <span className="ms" style={{ fontSize: 16 }}>close</span>
-            </button>
-          </div>
-        )}
-        <Input placeholder="Whisky name *" value={name} onChange={e => setName(e.target.value)} />
-        <Input placeholder="Distillery *" value={distillery} onChange={e => setDistillery(e.target.value)} />
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
-          <Input type="number" placeholder="Age (years)" value={age} onChange={e => setAge(e.target.value)} />
-          <Input type="number" placeholder="ABV %" step="0.1" value={abv} onChange={e => setAbv(e.target.value)} />
-        </div>
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
-          <Select value={region} onChange={e => setRegion(e.target.value)}>
-            <option value="">Region…</option>
-            {['Islay','Speyside','Highland','Lowland','Campbeltown','Islands','Japan','Ireland','Taiwan','India','Australia','USA','Other'].map(r => <option key={r}>{r}</option>)}
-          </Select>
-          <Select value={country} onChange={e => setCountry(e.target.value)}>
-            <option value="">Country…</option>
-            {['Scotland','Japan','Ireland','Taiwan','India','Australia','USA','Other'].map(c => <option key={c}>{c}</option>)}
-          </Select>
-        </div>
-        <Textarea rows={3} placeholder="Brief description (optional)…" value={description} onChange={e => setDescription(e.target.value)} />
-        <div style={{ background: '#1a1917', borderRadius: 12, padding: '12px 14px', display: 'flex', gap: 10 }}>
-          <span className="ms" style={{ fontSize: 16, color: '#ffbf00', marginTop: 1 }}>info</span>
-          <p style={{ fontSize: 12, color: '#7a7060', lineHeight: 1.5 }}>Reviewed before going live. Track status in your profile.</p>
-        </div>
-        <GoldButton onClick={submit} disabled={saving}>{saving ? 'Submitting…' : 'Submit for Review'}</GoldButton>
-        <div style={{ height: 6 }} />
-      </div>
-    </BottomSheet>
-  )
-}
-
 export default function Profile() {
   const { user, displayName, initials, signInWithGoogle, signOut } = useAuth()
-  const { checkins } = useCheckins()
+  const { checkins, triedWhiskies, ownedWhiskies } = useCheckins()
   const toast = useToast()
   const [addOpen, setAddOpen] = useState(false)
   const [submissions, setSubmissions] = useState(() => {
@@ -167,23 +105,21 @@ export default function Profile() {
   })
 
   const stats = passportStats(checkins)
+  const insights = insightStats(checkins)
   const pct = Math.round((stats._regions || 0) / 22 * 100)
   const earnedTitles = TITLES.filter(t => t.check(stats))
   const lockedTitles = TITLES.filter(t => !t.check(stats))
-  const scores = checkins.map(c => c.rating).filter(Boolean)
-  const avgScore = scores.length ? (scores.reduce((a, b) => a + b, 0) / scores.length).toFixed(1) + '★' : '—'
-  const uniqueBottles = [...new Set(checkins.map(c => String(c.whisky_id)))].length
 
   return (
     <div style={{ paddingTop: 56, paddingBottom: 80 }}>
       <div style={{ padding: '24px 18px 12px' }}>
-        <p style={{ fontSize: 9, textTransform: 'uppercase', letterSpacing: '.2em', color: '#7a7060', marginBottom: 4 }}>Collection & Journey</p>
+        <p style={{ fontSize: 9, textTransform: 'uppercase', letterSpacing: '.2em', color: '#7a7060', marginBottom: 4 }}>Your Journey</p>
         <h2 style={{ fontFamily: 'Manrope, sans-serif', fontSize: 42, fontWeight: 800, letterSpacing: '-.02em', lineHeight: 1, color: '#e8e4dc' }}>Profile.</h2>
       </div>
 
       <div style={{ padding: '0 16px', display: 'grid', gap: 12 }}>
 
-        {/* Auth */}
+        {/* Auth card */}
         <div style={{ background: '#1a1917', borderRadius: 16, padding: 16 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
             <div style={{ width: 48, height: 48, borderRadius: '50%', background: 'linear-gradient(135deg,#ffe2ab,#ffbf00)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, fontFamily: 'Manrope, sans-serif', fontWeight: 800, fontSize: 16, color: '#2a1a00' }}>
@@ -193,12 +129,12 @@ export default function Profile() {
               <div style={{ flex: 1 }}>
                 <p style={{ fontSize: 14, fontWeight: 600, color: '#e8e4dc' }}>{displayName}</p>
                 <p style={{ fontSize: 11, color: '#7a7060', marginTop: 2 }}>{user.email}</p>
-                <button onClick={signOut} style={{ marginTop: 6, fontSize: 10, color: '#504840', background: 'none', border: 'none', cursor: 'pointer', padding: 0, fontFamily: 'DM Sans, sans-serif' }}>Sign out</button>
+                <button onClick={signOut} style={{ marginTop: 6, fontSize: 10, color: '#504840', background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}>Sign out</button>
               </div>
             ) : (
               <div style={{ flex: 1 }}>
-                <p style={{ fontSize: 13, color: '#7a7060', marginBottom: 10 }}>Sign in to sync your collection across devices</p>
-                <button onClick={signInWithGoogle} style={{ display: 'flex', alignItems: 'center', gap: 8, background: '#fff', border: 'none', borderRadius: 10, padding: '9px 16px', fontSize: 13, fontWeight: 600, cursor: 'pointer', color: '#1a1a1a', fontFamily: 'DM Sans, sans-serif' }}>
+                <p style={{ fontSize: 13, color: '#7a7060', marginBottom: 10 }}>Sign in to sync across devices</p>
+                <button onClick={signInWithGoogle} style={{ display: 'flex', alignItems: 'center', gap: 8, background: '#fff', border: 'none', borderRadius: 10, padding: '9px 16px', fontSize: 13, fontWeight: 600, cursor: 'pointer', color: '#1a1a1a' }}>
                   <GoogleIcon /> Continue with Google
                 </button>
               </div>
@@ -208,7 +144,11 @@ export default function Profile() {
 
         {/* Stats */}
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 8 }}>
-          {[['Bottles', uniqueBottles], ['Regions', stats._regions || 0], ['Avg ★', avgScore]].map(([label, val]) => (
+          {[
+            ['Tried', triedWhiskies.length],
+            ['Owned', ownedWhiskies.length],
+            ['Drams', checkins.length],
+          ].map(([label, val]) => (
             <div key={label} style={{ background: '#1a1917', borderRadius: 12, padding: '14px 10px' }}>
               <span style={{ display: 'block', fontSize: 9, textTransform: 'uppercase', letterSpacing: '.1em', color: '#7a7060', marginBottom: 4 }}>{label}</span>
               <span style={{ fontFamily: 'Manrope, sans-serif', fontSize: 24, fontWeight: 800, color: '#ffbf00' }}>{val}</span>
@@ -216,22 +156,54 @@ export default function Profile() {
           ))}
         </div>
 
+        {/* Insights */}
+        {checkins.length > 0 && (
+          <div style={{ background: '#1a1917', borderRadius: 16, padding: 16 }}>
+            <p style={{ fontSize: 9, textTransform: 'uppercase', letterSpacing: '.12em', color: '#7a7060', marginBottom: 12, fontWeight: 700 }}>Insights</p>
+            <div style={{ display: 'grid', gap: 10 }}>
+              {insights.topRegion && (
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <span style={{ fontSize: 13, color: '#7a7060' }}>Favourite region</span>
+                  <span style={{ fontSize: 13, fontWeight: 600, color: '#e8e4dc' }}>{insights.topRegion}</span>
+                </div>
+              )}
+              {insights.avgScore && (
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <span style={{ fontSize: 13, color: '#7a7060' }}>Average rating</span>
+                  <span style={{ fontSize: 13, fontWeight: 600, color: '#ffbf00' }}>{insights.avgScore} / 5</span>
+                </div>
+              )}
+              {insights.fiveStars.length > 0 && (
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <span style={{ fontSize: 13, color: '#7a7060' }}>Five-star drams</span>
+                  <span style={{ fontSize: 13, fontWeight: 600, color: '#e8e4dc' }}>{insights.fiveStars.length}</span>
+                </div>
+              )}
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <span style={{ fontSize: 13, color: '#7a7060' }}>Countries explored</span>
+                <span style={{ fontSize: 13, fontWeight: 600, color: '#e8e4dc' }}>{stats._countries || 0}</span>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Passport progress */}
         <div style={{ background: '#1a1917', borderRadius: 16, padding: 18 }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 14 }}>
             <div>
-              <p style={{ fontSize: 9, textTransform: 'uppercase', letterSpacing: '.1em', color: '#7a7060' }}>Total drams</p>
-              <p style={{ fontFamily: 'Manrope, sans-serif', fontSize: 36, fontWeight: 800, color: '#ffbf00', lineHeight: 1 }}>{checkins.length}</p>
+              <p style={{ fontSize: 9, textTransform: 'uppercase', letterSpacing: '.1em', color: '#7a7060' }}>Regions explored</p>
+              <p style={{ fontFamily: 'Manrope, sans-serif', fontSize: 36, fontWeight: 800, color: '#ffbf00', lineHeight: 1 }}>
+                {stats._regions || 0}<span style={{ fontSize: 16, color: '#3d3a35' }}>/22</span>
+              </p>
             </div>
             <div style={{ textAlign: 'right' }}>
-              <p style={{ fontSize: 9, textTransform: 'uppercase', letterSpacing: '.1em', color: '#7a7060' }}>Regions</p>
-              <p style={{ fontFamily: 'Manrope, sans-serif', fontSize: 36, fontWeight: 800, color: '#ffbf00', lineHeight: 1 }}>{stats._regions || 0}<span style={{ fontSize: 16, color: '#3d3a35' }}>/22</span></p>
+              <p style={{ fontSize: 9, textTransform: 'uppercase', letterSpacing: '.1em', color: '#7a7060' }}>Passport</p>
+              <p style={{ fontFamily: 'Manrope, sans-serif', fontSize: 36, fontWeight: 800, color: '#ffbf00', lineHeight: 1 }}>{pct}%</p>
             </div>
           </div>
           <div style={{ height: 4, background: '#2a2825', borderRadius: 2, overflow: 'hidden' }}>
             <div style={{ height: '100%', width: `${pct}%`, background: 'linear-gradient(90deg,#ffe2ab,#ffbf00)', borderRadius: 2, transition: 'width .6s ease' }} />
           </div>
-          <p style={{ fontSize: 10, color: '#504840', marginTop: 6 }}>{pct}% of the world explored</p>
         </div>
 
         {/* Earned titles */}
@@ -263,7 +235,8 @@ export default function Profile() {
                   </div>
                   {stamped
                     ? <span className="ms" style={{ fontSize: 16, color: '#ffbf00', fontVariationSettings: "'FILL' 1" }}>verified</span>
-                    : <span style={{ fontSize: 10, color: '#3d3a35', fontWeight: 700 }}>{count}/{reg.min}</span>}
+                    : <span style={{ fontSize: 10, color: '#3d3a35', fontWeight: 700 }}>{count}/{reg.min}</span>
+                  }
                 </div>
               )
             })}
@@ -275,7 +248,7 @@ export default function Profile() {
           <div>
             <p style={{ fontSize: 9, textTransform: 'uppercase', letterSpacing: '.12em', color: '#7a7060', marginBottom: 8, fontWeight: 700 }}>Next to Unlock</p>
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
-              {lockedTitles.slice(0, 6).map(t => (
+              {lockedTitles.slice(0, 5).map(t => (
                 <span key={t.id} style={{ display: 'inline-flex', alignItems: 'center', gap: 5, background: 'rgba(80,72,64,.2)', border: '1px solid rgba(80,72,64,.3)', color: '#504840', fontSize: 10, fontWeight: 600, padding: '3px 10px', borderRadius: 99, fontFamily: 'Manrope, sans-serif' }}>
                   {t.emoji} {t.label} · {t.desc}
                 </span>
@@ -284,11 +257,11 @@ export default function Profile() {
           </div>
         )}
 
-        {/* Add whisky */}
+        {/* Contributions */}
         <div>
           <p style={{ fontSize: 9, textTransform: 'uppercase', letterSpacing: '.12em', color: '#7a7060', marginBottom: 8, fontWeight: 700 }}>My Contributions</p>
           {submissions.length === 0 ? (
-            <button onClick={() => setAddOpen(true)} style={{ width: '100%', padding: 14, background: 'rgba(255,191,0,.06)', border: '1px solid rgba(255,191,0,.2)', borderRadius: 12, color: '#ffe2ab', fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '.08em', cursor: 'pointer', fontFamily: 'DM Sans, sans-serif' }}>
+            <button onClick={() => setAddOpen(true)} style={{ width: '100%', padding: 14, background: 'rgba(255,191,0,.06)', border: '1px solid rgba(255,191,0,.2)', borderRadius: 12, color: '#ffe2ab', fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '.08em', cursor: 'pointer' }}>
               + Add a Whisky to the Database
             </button>
           ) : (
@@ -302,20 +275,15 @@ export default function Profile() {
                   <span style={{ fontSize: 9, fontWeight: 700, textTransform: 'uppercase', padding: '3px 8px', borderRadius: 99, color: '#ffbf00', background: 'rgba(255,191,0,.15)', flexShrink: 0, marginLeft: 8 }}>Pending</span>
                 </div>
               ))}
-              <button onClick={() => setAddOpen(true)} style={{ width: '100%', marginTop: 4, padding: 12, background: 'transparent', border: '1px solid rgba(80,72,64,.4)', borderRadius: 12, color: '#7a7060', fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '.08em', cursor: 'pointer', fontFamily: 'DM Sans, sans-serif' }}>
+              <button onClick={() => setAddOpen(true)} style={{ width: '100%', marginTop: 4, padding: 12, background: 'transparent', border: '1px solid rgba(80,72,64,.4)', borderRadius: 12, color: '#7a7060', fontSize: 11, fontWeight: 700, textTransform: 'uppercase', cursor: 'pointer' }}>
                 + Submit Another
               </button>
             </div>
           )}
         </div>
+
         <div style={{ height: 8 }} />
       </div>
-
-      <AddWhiskyModal open={addOpen} onClose={() => setAddOpen(false)} onSubmit={s => {
-        const next = [...submissions, s]
-        setSubmissions(next)
-        localStorage.setItem('tmc_submissions', JSON.stringify(next))
-      }} />
     </div>
   )
 }
