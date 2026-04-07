@@ -300,7 +300,11 @@ body{min-height:100dvh;}
   <div class="view" id="view-detail" style="padding-top:0">
     <div class="flex items-center justify-between px-5 pt-3 pb-1">
       <button id="back-btn" class="flex items-center gap-1.5 text-[#9c8f78] hover:text-primary transition-colors"><span class="material-symbols-outlined" style="font-size:20px;">arrow_back</span></button>
-      <button id="detail-checkin-btn" class="hidden">Check In</button>
+      <div class="flex gap-2">
+        <button id="detail-share-btn" class="hidden items-center gap-1 text-[9px] uppercase tracking-widest font-bold text-[#9c8f78] border border-[#504532]/30 px-3 py-2 rounded-full hover:bg-[#2a2a2a] transition-all" onclick="shareCheckin()">
+          <span class="material-symbols-outlined" style="font-size:13px">share</span> Share
+        </button>
+      </div>
     </div>
     <div id="detail-content" class="px-5 pb-6"></div>
   </div>
@@ -865,11 +869,12 @@ async function showDetail(slugOrId){
   S.current=w;if(S.history[S.history.length-1]!=='detail')S.history.push('detail');
   const m=w.metadata||{},notes=w.tasting_notes||{},score=avgR(w);
   const isC=S.checkins.some(c=>String(c.whisky_id)===String(w.id||w.slug));
-  const btn=document.getElementById('detail-checkin-btn');
-  if(isC){btn.textContent='✓ Checked In';btn.className='text-[9px] uppercase tracking-widest font-bold text-[#FFBF00] border border-[#FFBF00]/50 px-4 py-2 rounded-full bg-[#FFBF00]/10';}
-  else{btn.textContent='Check In';btn.className='text-[9px] uppercase tracking-widest font-bold text-primary border border-primary/30 px-4 py-2 rounded-full hover:bg-primary/10 transition-all';}
+  // Share button in header — show only if already checked in
   const shareBtn=document.getElementById('detail-share-btn');
-  if(shareBtn) shareBtn.classList.toggle('hidden',!isC);
+  if(shareBtn){
+    shareBtn.classList.toggle('hidden', !isC);
+    shareBtn.style.display = isC ? 'flex' : 'none';
+  }
   const userNote=S.checkins.find(c=>String(c.whisky_id)===String(w.id||w.slug));
   document.getElementById('detail-content').innerHTML=`
     <!-- HERO — full bleed bottle image matching reference design -->
@@ -916,12 +921,29 @@ async function showDetail(slugOrId){
       ${userNote?`<div class="p-4 rounded-xl mb-5" style="background:#1c1b1b;border:1px solid rgba(255,191,0,0.12)"><div class="flex items-center justify-between mb-2"><span class="text-[9px] uppercase tracking-widest font-bold" style="color:#FFBF00">Your Note</span><div class="flex">${starsHTML(userNote.rating,5,13)}</div></div>${userNote.notes?`<p class="text-sm italic leading-relaxed" style="color:#9c8f78">"${userNote.notes}"</p>`:''}</div>`:''}
       <!-- ABV bar -->
       ${m.abv?`<div class="mb-5"><div class="flex justify-between text-[9px] mb-2"><span class="uppercase tracking-wider" style="color:#9c8f78">ABV</span><span class="font-bold" style="color:#FFBF00">${m.abv}%</span></div><div class="h-0.5 rounded-full overflow-hidden" style="background:#2a2a2a"><div class="h-full rounded-full" style="width:${Math.min((m.abv/70)*100,100)}%;background:linear-gradient(90deg,#FFBF00,#FFE2AB)"></div></div></div>`:''}
-      <!-- Action buttons — primary + secondary like reference -->
-      <div class="flex gap-3 pb-8 mt-3">
-        <button class="flex-1 font-headline font-bold py-4 rounded-2xl text-[12px] uppercase tracking-widest transition-all active:scale-[0.98] amber-glow" style="color:#402d00" onclick="openModal()">${isC?'✓ Checked In':'Add to Cellar'}</button>
-        <button class="request-photo-btn px-5 py-4 rounded-2xl text-[11px] font-bold transition-all flex items-center gap-1.5" style="color:#9c8f78;background:#1c1b1b;border:1px solid rgba(80,69,50,0.4)" data-slug="${w.slug||w.id}" data-name="${(w.name||'').replace(/"/g,'')}" data-region="${m.region||''}"><span class="material-symbols-outlined" style="font-size:14px">add_photo_alternate</span>Get Photo</button>
-      </div>
+      <!-- Spacer so content isn't hidden behind sticky bar -->
+      <div style="height:96px"></div>
     </div>
+  </div>
+
+  <!-- Sticky action bar — always visible above nav -->
+  <div id="detail-action-bar" style="position:fixed;bottom:68px;left:0;right:0;z-index:40;padding:12px 20px;background:linear-gradient(0deg,#131313 70%,transparent 100%)">
+    <div class="flex gap-3">
+      ${isC
+        ? `<button class="flex-1 font-headline font-bold py-4 rounded-2xl text-[12px] uppercase tracking-widest transition-all active:scale-[0.98]" style="background:#1c1b1b;border:1px solid rgba(255,191,0,0.4);color:#FFBF00" onclick="openModal()">
+             <span class="material-symbols-outlined" style="font-size:14px;vertical-align:middle;font-variation-settings:'FILL' 1">check_circle</span>
+             Checked In — Edit
+           </button>`
+        : `<button class="flex-1 font-headline font-bold py-4 rounded-2xl text-[12px] uppercase tracking-widest transition-all active:scale-[0.98] amber-glow" style="color:#402d00" onclick="openModal()">
+             Add to Cellar
+           </button>`
+      }
+      <button class="request-photo-btn px-4 py-4 rounded-2xl text-[11px] font-bold transition-all flex items-center gap-1.5" style="color:#9c8f78;background:#1c1b1b;border:1px solid rgba(80,69,50,0.4)" data-slug="${w.slug||w.id}" data-name="${(w.name||'').replace(/"/g,'')}" data-region="${m.region||''}">
+        <span class="material-symbols-outlined" style="font-size:15px">add_photo_alternate</span>
+      </button>
+    </div>
+  </div>
+  <div style="display:none">
 `;
   showView('detail',false);
 }
@@ -1178,8 +1200,7 @@ async function submitCheckin(){
   if(detailView?.classList.contains('active')&&S.current){
     showDetail(S.current.slug||String(S.current.id||''));
   }
-  const btn=document.getElementById('detail-checkin-btn');
-  if(btn){btn.textContent='✓ Checked In';btn.className='text-[9px] uppercase tracking-widest font-bold text-[#FFBF00] border border-[#FFBF00]/50 px-4 py-2 rounded-full bg-[#FFBF00]/10';}
+  // sticky bar re-renders via showDetail refresh below
 }
 async function saveNote(){
   const name=document.getElementById('note-name').value.trim();
@@ -1427,6 +1448,11 @@ function downloadCanvas(canvas,slug){
 function showView(id,push=true){
   document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
   document.getElementById('view-'+id)?.classList.add('active');
+  // Hide sticky action bar when leaving detail
+  if(id!=='detail'){
+    const bar=document.getElementById('detail-action-bar');
+    if(bar) bar.remove();
+  }
   document.querySelectorAll('.nav-btn').forEach(b=>{const on=b.dataset.v===id;b.style.color=on?'#FFE2AB':'#9c8f78';const ic=b.querySelector('.nav-icon');if(ic)ic.style.fontVariationSettings=on?"'FILL' 1":"'FILL' 0";});
   if(push&&S.history[S.history.length-1]!==id)S.history.push(id);
   if(id==='library')renderLibrary();
@@ -1472,7 +1498,7 @@ async function init(){
   document.getElementById('avatar-btn').addEventListener('click',()=>showView('profile'));
   document.getElementById('home-btn').addEventListener('click',()=>showView('discover'));
   document.getElementById('back-btn')?.addEventListener('click',goBack);
-  document.getElementById('detail-checkin-btn')?.addEventListener('click',openModal);
+  // detail-checkin-btn removed — action bar handles this
 
   // 3. Wire modal
   document.getElementById('modal-close-btn').addEventListener('click',closeModal);
