@@ -137,8 +137,10 @@ export default function Profile() {
           {user ? (
             <>
               <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginBottom: extProfile.bio ? 12 : 0 }}>
-                <div style={{ width: 52, height: 52, borderRadius: '50%', background: 'linear-gradient(135deg,#ffe2ab,#ffbf00)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, fontFamily: 'Manrope, sans-serif', fontWeight: 800, fontSize: 18, color: '#2a1a00' }}>
-                  {initials}
+                <div style={{ width: 52, height: 52, borderRadius: '50%', background: 'linear-gradient(135deg,#ffe2ab,#ffbf00)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, fontFamily: 'Manrope, sans-serif', fontWeight: 800, fontSize: 18, color: '#2a1a00', overflow: 'hidden', border: '2px solid rgba(255,191,0,.3)' }}>
+                  {extProfile.avatarUrl
+                    ? <img src={extProfile.avatarUrl} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                    : initials}
                 </div>
                 <div style={{ flex: 1 }}>
                   <p style={{ fontSize: 15, fontWeight: 700, color: '#e8e4dc', fontFamily: 'Manrope, sans-serif' }}>{displayName}</p>
@@ -311,9 +313,10 @@ export default function Profile() {
 
       <EditProfileModal
         open={editOpen}
-        onClose={() => {
+        onClose={() => setEditOpen(false)}
+        onSaved={(profile) => {
+          setExtProfile(profile)
           setEditOpen(false)
-          try { setExtProfile(JSON.parse(localStorage.getItem('tmc_profile')) || {}) } catch {}
         }}
       />
     </div>
