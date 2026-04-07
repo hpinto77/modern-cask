@@ -4,6 +4,7 @@ import { useCheckins } from '../hooks/useCheckins'
 import { supabase } from '../lib/supabase'
 import { useToast } from '../components/UI'
 import { EditProfileModal } from '../components/EditProfileModal'
+import { STAMP_URLS, BADGE_URLS } from '../lib/assets'
 
 const REGIONS = [
   {id:'islay',label:'Islay',country:'Scotland',min:3},
@@ -240,12 +241,18 @@ export default function Profile() {
         {/* Earned titles */}
         {earnedTitles.length > 0 && (
           <div>
-            <p style={{ fontSize: 9, textTransform: 'uppercase', letterSpacing: '.12em', color: '#7a7060', marginBottom: 8, fontWeight: 700 }}>Titles Earned</p>
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
+            <p style={{ fontSize: 9, textTransform: 'uppercase', letterSpacing: '.12em', color: '#7a7060', marginBottom: 12, fontWeight: 700 }}>Titles Earned</p>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 12 }}>
               {earnedTitles.map(t => (
-                <span key={t.id} style={{ display: 'inline-flex', alignItems: 'center', gap: 5, background: 'rgba(255,191,0,.1)', border: '1px solid rgba(255,191,0,.25)', color: '#ffe2ab', fontSize: 10, fontWeight: 600, padding: '3px 10px', borderRadius: 99, fontFamily: 'Manrope, sans-serif' }}>
-                  {t.emoji} {t.label}
-                </span>
+                <div key={t.id} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6 }}>
+                  <div style={{ width: 72, height: 72 }}>
+                    {BADGE_URLS[t.id]
+                      ? <img src={BADGE_URLS[t.id]} alt={t.label} style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
+                      : <div style={{ width: '100%', height: '100%', background: 'rgba(255,191,0,.1)', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 28 }}>{t.emoji}</div>
+                    }
+                  </div>
+                  <p style={{ fontSize: 9, fontWeight: 700, color: '#ffe2ab', textAlign: 'center', lineHeight: 1.3, fontFamily: 'Manrope, sans-serif' }}>{t.label}</p>
+                </div>
               ))}
             </div>
           </div>
@@ -253,21 +260,27 @@ export default function Profile() {
 
         {/* Passport grid */}
         <div>
-          <p style={{ fontSize: 9, textTransform: 'uppercase', letterSpacing: '.12em', color: '#7a7060', marginBottom: 8, fontWeight: 700 }}>Passport</p>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 6 }}>
+          <p style={{ fontSize: 9, textTransform: 'uppercase', letterSpacing: '.12em', color: '#7a7060', marginBottom: 12, fontWeight: 700 }}>Passport</p>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 10 }}>
             {REGIONS.map(reg => {
               const count = stats[reg.id] || 0
               const stamped = count >= 1
+              const stampUrl = STAMP_URLS[reg.id]
               return (
-                <div key={reg.id} style={{ background: stamped ? 'rgba(255,191,0,.08)' : '#1a1917', border: `1px solid ${stamped ? 'rgba(255,191,0,.25)' : 'rgba(80,72,64,.25)'}`, borderRadius: 10, padding: '10px 12px', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-                  <div>
-                    <p style={{ fontSize: 12, fontWeight: 600, color: stamped ? '#e8e4dc' : '#504840', lineHeight: 1.2 }}>{reg.label}</p>
-                    <p style={{ fontSize: 10, color: '#504840', marginTop: 1 }}>{reg.country}</p>
+                <div key={reg.id} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6 }}>
+                  <div style={{ width: 80, height: 80, borderRadius: '50%', overflow: 'hidden', position: 'relative', opacity: stamped ? 1 : 0.25, transition: 'opacity .4s ease', filter: stamped ? 'none' : 'grayscale(100%)' }}>
+                    {stampUrl
+                      ? <img src={stampUrl} alt={reg.label} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                      : <div style={{ width: '100%', height: '100%', background: '#2a2825', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><span className="ms" style={{ fontSize: 28, color: stamped ? '#ffbf00' : '#504840' }}>location_on</span></div>
+                    }
+                    {stamped && (
+                      <div style={{ position: 'absolute', inset: 0, borderRadius: '50%', border: '2px solid rgba(255,191,0,.6)', pointerEvents: 'none' }} />
+                    )}
                   </div>
-                  {stamped
-                    ? <span className="ms" style={{ fontSize: 16, color: '#ffbf00', fontVariationSettings: "'FILL' 1" }}>verified</span>
-                    : <span style={{ fontSize: 10, color: '#3d3a35', fontWeight: 700 }}>{count}/{reg.min}</span>
-                  }
+                  <div style={{ textAlign: 'center' }}>
+                    <p style={{ fontSize: 10, fontWeight: 600, color: stamped ? '#e8e4dc' : '#504840', lineHeight: 1.2 }}>{reg.label}</p>
+                    {!stamped && <p style={{ fontSize: 9, color: '#3d3a35', marginTop: 1 }}>{count}/{reg.min}</p>}
+                  </div>
                 </div>
               )
             })}
@@ -277,12 +290,18 @@ export default function Profile() {
         {/* Next titles */}
         {lockedTitles.length > 0 && (
           <div>
-            <p style={{ fontSize: 9, textTransform: 'uppercase', letterSpacing: '.12em', color: '#7a7060', marginBottom: 8, fontWeight: 700 }}>Next to Unlock</p>
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
-              {lockedTitles.slice(0, 5).map(t => (
-                <span key={t.id} style={{ display: 'inline-flex', alignItems: 'center', gap: 5, background: 'rgba(80,72,64,.2)', border: '1px solid rgba(80,72,64,.3)', color: '#504840', fontSize: 10, fontWeight: 600, padding: '3px 10px', borderRadius: 99, fontFamily: 'Manrope, sans-serif' }}>
-                  {t.emoji} {t.label} · {t.desc}
-                </span>
+            <p style={{ fontSize: 9, textTransform: 'uppercase', letterSpacing: '.12em', color: '#7a7060', marginBottom: 12, fontWeight: 700 }}>Next to Unlock</p>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 12 }}>
+              {lockedTitles.slice(0, 6).map(t => (
+                <div key={t.id} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6, opacity: 0.35, filter: 'grayscale(100%)' }}>
+                  <div style={{ width: 72, height: 72 }}>
+                    {BADGE_URLS[t.id]
+                      ? <img src={BADGE_URLS[t.id]} alt={t.label} style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
+                      : <div style={{ width: '100%', height: '100%', background: 'rgba(80,72,64,.2)', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 28 }}>{t.emoji}</div>
+                    }
+                  </div>
+                  <p style={{ fontSize: 9, fontWeight: 600, color: '#504840', textAlign: 'center', lineHeight: 1.3, fontFamily: 'Manrope, sans-serif' }}>{t.label}<br/><span style={{ fontSize: 8, color: '#3d3a35' }}>{t.desc}</span></p>
+                </div>
               ))}
             </div>
           </div>
