@@ -364,7 +364,7 @@ body{min-height:100dvh;}
         <label class="block text-[9px] uppercase tracking-[0.22em] text-[#9c8f78] mb-1.5">Email (optional — if you want a reply)</label>
         <input id="feedback-email" type="email" placeholder="your@email.com" class="w-full bg-[#2a2a2a] border border-[#504532]/30 rounded-xl py-3 px-4 text-[#e5e2e1] placeholder:text-[#504532] focus:border-[#FFBF00]/40 focus:outline-none text-[16px]"/>
       </div>
-      <button onclick="submitFeedback()" class="w-full amber-glow text-[#402d00] font-headline font-bold py-4 rounded-xl uppercase tracking-widest text-[11px] hover:opacity-90 active:scale-[0.98] transition-all">Send Feedback</button>
+      <button id="submit-feedback-btn" onclick="submitFeedback()" class="w-full amber-glow text-[#402d00] font-headline font-bold py-4 rounded-xl uppercase tracking-widest text-[11px] hover:opacity-90 active:scale-[0.98] transition-all">Send Feedback</button>
       <div class="h-2"></div>
     </div>
   </div>
@@ -407,7 +407,7 @@ body{min-height:100dvh;}
         <label class="block text-[9px] uppercase tracking-[0.22em] text-[#9c8f78] mb-1.5">Any other info (optional)</label>
         <textarea id="req-notes" placeholder="Cask type, vintage, bottler, where you've seen it…" rows="2" class="w-full bg-[#2a2a2a] border border-[#504532]/30 rounded-xl py-3 px-4 text-[#e5e2e1] placeholder:text-[#504532] focus:border-[#FFBF00]/40 focus:outline-none text-[14px] resize-none"></textarea>
       </div>
-      <button onclick="submitWhiskyRequest()" class="w-full amber-glow text-[#402d00] font-headline font-bold py-4 rounded-xl uppercase tracking-widest text-[11px] hover:opacity-90 active:scale-[0.98] transition-all">Submit Request</button>
+      <button id="submit-request-btn" onclick="submitWhiskyRequest()" class="w-full amber-glow text-[#402d00] font-headline font-bold py-4 rounded-xl uppercase tracking-widest text-[11px] hover:opacity-90 active:scale-[0.98] transition-all">Submit Request</button>
       <div class="h-2"></div>
     </div>
   </div>
@@ -471,7 +471,7 @@ const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON, {
 
 // ── STATE ─────────────────────────────────────────────────────────
 const S = {
-  user: null, whiskies: [], checkins: [], manualNotes: [],
+  user: null, whiskies: [], checkins: [], manualNotes: [], deepLinkSlug: null,
   current: null, modalRating: 0, noteRating: 0,
   history: ['discover'], page: 1, totalPages: 99,
   filter: 'all', busy: false, debounce: null
@@ -868,6 +868,8 @@ async function showDetail(slugOrId){
   const btn=document.getElementById('detail-checkin-btn');
   if(isC){btn.textContent='✓ Checked In';btn.className='text-[9px] uppercase tracking-widest font-bold text-[#FFBF00] border border-[#FFBF00]/50 px-4 py-2 rounded-full bg-[#FFBF00]/10';}
   else{btn.textContent='Check In';btn.className='text-[9px] uppercase tracking-widest font-bold text-primary border border-primary/30 px-4 py-2 rounded-full hover:bg-primary/10 transition-all';}
+  const shareBtn=document.getElementById('detail-share-btn');
+  if(shareBtn) shareBtn.classList.toggle('hidden',!isC);
   const userNote=S.checkins.find(c=>String(c.whisky_id)===String(w.id||w.slug));
   document.getElementById('detail-content').innerHTML=`
     <!-- HERO — full bleed bottle image matching reference design -->
@@ -1116,7 +1118,7 @@ async function deleteCheckin(id){
   if(idx===-1)return;
   const name=S.checkins[idx].whisky_name||'dram';
   S.checkins.splice(idx,1);
-  if(S.user)await sb.from('checkins').delete().eq('id',id);
+  if(S.user)await sb.from('checkins').delete().eq('id',id).eq('user_id',S.user.id);
   renderCellar();renderLibrary();
   showToast('Removed — '+name);
 }
@@ -1159,7 +1161,15 @@ async function submitCheckin(){
   const ci={id:existingId,whisky_id:String(w.id||w.slug),whisky_name:w.name,rating:S.modalRating,nose:document.getElementById('modal-nose').value,notes:document.getElementById('modal-notes').value,finish:document.getElementById('modal-finish')?.value||'',location:document.getElementById('modal-location').value,date:new Date().toISOString(),user_id:S.user?.id};
   S.checkins=S.checkins.filter(x=>String(x.id)!==String(existingId)&&String(x.whisky_id)!==ci.whisky_id);
   S.checkins.unshift(ci);
-  if(S.user)await sb.from('checkins').upsert(ci,{onConflict:'id'});
+  if(S.user){
+    const{error:writeErr}=await sb.from('checkins').upsert(ci,{onConflict:'id'});
+    if(writeErr){
+      console.error('checkin write error:',writeErr);
+      if(typeof Sentry!=='undefined') Sentry.captureException(writeErr);
+      showToast('Save failed: '+writeErr.message);
+      return;
+    }
+  }
   S.editingCheckinId=null;
   closeModal();showToast((isEdit?'Updated — ':'Archived — ')+w.name);
   renderList(filteredList());renderLibrary();renderCellar();
@@ -1225,7 +1235,7 @@ function closeFeedbackModal(){
 async function submitFeedback(){
   const text = document.getElementById('feedback-text').value.trim();
   if(!text){showToast('Please write something first');return;}
-  const btn = document.querySelector('#feedback-modal-overlay button[onclick="submitFeedback()"]');
+  const btn=document.getElementById('submit-feedback-btn');
   if(btn){btn.textContent='Sending…';btn.disabled=true;}
   try{
     await sb.from('feedback').insert({
@@ -1240,10 +1250,8 @@ async function submitFeedback(){
     closeFeedbackModal();
     showToast('Thanks — feedback received!');
   }catch(e){
-    // Table may not exist yet — log to Sentry and show friendly message
     if(typeof Sentry!=='undefined') Sentry.captureException(e);
-    showToast('Sent! ('+e.message+')');
-    closeFeedbackModal();
+    showToast('Error: '+e.message);
   }finally{
     if(btn){btn.textContent='Send Feedback';btn.disabled=false;}
   }
@@ -1262,7 +1270,7 @@ function closeRequestModal(){
 async function submitWhiskyRequest(){
   const name=document.getElementById('req-whisky-name').value.trim();
   if(!name){showToast('Please enter a whisky name');return;}
-  const btn=document.querySelector('#request-modal-overlay button[onclick="submitWhiskyRequest()"]');
+  const btn=document.getElementById('submit-request-btn');
   if(btn){btn.textContent='Submitting…';btn.disabled=true;}
   try{
     const payload={
@@ -1279,9 +1287,15 @@ async function submitWhiskyRequest(){
     const slug = name.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');
     payload.whisky_slug = slug;
     const {error}=await sb.from('whisky_requests').insert(payload);
-    if(error) throw error;
+    if(error){
+      // Unique constraint violation = already requested
+      if(error.code==='23505') showToast('Already requested — we have it!');
+      else throw error;
+      closeRequestModal();
+      return;
+    }
     closeRequestModal();
-    showToast('Added to queue: '+name);
+    showToast('Requested — '+name);
   } catch(e){
     showToast('Failed: '+e.message);
   } finally{
@@ -1342,6 +1356,74 @@ function updateGeminiUI(){ return; // server-side
 }
 
 // ── NAV ─────────────────────────────────────────────────────────────
+async function shareCheckin(){
+  const w = S.current;
+  if(!w) return;
+  const m = w.metadata||{};
+  const ci = S.checkins.find(x=>String(x.whisky_id)===String(w.id||w.slug));
+  const score = ci?.rating||0;
+  // Build canvas card
+  const canvas = document.createElement('canvas');
+  canvas.width = 1080; canvas.height = 1080;
+  const ctx = canvas.getContext('2d');
+  // Background
+  const grad = ctx.createLinearGradient(0,0,1080,1080);
+  grad.addColorStop(0,'#1a1208'); grad.addColorStop(1,'#0d0d0d');
+  ctx.fillStyle = grad; ctx.fillRect(0,0,1080,1080);
+  // Amber accent bar
+  ctx.fillStyle = '#FFBF00'; ctx.fillRect(0,0,6,1080);
+  // TMC label
+  ctx.fillStyle = '#FFE2AB'; ctx.font = '600 28px system-ui,sans-serif';
+  ctx.fillText('THE MODERN CASK', 60, 80);
+  // Whisky name
+  ctx.fillStyle = '#e5e2e1'; ctx.font = 'bold 68px system-ui,sans-serif';
+  const name = w.name||'';
+  // Word wrap name
+  const words = name.split(' '); let line=''; let y=220;
+  words.forEach(word=>{
+    const test = line+word+' ';
+    if(ctx.measureText(test).width>900&&line){
+      ctx.fillText(line.trim(),60,y); line=word+' '; y+=90;
+    } else { line=test; }
+  });
+  ctx.fillText(line.trim(),60,y); y+=80;
+  // Distillery + region
+  ctx.fillStyle='#9c8f78'; ctx.font='500 36px system-ui,sans-serif';
+  const sub=[m.distillery,m.region,m.country].filter(Boolean).join(' · ');
+  ctx.fillText(sub,60,y+10); y+=70;
+  // Stats row
+  const stats=[];
+  if(m.age) stats.push(m.age+'yr');
+  if(m.abv) stats.push(m.abv+'% ABV');
+  if(score) stats.push('★'.repeat(score));
+  ctx.fillStyle='#FFBF00'; ctx.font='600 32px system-ui,sans-serif';
+  ctx.fillText(stats.join('  ·  '),60,y+20); y+=80;
+  // Notes
+  if(ci?.nose||ci?.notes){
+    ctx.fillStyle='#504532'; ctx.fillRect(60,y,4,120);
+    ctx.fillStyle='#9c8f78'; ctx.font='400 28px system-ui,sans-serif';
+    const note=ci.nose||ci.notes||'';
+    ctx.fillText(note.length>80?note.substring(0,80)+'…':note,80,y+50);
+  }
+  // Bottom URL
+  ctx.fillStyle='#504532'; ctx.font='400 24px system-ui,sans-serif';
+  ctx.fillText('modern-cask.netlify.app',60,1040);
+  // Share or download
+  canvas.toBlob(async blob=>{
+    const file = new File([blob],`${w.slug||'dram'}.png`,{type:'image/png'});
+    if(navigator.share&&navigator.canShare({files:[file]})){
+      try{ await navigator.share({files:[file],title:w.name,text:`Tasting ${w.name} — The Modern Cask`}); }
+      catch(e){ if(e.name!=='AbortError') downloadCanvas(canvas,w.slug); }
+    } else { downloadCanvas(canvas,w.slug||'dram'); }
+  },'image/png');
+}
+function downloadCanvas(canvas,slug){
+  const a=document.createElement('a');
+  a.href=canvas.toDataURL('image/png');
+  a.download=`${slug||'dram'}-tmc.png`;
+  a.click();
+}
+
 function showView(id,push=true){
   document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
   document.getElementById('view-'+id)?.classList.add('active');
@@ -1360,7 +1442,15 @@ function goBack(){
 
 // ── INIT ─────────────────────────────────────────────────────────────
 async function init(){
-  // 0. Show loading if returning from Google OAuth (PKCE code in URL)
+  // 0a. Deep link — /w/slug opens directly to a whisky detail
+  const pathMatch = location.pathname.match(/^\/w\/([\w-]+)/);
+  if(pathMatch){
+    // Store slug, will show detail after whiskies load
+    S.deepLinkSlug = pathMatch[1];
+    history.replaceState(null,'','/');
+  }
+
+  // 0b. Show loading if returning from Google OAuth (PKCE code in URL)
   if (new URLSearchParams(window.location.search).get('code')) {
     const ov = document.getElementById('auth-overlay');
     ov.style.display = 'flex';
@@ -1467,9 +1557,21 @@ async function init(){
   });
 
   await whiskyLoadPromise;
+  // Deep link: show detail once whiskies are loaded
+  if(S.deepLinkSlug){
+    showDetail(S.deepLinkSlug);
+    S.deepLinkSlug = null;
+  }
 }
 
 document.addEventListener('DOMContentLoaded',init);
+
+// Register service worker for offline support
+if('serviceWorker' in navigator){
+  window.addEventListener('load',()=>{
+    navigator.serviceWorker.register('/sw.js').catch(()=>{});
+  });
+}
 </script>
 </body>
 </html>  <!-- PROFILE -->
@@ -1558,110 +1660,18 @@ document.addEventListener('DOMContentLoaded',init);
 </div>
 
 <!-- BOTTOM NAV -->
-<nav class="fixed bottom-0 left-0 w-full flex justify-around items-center h-[68px] px-2 pb-safe bg-[#1C1B1B]/93 backdrop-blur-lg z-50 rounded-t-2xl shadow-[0_-8px_28px_rgba(0,0,0,0.5)] border-t border-[#504532]/15">
-  <button class="nav-btn flex flex-col items-center justify-center px-4 py-1 rounded-xl" data-v="discover"><span class="material-symbols-outlined nav-icon" style="font-size:22px;">explore</span><span class="text-[8px] font-bold uppercase tracking-tight mt-0.5">Discover</span></button>
-  <button class="nav-btn flex flex-col items-center justify-center px-4 py-1 rounded-xl" data-v="library"><span class="material-symbols-outlined nav-icon" style="font-size:22px;">shelves</span><span class="text-[8px] font-bold uppercase tracking-tight mt-0.5">Library</span></button>
-  <button class="nav-btn flex flex-col items-center justify-center px-4 py-1 rounded-xl" data-v="profile"><span class="material-symbols-outlined nav-icon" style="font-size:22px;">person</span><span class="text-[8px] font-bold uppercase tracking-tight mt-0.5">Profile</span></button>
-  <button class="nav-btn flex flex-col items-center justify-center px-4 py-1 rounded-xl" data-v="cellar"><span class="material-symbols-outlined nav-icon" style="font-size:22px;">inventory_2</span><span class="text-[8px] font-bold uppercase tracking-tight mt-0.5">Cellar</span></button>
-</nav>
+
 
 <!-- CHECK-IN MODAL -->
-<div id="modal-overlay">
-  <div id="modal-sheet">
-    <div class="w-8 h-1 bg-[#504532]/50 rounded-full mx-auto mt-3"></div>
-    <div class="flex justify-between items-center px-5 py-3 border-b border-[#504532]/15">
-      <h3 class="font-headline font-bold text-base">Check In</h3>
-      <button id="modal-close-btn"><span class="material-symbols-outlined text-[#9c8f78] hover:text-primary" style="font-size:22px;">close</span></button>
-    </div>
-    <div class="px-5 py-4 space-y-4">
-      <div id="modal-whisky-info" class="text-center py-2"></div>
-      <div><label class="block text-[9px] uppercase tracking-[0.22em] text-[#9c8f78] mb-2">Your Rating</label>
-        <div class="flex justify-center gap-3" id="modal-stars">
-          <span class="star-btn" data-v="1">star</span><span class="star-btn" data-v="2">star</span><span class="star-btn" data-v="3">star</span><span class="star-btn" data-v="4">star</span><span class="star-btn" data-v="5">star</span>
-        </div>
-      </div>
-      <div><label class="block text-[9px] uppercase tracking-[0.22em] text-[#9c8f78] mb-1.5">Nose</label><textarea id="modal-nose" class="w-full bg-surface-container-low border-none rounded-xl py-3 px-4 text-on-surface placeholder:text-[#504532] focus:ring-1 focus:ring-[#FFE2AB]/20 transition-all outline-none text-sm resize-none" placeholder="First aromas, character…" rows="2"></textarea></div>
-      <div><label class="block text-[9px] uppercase tracking-[0.22em] text-[#9c8f78] mb-1.5">Palate</label><textarea id="modal-notes" class="w-full bg-surface-container-low border-none rounded-xl py-3 px-4 text-on-surface placeholder:text-[#504532] focus:ring-1 focus:ring-[#FFE2AB]/20 transition-all outline-none text-sm resize-none" placeholder="Texture, mouthfeel, flavours…" rows="2"></textarea></div>
-      <div><label class="block text-[9px] uppercase tracking-[0.22em] text-[#9c8f78] mb-1.5">Finish</label><textarea id="modal-finish" class="w-full bg-surface-container-low border-none rounded-xl py-3 px-4 text-on-surface placeholder:text-[#504532] focus:ring-1 focus:ring-[#FFE2AB]/20 transition-all outline-none text-sm resize-none" placeholder="Length, warmth, aftertaste…" rows="2"></textarea></div>
-      <div><label class="block text-[9px] uppercase tracking-[0.22em] text-[#9c8f78] mb-1.5">Location (optional)</label><input id="modal-location" type="text" class="w-full bg-surface-container-low border-none rounded-xl py-3 px-4 text-on-surface placeholder:text-[#504532] focus:ring-1 focus:ring-[#FFE2AB]/20 transition-all outline-none text-sm" placeholder="Where are you?"/></div>
-      <button id="submit-checkin-btn" class="w-full amber-glow text-[#402d00] font-headline font-bold py-4 rounded-xl uppercase tracking-widest text-[11px] hover:opacity-90 active:scale-[0.98] transition-all">Archive Dram</button>
-      <div class="h-3"></div>
-    </div>
-  </div>
-</div>
 
-<div id="toast"></div>
+
+
 
 <!-- Feedback Modal -->
-<div id="feedback-modal-overlay" style="position:fixed;inset:0;background:rgba(0,0,0,0.88);backdrop-filter:blur(6px);display:none;align-items:flex-end;justify-content:center;z-index:500">
-  <div style="width:100%;max-width:480px;background:#1c1b1b;border-radius:16px 16px 0 0;animation:slideUp 0.35s cubic-bezier(0.22,1,0.36,1)">
-    <div class="w-8 h-1 bg-[#504532]/50 rounded-full mx-auto mt-3"></div>
-    <div class="flex justify-between items-center px-5 py-3 border-b border-[#504532]/15">
-      <h3 class="font-headline font-bold text-base">Share Feedback</h3>
-      <button onclick="closeFeedbackModal()" class="text-[#9c8f78] hover:text-primary"><span class="material-symbols-outlined" style="font-size:22px">close</span></button>
-    </div>
-    <div class="px-5 py-4 space-y-4">
-      <div class="grid grid-cols-4 gap-2">
-        <button class="feedback-type-btn py-2.5 rounded-xl text-[10px] font-bold uppercase tracking-wider border border-[#504532]/30 text-[#9c8f78] hover:border-[#FFE2AB]/30 transition-all" data-type="bug">🐛 Bug</button>
-        <button class="feedback-type-btn py-2.5 rounded-xl text-[10px] font-bold uppercase tracking-wider border border-[#504532]/30 text-[#9c8f78] hover:border-[#FFE2AB]/30 transition-all" data-type="idea">💡 Idea</button>
-        <button class="feedback-type-btn py-2.5 rounded-xl text-[10px] font-bold uppercase tracking-wider border border-[#504532]/30 text-[#9c8f78] hover:border-[#FFE2AB]/30 transition-all" data-type="praise">⭐ Praise</button>
-        <button class="feedback-type-btn py-2.5 rounded-xl text-[10px] font-bold uppercase tracking-wider border border-[#504532]/30 text-[#9c8f78] hover:border-[#FFE2AB]/30 transition-all" data-type="other">💬 Other</button>
-      </div>
-      <div>
-        <textarea id="feedback-text" placeholder="What's on your mind? Be as specific as you like…" rows="4" class="w-full bg-[#2a2a2a] border border-[#504532]/30 rounded-xl py-3 px-4 text-[#e5e2e1] placeholder:text-[#504532] focus:border-[#FFBF00]/40 focus:outline-none text-[16px] resize-none"></textarea>
-      </div>
-      <div>
-        <label class="block text-[9px] uppercase tracking-[0.22em] text-[#9c8f78] mb-1.5">Email (optional — if you want a reply)</label>
-        <input id="feedback-email" type="email" placeholder="your@email.com" class="w-full bg-[#2a2a2a] border border-[#504532]/30 rounded-xl py-3 px-4 text-[#e5e2e1] placeholder:text-[#504532] focus:border-[#FFBF00]/40 focus:outline-none text-[16px]"/>
-      </div>
-      <button onclick="submitFeedback()" class="w-full amber-glow text-[#402d00] font-headline font-bold py-4 rounded-xl uppercase tracking-widest text-[11px] hover:opacity-90 active:scale-[0.98] transition-all">Send Feedback</button>
-      <div class="h-2"></div>
-    </div>
-  </div>
-</div>
+
 
 <!-- Request a Whisky Modal -->
-<div id="request-modal-overlay" style="position:fixed;inset:0;background:rgba(0,0,0,0.88);backdrop-filter:blur(6px);display:none;align-items:flex-end;justify-content:center;z-index:500">
-  <div style="width:100%;max-width:480px;max-height:88vh;background:#1c1b1b;border-radius:16px 16px 0 0;overflow-y:auto;animation:slideUp 0.35s cubic-bezier(0.22,1,0.36,1)">
-    <div class="w-8 h-1 bg-[#504532]/50 rounded-full mx-auto mt-3"></div>
-    <div class="flex justify-between items-center px-5 py-3 border-b border-[#504532]/15">
-      <h3 class="font-headline font-bold text-base">Request a Whisky</h3>
-      <button onclick="closeRequestModal()" class="text-[#9c8f78] hover:text-primary"><span class="material-symbols-outlined" style="font-size:22px">close</span></button>
-    </div>
-    <div class="px-5 py-4 space-y-4">
-      <p class="text-[#9c8f78] text-sm">Tell us what's missing and we'll add it to the database.</p>
-      <div>
-        <label class="block text-[9px] uppercase tracking-[0.22em] text-[#9c8f78] mb-1.5">Whisky Name *</label>
-        <input id="req-whisky-name" type="text" placeholder="e.g. GlenDronach 21 Parliament" class="w-full bg-[#2a2a2a] border border-[#504532]/30 rounded-xl py-3 px-4 text-[#e5e2e1] placeholder:text-[#504532] focus:border-[#FFBF00]/40 focus:outline-none text-[16px]"/>
-      </div>
-      <div>
-        <label class="block text-[9px] uppercase tracking-[0.22em] text-[#9c8f78] mb-1.5">Distillery</label>
-        <input id="req-distillery" type="text" placeholder="e.g. GlenDronach" class="w-full bg-[#2a2a2a] border border-[#504532]/30 rounded-xl py-3 px-4 text-[#e5e2e1] placeholder:text-[#504532] focus:border-[#FFBF00]/40 focus:outline-none text-[16px]"/>
-      </div>
-      <div class="grid grid-cols-2 gap-3">
-        <div>
-          <label class="block text-[9px] uppercase tracking-[0.22em] text-[#9c8f78] mb-1.5">Region</label>
-          <select id="req-region" class="w-full bg-[#2a2a2a] border border-[#504532]/30 rounded-xl py-3 px-4 text-[#e5e2e1] focus:border-[#FFBF00]/40 focus:outline-none text-[14px]">
-            <option value="">Unknown</option>
-            <option>Islay</option><option>Speyside</option><option>Highland</option>
-            <option>Lowland</option><option>Campbeltown</option><option>Islands</option>
-            <option>Orkney</option><option>Japan</option><option>Ireland</option><option>World</option>
-          </select>
-        </div>
-        <div>
-          <label class="block text-[9px] uppercase tracking-[0.22em] text-[#9c8f78] mb-1.5">Approx Age</label>
-          <input id="req-age" type="text" placeholder="e.g. 21" class="w-full bg-[#2a2a2a] border border-[#504532]/30 rounded-xl py-3 px-4 text-[#e5e2e1] placeholder:text-[#504532] focus:border-[#FFBF00]/40 focus:outline-none text-[16px]"/>
-        </div>
-      </div>
-      <div>
-        <label class="block text-[9px] uppercase tracking-[0.22em] text-[#9c8f78] mb-1.5">Any other info (optional)</label>
-        <textarea id="req-notes" placeholder="Cask type, vintage, bottler, where you've seen it…" rows="2" class="w-full bg-[#2a2a2a] border border-[#504532]/30 rounded-xl py-3 px-4 text-[#e5e2e1] placeholder:text-[#504532] focus:border-[#FFBF00]/40 focus:outline-none text-[14px] resize-none"></textarea>
-      </div>
-      <button onclick="submitWhiskyRequest()" class="w-full amber-glow text-[#402d00] font-headline font-bold py-4 rounded-xl uppercase tracking-widest text-[11px] hover:opacity-90 active:scale-[0.98] transition-all">Submit Request</button>
-      <div class="h-2"></div>
-    </div>
-  </div>
-</div>
+
 
 
 </body>
