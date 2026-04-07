@@ -1,3 +1,5 @@
+import { supabase } from './supabase'
+
 const API_BASE = 'https://thewhiskyedition.com/api/whisky-reviews'
 
 export const FALLBACK = [
@@ -15,35 +17,50 @@ export const FALLBACK = [
   {id:12,slug:'nikka-yoichi',name:'Nikka Yoichi Single Malt',description:'Scottish-style on Hokkaido\'s north coast.',metadata:{distillery:'Yoichi',region:'Japan',country:'Japan',abv:45,flavour:'Peated'},rating:{marcel:91,sascha:92},tasting_notes:{nose:'Coal smoke, peat, apple.',palate:'Dried fruit, peat and brine.',finish:'Dry, smoky and warming.'}},
 ]
 
-async function apiFetch(params = {}) {
-  const p = new URLSearchParams({ type: 'Single Malt', lang: 'en', ...params })
-  for (let attempt = 0; attempt < 2; attempt++) {
-    try {
-      const r = await fetch(`${API_BASE}?${p}`, { signal: AbortSignal.timeout(14000), mode: 'cors' })
-      if (!r.ok) throw new Error(`HTTP ${r.status}`)
-      const d = await r.json()
-      if (d?.ok === false) return null
-      return d
-    } catch (e) {
-      console.warn(`API attempt ${attempt + 1}:`, e.message)
-      if (attempt === 0) await new Promise(res => setTimeout(res, 1200))
-    }
-  }
-  return null
-}
-
 export async function fetchWhiskies(page = 1, perPage = 30) {
-  const d = await apiFetch({ page, per_page: perPage })
-  if (d?.items?.length) return { items: d.items, total: d.total, live: true }
-  return { items: FALLBACK, total: FALLBACK.length, live: false }
+  // Try Supabase first — no CORS, always fast
+  const from = (page - 1) * perPage
+  const to = from + perPage - 1
+  const { data, error, count } = await supabase
+    .from('whiskies')
+    .select('*', { count: 'exact' })
+    .range(from, to)
+    .order('name')
+
+  if (!error && data?.length) {
+    return { items: data, total: count || data.length, live: true, source: 'supabase' }
+  }
+
+  // Fallback to direct API
+  try {
+    const p = new URLSearchParams({ type: 'Single Malt', lang: 'en', page, per_page: perPage })
+    const r = await fetch(`${API_BASE}?${p}`, { signal: AbortSignal.timeout(14000), mode: 'cors' })
+    if (!r.ok) throw new Error(`HTTP ${r.status}`)
+    const d = await r.json()
+    if (d?.items?.length) return { items: d.items, total: d.total, live: true, source: 'api' }
+  } catch (e) {
+    console.warn('API fallback failed:', e.message)
+  }
+
+  return { items: FALLBACK, total: FALLBACK.length, live: false, source: 'fallback' }
 }
 
-export async function fetchWhisky(slug) {
+export async function fetchWhisky(slugOrId) {
+  // Try Supabase first
+  const { data } = await supabase
+    .from('whiskies')
+    .select('*')
+    .or(`slug.eq.${slugOrId},id.eq.${slugOrId}`)
+    .single()
+
+  if (data) return data
+
+  // Try direct API
   try {
-    const r = await fetch(`${API_BASE}/${slug}`, { signal: AbortSignal.timeout(8000) })
+    const r = await fetch(`${API_BASE}/${slugOrId}`, { signal: AbortSignal.timeout(8000) })
     if (!r.ok) throw new Error('not found')
     return await r.json()
   } catch {
-    return FALLBACK.find(w => w.slug === slug || String(w.id) === String(slug)) || null
+    return FALLBACK.find(w => w.slug === slugOrId || String(w.id) === String(slugOrId)) || null
   }
 }
