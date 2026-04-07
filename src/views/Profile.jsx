@@ -111,7 +111,11 @@ export default function Profile() {
     supabase.from('profiles').select('*').eq('id', user.id).single()
       .then(({ data }) => {
         if (data) {
-          const p = { bio: data.bio, favouriteRegion: data.favourite_region }
+          const p = {
+            bio: data.bio,
+            favouriteRegion: data.favourite_region,
+            avatarUrl: data.avatar_url || null,
+          }
           setExtProfile(p)
           localStorage.setItem('tmc_profile', JSON.stringify(p))
         }
@@ -245,11 +249,27 @@ export default function Profile() {
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 12 }}>
               {earnedTitles.map(t => (
                 <div key={t.id} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6 }}>
-                  <div style={{ width: 72, height: 72 }}>
+                  <div
+                    style={{ width: 72, height: 72, cursor: 'pointer', position: 'relative' }}
+                    onClick={() => {
+                      const text = `I just earned "${t.label}" on The Modern Cask 🥃
+${t.desc}
+https://modern-cask.netlify.app`
+                      if (navigator.share) {
+                        navigator.share({ text, url: 'https://modern-cask.netlify.app' }).catch(() => {})
+                      } else {
+                        navigator.clipboard?.writeText(text)
+                      }
+                    }}
+                    title="Tap to share"
+                  >
                     {BADGE_URLS[t.id]
                       ? <img src={BADGE_URLS[t.id]} alt={t.label} style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
                       : <div style={{ width: '100%', height: '100%', background: 'rgba(255,191,0,.1)', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 28 }}>{t.emoji}</div>
                     }
+                    <div style={{ position: 'absolute', bottom: -2, right: -2, width: 20, height: 20, background: '#1a1917', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '1px solid rgba(255,191,0,.3)' }}>
+                      <span className="ms" style={{ fontSize: 11, color: '#ffbf00' }}>ios_share</span>
+                    </div>
                   </div>
                   <p style={{ fontSize: 9, fontWeight: 700, color: '#ffe2ab', textAlign: 'center', lineHeight: 1.3, fontFamily: 'Manrope, sans-serif' }}>{t.label}</p>
                 </div>

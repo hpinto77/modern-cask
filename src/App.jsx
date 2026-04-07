@@ -18,6 +18,8 @@ const NAV = [
 
 function AppInner() {
   const { initials, user } = useAuth()
+  const storedProfile = (() => { try { return JSON.parse(localStorage.getItem('tmc_profile')) || {} } catch { return {} } })()
+  const avatarUrl = storedProfile.avatarUrl || null
   const [view, setView] = useState('discover')
   const [selected, setSelected] = useState(null)
   const [history, setHistory] = useState(['discover'])
@@ -45,9 +47,15 @@ function AppInner() {
     <div style={{ minHeight: '100dvh', background: '#0f0e0d', color: '#e8e4dc', fontFamily: 'DM Sans, sans-serif', overflowX: 'hidden' }}>
 
       <header style={{ position: 'fixed', top: 0, left: 0, right: 0, height: 56, background: 'rgba(15,14,13,.92)', backdropFilter: 'blur(20px)', borderBottom: '.5px solid rgba(80,72,64,.2)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 18px', zIndex: 400 }}>
-        <img src={LOGO_URL} alt="The Modern Cask" style={{ height: 28, width: 'auto' }} onError={e => { e.target.style.display='none'; e.target.nextSibling.style.display='block' }} /><h1 style={{ fontFamily: 'Manrope, sans-serif', fontSize: 12, fontWeight: 800, textTransform: 'uppercase', letterSpacing: '.22em', color: '#ffe2ab', display: 'none' }}>The Modern Cask</h1>
-        <button onClick={() => navigate('profile')} style={{ width: 30, height: 30, borderRadius: '50%', background: 'linear-gradient(135deg,#ffe2ab,#ffbf00)', display: 'flex', alignItems: 'center', justifyContent: 'center', border: 'none', cursor: 'pointer', color: '#2a1a00', fontSize: user ? 10 : undefined, fontWeight: 800, fontFamily: 'Manrope, sans-serif' }}>
-          {user ? initials : <span className="ms" style={{ fontSize: 16, color: '#2a1a00' }}>person</span>}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+          <img src={LOGO_URL} alt="" style={{ height: 32, width: 32, objectFit: 'contain', flexShrink: 0 }} onError={e => e.target.style.display='none'} />
+          <span style={{ fontFamily: 'Manrope, sans-serif', fontSize: 11, fontWeight: 800, textTransform: 'uppercase', letterSpacing: '.18em', color: '#ffe2ab', whiteSpace: 'nowrap' }}>The Modern Cask</span>
+        </div>
+        <button onClick={() => navigate('profile')} style={{ width: 32, height: 32, borderRadius: '50%', background: 'linear-gradient(135deg,#ffe2ab,#ffbf00)', display: 'flex', alignItems: 'center', justifyContent: 'center', border: 'none', cursor: 'pointer', color: '#2a1a00', fontSize: user ? 10 : undefined, fontWeight: 800, fontFamily: 'Manrope, sans-serif', overflow: 'hidden', flexShrink: 0 }}>
+          {avatarUrl
+            ? <img src={avatarUrl} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+            : user ? initials : <span className="ms" style={{ fontSize: 16, color: '#2a1a00' }}>person</span>
+          }
         </button>
       </header>
 
