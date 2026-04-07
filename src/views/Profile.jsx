@@ -1,8 +1,9 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useAuth } from '../hooks/useAuth'
 import { useCheckins } from '../hooks/useCheckins'
 import { supabase } from '../lib/supabase'
-import { GoldButton, Input, Textarea, Select, BottomSheet, useToast } from '../components/UI'
+import { useToast } from '../components/UI'
+import { EditProfileModal } from '../components/EditProfileModal'
 
 const REGIONS = [
   {id:'islay',label:'Islay',country:'Scotland',min:3},
@@ -51,7 +52,6 @@ const TITLES = [
 function passportStats(checkins) {
   const counts = {}
   const countries = {}
-  // Use all check-in occasions
   checkins.forEach(c => {
     const region = (c.whisky_region || '').toLowerCase()
     const country = (c.whisky_country || '').toLowerCase()
@@ -62,16 +62,13 @@ function passportStats(checkins) {
       }
     })
   })
-  const regionsVisited = REGIONS.filter(r => (counts[r.id] || 0) >= 1).length
-  counts._regions = regionsVisited
+  counts._regions = REGIONS.filter(r => (counts[r.id] || 0) >= 1).length
   counts._countries = Object.keys(countries).length
   return counts
 }
 
 function insightStats(checkins) {
-  // Favourite region
   const regionCounts = {}
-  const flavourCounts = {}
   const scores = []
   checkins.forEach(c => {
     const r = c.whisky_region
@@ -99,10 +96,26 @@ export default function Profile() {
   const { user, displayName, initials, signInWithGoogle, signOut } = useAuth()
   const { checkins, triedWhiskies, ownedWhiskies } = useCheckins()
   const toast = useToast()
-  const [addOpen, setAddOpen] = useState(false)
+  const [editOpen, setEditOpen] = useState(false)
+  const [extProfile, setExtProfile] = useState(() => {
+    try { return JSON.parse(localStorage.getItem('tmc_profile')) || {} } catch { return {} }
+  })
   const [submissions, setSubmissions] = useState(() => {
     try { return JSON.parse(localStorage.getItem('tmc_submissions')) || [] } catch { return [] }
   })
+
+  // Load extended profile from Supabase
+  useEffect(() => {
+    if (!user) return
+    supabase.from('profiles').select('*').eq('id', user.id).single()
+      .then(({ data }) => {
+        if (data) {
+          const p = { bio: data.bio, favouriteRegion: data.favourite_region }
+          setExtProfile(p)
+          localStorage.setItem('tmc_profile', JSON.stringify(p))
+        }
+      })
+  }, [user?.id])
 
   const stats = passportStats(checkins)
   const insights = insightStats(checkins)
@@ -119,36 +132,51 @@ export default function Profile() {
 
       <div style={{ padding: '0 16px', display: 'grid', gap: 12 }}>
 
-        {/* Auth card */}
+        {/* Auth + profile card */}
         <div style={{ background: '#1a1917', borderRadius: 16, padding: 16 }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
-            <div style={{ width: 48, height: 48, borderRadius: '50%', background: 'linear-gradient(135deg,#ffe2ab,#ffbf00)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, fontFamily: 'Manrope, sans-serif', fontWeight: 800, fontSize: 16, color: '#2a1a00' }}>
-              {user ? initials : <span className="ms" style={{ fontSize: 20, color: '#2a1a00' }}>person</span>}
-            </div>
-            {user ? (
-              <div style={{ flex: 1 }}>
-                <p style={{ fontSize: 14, fontWeight: 600, color: '#e8e4dc' }}>{displayName}</p>
-                <p style={{ fontSize: 11, color: '#7a7060', marginTop: 2 }}>{user.email}</p>
-                <button onClick={signOut} style={{ marginTop: 6, fontSize: 10, color: '#504840', background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}>Sign out</button>
+          {user ? (
+            <>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginBottom: extProfile.bio ? 12 : 0 }}>
+                <div style={{ width: 52, height: 52, borderRadius: '50%', background: 'linear-gradient(135deg,#ffe2ab,#ffbf00)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, fontFamily: 'Manrope, sans-serif', fontWeight: 800, fontSize: 18, color: '#2a1a00' }}>
+                  {initials}
+                </div>
+                <div style={{ flex: 1 }}>
+                  <p style={{ fontSize: 15, fontWeight: 700, color: '#e8e4dc', fontFamily: 'Manrope, sans-serif' }}>{displayName}</p>
+                  <p style={{ fontSize: 11, color: '#7a7060', marginTop: 2 }}>{user.email}</p>
+                  {extProfile.favouriteRegion && (
+                    <p style={{ fontSize: 11, color: '#ffbf00', marginTop: 3 }}>❤️ {extProfile.favouriteRegion}</p>
+                  )}
+                </div>
+                <button
+                  onClick={() => setEditOpen(true)}
+                  style={{ width: 34, height: 34, background: 'rgba(80,72,64,.3)', border: 'none', borderRadius: 10, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', flexShrink: 0 }}
+                >
+                  <span className="ms" style={{ fontSize: 18, color: '#7a7060' }}>edit</span>
+                </button>
               </div>
-            ) : (
+              {extProfile.bio && (
+                <p style={{ fontSize: 13, color: '#7a7060', lineHeight: 1.5, marginTop: 10, paddingTop: 10, borderTop: '0.5px solid rgba(80,72,64,.2)' }}>{extProfile.bio}</p>
+              )}
+              <button onClick={signOut} style={{ marginTop: 10, fontSize: 10, color: '#504840', background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}>Sign out</button>
+            </>
+          ) : (
+            <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+              <div style={{ width: 52, height: 52, borderRadius: '50%', background: 'rgba(80,72,64,.3)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                <span className="ms" style={{ fontSize: 24, color: '#504840' }}>person</span>
+              </div>
               <div style={{ flex: 1 }}>
                 <p style={{ fontSize: 13, color: '#7a7060', marginBottom: 10 }}>Sign in to sync across devices</p>
                 <button onClick={signInWithGoogle} style={{ display: 'flex', alignItems: 'center', gap: 8, background: '#fff', border: 'none', borderRadius: 10, padding: '9px 16px', fontSize: 13, fontWeight: 600, cursor: 'pointer', color: '#1a1a1a' }}>
                   <GoogleIcon /> Continue with Google
                 </button>
               </div>
-            )}
-          </div>
+            </div>
+          )}
         </div>
 
         {/* Stats */}
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 8 }}>
-          {[
-            ['Tried', triedWhiskies.length],
-            ['Owned', ownedWhiskies.length],
-            ['Drams', checkins.length],
-          ].map(([label, val]) => (
+          {[['Tried', triedWhiskies.length], ['Owned', ownedWhiskies.length], ['Drams', checkins.length]].map(([label, val]) => (
             <div key={label} style={{ background: '#1a1917', borderRadius: 12, padding: '14px 10px' }}>
               <span style={{ display: 'block', fontSize: 9, textTransform: 'uppercase', letterSpacing: '.1em', color: '#7a7060', marginBottom: 4 }}>{label}</span>
               <span style={{ fontFamily: 'Manrope, sans-serif', fontSize: 24, fontWeight: 800, color: '#ffbf00' }}>{val}</span>
@@ -162,24 +190,24 @@ export default function Profile() {
             <p style={{ fontSize: 9, textTransform: 'uppercase', letterSpacing: '.12em', color: '#7a7060', marginBottom: 12, fontWeight: 700 }}>Insights</p>
             <div style={{ display: 'grid', gap: 10 }}>
               {insights.topRegion && (
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                   <span style={{ fontSize: 13, color: '#7a7060' }}>Favourite region</span>
                   <span style={{ fontSize: 13, fontWeight: 600, color: '#e8e4dc' }}>{insights.topRegion}</span>
                 </div>
               )}
               {insights.avgScore && (
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                   <span style={{ fontSize: 13, color: '#7a7060' }}>Average rating</span>
                   <span style={{ fontSize: 13, fontWeight: 600, color: '#ffbf00' }}>{insights.avgScore} / 5</span>
                 </div>
               )}
               {insights.fiveStars.length > 0 && (
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                   <span style={{ fontSize: 13, color: '#7a7060' }}>Five-star drams</span>
                   <span style={{ fontSize: 13, fontWeight: 600, color: '#e8e4dc' }}>{insights.fiveStars.length}</span>
                 </div>
               )}
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                 <span style={{ fontSize: 13, color: '#7a7060' }}>Countries explored</span>
                 <span style={{ fontSize: 13, fontWeight: 600, color: '#e8e4dc' }}>{stats._countries || 0}</span>
               </div>
@@ -204,6 +232,7 @@ export default function Profile() {
           <div style={{ height: 4, background: '#2a2825', borderRadius: 2, overflow: 'hidden' }}>
             <div style={{ height: '100%', width: `${pct}%`, background: 'linear-gradient(90deg,#ffe2ab,#ffbf00)', borderRadius: 2, transition: 'width .6s ease' }} />
           </div>
+          <p style={{ fontSize: 10, color: '#504840', marginTop: 6 }}>{pct}% of the world explored</p>
         </div>
 
         {/* Earned titles */}
@@ -261,9 +290,7 @@ export default function Profile() {
         <div>
           <p style={{ fontSize: 9, textTransform: 'uppercase', letterSpacing: '.12em', color: '#7a7060', marginBottom: 8, fontWeight: 700 }}>My Contributions</p>
           {submissions.length === 0 ? (
-            <button onClick={() => setAddOpen(true)} style={{ width: '100%', padding: 14, background: 'rgba(255,191,0,.06)', border: '1px solid rgba(255,191,0,.2)', borderRadius: 12, color: '#ffe2ab', fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '.08em', cursor: 'pointer' }}>
-              + Add a Whisky to the Database
-            </button>
+            <p style={{ fontSize: 12, color: '#504840', fontStyle: 'italic' }}>No submissions yet. Use the Add button to contribute a whisky.</p>
           ) : (
             <div style={{ display: 'grid', gap: 6 }}>
               {submissions.map(s => (
@@ -275,15 +302,20 @@ export default function Profile() {
                   <span style={{ fontSize: 9, fontWeight: 700, textTransform: 'uppercase', padding: '3px 8px', borderRadius: 99, color: '#ffbf00', background: 'rgba(255,191,0,.15)', flexShrink: 0, marginLeft: 8 }}>Pending</span>
                 </div>
               ))}
-              <button onClick={() => setAddOpen(true)} style={{ width: '100%', marginTop: 4, padding: 12, background: 'transparent', border: '1px solid rgba(80,72,64,.4)', borderRadius: 12, color: '#7a7060', fontSize: 11, fontWeight: 700, textTransform: 'uppercase', cursor: 'pointer' }}>
-                + Submit Another
-              </button>
             </div>
           )}
         </div>
 
         <div style={{ height: 8 }} />
       </div>
+
+      <EditProfileModal
+        open={editOpen}
+        onClose={() => {
+          setEditOpen(false)
+          try { setExtProfile(JSON.parse(localStorage.getItem('tmc_profile')) || {}) } catch {}
+        }}
+      />
     </div>
   )
 }
