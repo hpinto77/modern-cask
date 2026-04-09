@@ -501,16 +501,6 @@ function showPage(page) {
 
 // ── DATA LOADING ──
 async function loadAllData() {
-  // Load counts for badges and dashboard
-  const [whiskies, checkins, reports, submissions, profiles] = await Promise.all([
-    sbGet('whiskies', '?select=id&limit=1&offset=0', true),
-    sbGet('checkins', '?select=id&limit=1&offset=0', true),
-    sbGet('feedback', '?select=id&limit=1&offset=0', true),
-    sbGet('whisky_requests', '?select=id&status=eq.pending&limit=1&offset=0', true),
-    sbGet('profiles', '?select=id&limit=1&offset=0', true),
-  ])
-
-  // Get counts via head requests
   const counts = await getCounts()
 
   document.getElementById('stat-users').textContent = counts.profiles || '—'
@@ -603,23 +593,22 @@ async function loadPage(page) {
 }
 
 async function loadUsers() {
-  const data = await sbGet('profiles', '?select=id,full_name,bio,favourite_region,avatar_url,updated_at&order=updated_at.desc&limit=100')
   const wrap = document.getElementById('users-table-wrap')
-  if (!data.length) { wrap.innerHTML = '<div class="empty-state"><span class="ms">group</span>No users yet</div>'; return }
-  wrap.innerHTML = `<table id="users-table">
-    <thead><tr><th>User</th><th>Favourite Region</th><th>Bio</th><th>Last Active</th></tr></thead>
-    <tbody>${data.map(u => `
-      <tr>
-        <td>
-          <div style="font-weight:600">${u.full_name || '—'}</div>
-          <div class="td-mono">${u.id.substring(0,8)}…</div>
-        </td>
-        <td class="td-muted">${u.favourite_region || '—'}</td>
-        <td class="td-muted" style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${u.bio || '—'}</td>
-        <td class="td-muted">${u.updated_at ? new Date(u.updated_at).toLocaleDateString('en-GB') : '—'}</td>
-      </tr>`).join('')}
-    </tbody>
-  </table>`
+  const [profiles, allCheckins] = await Promise.all([
+    sbGet('profiles', '?select=id,full_name,bio,favourite_region,avatar_url,updated_at&order=updated_at.desc&limit=100'),
+    sbGet('checkins', '?select=user_id&limit=2000')
+  ])
+  const checkinCounts = {}
+  allCheckins.forEach(c => { if (c.user_id) checkinCounts[c.user_id] = (checkinCounts[c.user_id] || 0) + 1 })
+  if (!profiles.length) { wrap.innerHTML = '<div class="empty-state"><span class="ms">group</span>No user profiles yet — users appear here after editing their profile</div>'; return }
+  const rows = profiles.map(u => `<tr>
+    <td><div style="font-weight:600">${u.full_name || '—'}</div>${u.bio ? '<div class="td-muted" style="font-size:11px">' + u.bio.substring(0,60) + '</div>' : ''}</td>
+    <td class="td-muted">${u.favourite_region || '—'}</td>
+    <td style="font-family:'Manrope',sans-serif;font-weight:700;color:#ffbf00">${checkinCounts[u.id] || 0}</td>
+    <td>${u.avatar_url ? '<span class="ms check-ok" style="font-size:16px;font-variation-settings:'\''FILL'\'' 1">account_circle</span>' : '—'}</td>
+    <td class="td-muted">${u.updated_at ? new Date(u.updated_at).toLocaleDateString('en-GB') : '—'}</td>
+  </tr>`).join('')
+  wrap.innerHTML = `<table id="users-table"><thead><tr><th>Name</th><th>Favourite Region</th><th>Drams</th><th>Avatar</th><th>Last Active</th></tr></thead><tbody>${rows}</tbody></table>`
 }
 
 async function loadCheckins() {
@@ -664,44 +653,45 @@ async function loadWhiskies() {
 }
 
 async function loadSubmissions() {
-  const data = await sbGet('whisky_requests', '?select=*&order=date.desc&limit=100')
   const wrap = document.getElementById('submissions-table-wrap')
-  if (!data.length) { wrap.innerHTML = '<div class="empty-state"><span class="ms">add_circle</span>No submissions yet</div>'; return }
-  wrap.innerHTML = `<table>
-    <thead><tr><th>Whisky</th><th>Distillery</th><th>Region</th><th>Submitted by</th><th>Status</th><th>Actions</th></tr></thead>
-    <tbody>${data.map(s => `
-      <tr id="sub-row-${s.id}">
-        <td style="font-weight:500">${s.name}</td>
-        <td class="td-muted">${s.distillery || '—'}</td>
-        <td class="td-muted">${s.region || '—'}</td>
-        <td class="td-muted">${s.submitted_by || '—'}</td>
-        <td><span class="pill pill-${s.status === 'pending' ? 'pending' : s.status === 'approved' ? 'approved' : 'rejected'}">${s.status}</span></td>
-        <td style="display:flex;gap:6px">
-          ${s.status === 'pending' ? `
-            <button class="act-btn approve" onclick="reviewSubmission(${s.id}, 'approved')">Approve</button>
-            <button class="act-btn reject" onclick="reviewSubmission(${s.id}, 'rejected')">Reject</button>
-          ` : '—'}
-        </td>
-      </tr>`).join('')}
-    </tbody>
-  </table>`
+  const data = await sbGet('whisky_requests', '?select=*&order=date.desc&limit=100')
+  if (!data || !data.length || (data.message && data.code)) {
+    wrap.innerHTML = '<div class="empty-state"><span class="ms">add_circle</span>No submissions yet</div>'
+    return
+  }
+  const rows = data.map(s => {
+    const statusClass = s.status === 'pending' ? 'pending' : s.status === 'approved' ? 'approved' : 'rejected'
+    const actions = s.status === 'pending'
+      ? `<button class="act-btn approve" onclick="reviewSubmission('${s.id}', 'approved')">Approve</button>
+         <button class="act-btn reject" onclick="reviewSubmission('${s.id}', 'rejected')">Reject</button>`
+      : '<span style="color:#504840;font-size:11px">Reviewed</span>'
+    return `<tr id="sub-row-${s.id}">
+      <td style="font-weight:500">${s.name || '—'}</td>
+      <td class="td-muted">${s.distillery || '—'}</td>
+      <td class="td-muted">${s.region || '—'}${s.country ? ' · ' + s.country : ''}</td>
+      <td class="td-muted">${s.submitted_by || 'anonymous'}</td>
+      <td><span class="pill pill-${statusClass}">${s.status}</span></td>
+      <td style="display:flex;gap:6px">${actions}</td>
+    </tr>`
+  }).join('')
+  wrap.innerHTML = `<table><thead><tr><th>Whisky</th><th>Distillery</th><th>Region</th><th>Submitted by</th><th>Status</th><th>Actions</th></tr></thead><tbody>${rows}</tbody></table>`
 }
 
 async function reviewSubmission(id, status) {
-  await fetch(`${SB_URL}/rest/v1/whisky_requests?id=eq.${id}`, {
+  const r = await fetch(`${SB_URL}/rest/v1/whisky_requests?id=eq.${id}`, {
     method: 'PATCH',
-    headers: { ...hdrs(SESSION?.access_token), 'Prefer': 'return=minimal' },
+    headers: { ...hdrs(SESSION?.access_token), 'Prefer': 'return=minimal', 'Content-Type': 'application/json' },
     body: JSON.stringify({ status })
   })
-  const row = document.getElementById(`sub-row-${id}`)
+  const row = document.getElementById('sub-row-' + id)
   if (row) {
     const pill = row.querySelector('.pill')
-    if (pill) { pill.className = `pill pill-${status === 'approved' ? 'approved' : 'rejected'}`; pill.textContent = status }
-    const actions = row.querySelectorAll('.act-btn')
-    actions.forEach(b => b.remove())
+    if (pill) { pill.className = 'pill pill-' + (status === 'approved' ? 'approved' : 'rejected'); pill.textContent = status }
+    row.querySelectorAll('.act-btn').forEach(b => b.remove())
+    const td = row.querySelector('td:last-child')
+    if (td) td.innerHTML = '<span style="color:#504840;font-size:11px">Reviewed</span>'
   }
   toast(status === 'approved' ? 'Approved ✓' : 'Rejected')
-  pageLoaded['submissions'] = false
 }
 
 async function loadReports() {
