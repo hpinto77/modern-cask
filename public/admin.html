@@ -3,14 +3,14 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>The Modern Cask — Admin</title>
+<title>The Modern Cask -- Admin</title>
 <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,300,0,0&display=swap" rel="stylesheet"/>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 body{background:#0a0908;color:#e8e4dc;font-family:'DM Sans',sans-serif;min-height:100vh;display:flex}
 .ms{font-family:'Material Symbols Outlined';font-style:normal;display:inline-block;line-height:1;text-transform:none;letter-spacing:normal;white-space:nowrap;font-variation-settings:'FILL' 0,'wght' 300}
 
-/* ── LOGIN ── */
+/* -- LOGIN -- */
 #login-screen{position:fixed;inset:0;background:#0a0908;display:flex;align-items:center;justify-content:center;z-index:1000}
 .login-card{background:#1a1917;border:1px solid rgba(80,72,64,.4);border-radius:20px;padding:40px;width:360px}
 .login-card h1{font-family:'Manrope',sans-serif;font-size:22px;font-weight:800;color:#ffe2ab;margin-bottom:4px}
@@ -20,10 +20,10 @@ body{background:#0a0908;color:#e8e4dc;font-family:'DM Sans',sans-serif;min-heigh
 .btn-gold{width:100%;background:linear-gradient(135deg,#ffe2ab,#ffbf00);color:#2a1a00;font-family:'Manrope',sans-serif;font-weight:700;font-size:13px;text-transform:uppercase;letter-spacing:.1em;border:none;border-radius:10px;padding:13px;cursor:pointer;margin-top:4px}
 #login-error{color:#e24b4a;font-size:12px;margin-top:8px;display:none}
 
-/* ── LAYOUT ── */
+/* -- LAYOUT -- */
 #app{display:none;width:100%;min-height:100vh}
 
-/* ── SIDEBAR ── */
+/* -- SIDEBAR -- */
 aside{width:220px;background:#0f0e0d;border-right:1px solid rgba(80,72,64,.2);display:flex;flex-direction:column;position:fixed;top:0;bottom:0;left:0;z-index:100}
 .sidebar-logo{padding:20px 18px 16px;border-bottom:1px solid rgba(80,72,64,.2)}
 .sidebar-logo h1{font-family:'Manrope',sans-serif;font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.2em;color:#ffe2ab}
@@ -44,7 +44,7 @@ aside{width:220px;background:#0f0e0d;border-right:1px solid rgba(80,72,64,.2);di
 .sign-out-btn{background:none;border:none;cursor:pointer;color:#504840;display:flex;padding:2px}
 .sign-out-btn:hover{color:#e24b4a}
 
-/* ── MAIN ── */
+/* -- MAIN -- */
 main{margin-left:220px;flex:1;padding:28px 32px;min-height:100vh}
 .page{display:none}
 .page.active{display:block;animation:fadeIn .2s ease}
@@ -53,7 +53,7 @@ main{margin-left:220px;flex:1;padding:28px 32px;min-height:100vh}
 .page-header h2{font-family:'Manrope',sans-serif;font-size:24px;font-weight:800;color:#e8e4dc}
 .page-header p{font-size:13px;color:#7a7060;margin-top:4px}
 
-/* ── STAT CARDS ── */
+/* -- STAT CARDS -- */
 .stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:24px}
 .stat-card{background:#1a1917;border:1px solid rgba(80,72,64,.25);border-radius:14px;padding:18px}
 .stat-label{font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:#7a7060;margin-bottom:6px}
@@ -61,7 +61,7 @@ main{margin-left:220px;flex:1;padding:28px 32px;min-height:100vh}
 .stat-sub{font-size:11px;color:#504840;margin-top:4px}
 .stat-card.highlight{border-color:rgba(255,191,0,.2);background:rgba(255,191,0,.04)}
 
-/* ── TABLES ── */
+/* -- TABLES -- */
 .table-card{background:#1a1917;border:1px solid rgba(80,72,64,.25);border-radius:14px;overflow:hidden;margin-bottom:20px}
 .table-header{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid rgba(80,72,64,.2)}
 .table-title{font-family:'Manrope',sans-serif;font-size:14px;font-weight:700;color:#e8e4dc}
@@ -76,7 +76,7 @@ tr:hover td{background:rgba(255,226,171,.02)}
 .td-muted{color:#7a7060;font-size:12px}
 .td-mono{font-family:monospace;font-size:11px;color:#7a7060}
 
-/* ── STATUS PILLS ── */
+/* -- STATUS PILLS -- */
 .pill{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:99px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.04em}
 .pill-pending{background:rgba(255,191,0,.12);color:#ffbf00}
 .pill-approved{background:rgba(99,153,34,.15);color:#7ab840}
@@ -84,7 +84,7 @@ tr:hover td{background:rgba(255,226,171,.02)}
 .pill-new{background:rgba(55,138,221,.15);color:#6ab0f0}
 .pill-resolved{background:rgba(80,72,64,.25);color:#7a7060}
 
-/* ── ACTION BUTTONS ── */
+/* -- ACTION BUTTONS -- */
 .act-btn{background:none;border:1px solid rgba(80,72,64,.3);border-radius:6px;padding:4px 10px;font-size:11px;color:#7a7060;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .15s}
 .act-btn:hover{color:#e8e4dc;border-color:rgba(80,72,64,.6)}
 .act-btn.approve{border-color:rgba(99,153,34,.3);color:#7ab840}
@@ -93,12 +93,12 @@ tr:hover td{background:rgba(255,226,171,.02)}
 .act-btn.reject:hover{background:rgba(226,75,74,.08)}
 .act-btn.danger{border-color:rgba(226,75,74,.2);color:#e24b4a}
 
-/* ── LOADING ── */
+/* -- LOADING -- */
 .loading{text-align:center;padding:40px;color:#504840;font-size:13px}
 .empty-state{text-align:center;padding:48px;color:#504840}
 .empty-state .ms{font-size:40px;display:block;margin-bottom:10px;color:#3d3a35}
 
-/* ── CHART AREA ── */
+/* -- CHART AREA -- */
 .chart-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:20px}
 .chart-card{background:#1a1917;border:1px solid rgba(80,72,64,.25);border-radius:14px;padding:20px}
 .chart-title{font-family:'Manrope',sans-serif;font-size:13px;font-weight:700;color:#e8e4dc;margin-bottom:16px}
@@ -108,7 +108,7 @@ tr:hover td{background:rgba(255,226,171,.02)}
 .bar-fill{height:100%;background:linear-gradient(90deg,#ffe2ab,#ffbf00);border-radius:3px;transition:width .6s ease}
 .bar-count{font-size:11px;color:#504840;width:30px;text-align:right;flex-shrink:0}
 
-/* ── SECURITY SECTION ── */
+/* -- SECURITY SECTION -- */
 .security-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:20px}
 .security-card{background:#1a1917;border:1px solid rgba(80,72,64,.25);border-radius:14px;padding:18px}
 .security-card h3{font-family:'Manrope',sans-serif;font-size:13px;font-weight:700;color:#e8e4dc;margin-bottom:12px;display:flex;align-items:center;gap:8px}
@@ -118,7 +118,7 @@ tr:hover td{background:rgba(255,226,171,.02)}
 .check-warn{color:#ffbf00}
 .check-fail{color:#e24b4a}
 
-/* ── TOAST ── */
+/* -- TOAST -- */
 #toast{position:fixed;bottom:24px;right:24px;background:#ffe2ab;color:#2a1a00;padding:10px 18px;border-radius:10px;font-size:12px;font-weight:600;opacity:0;transition:opacity .25s;pointer-events:none;z-index:9999}
 #toast.show{opacity:1}
 </style>
@@ -129,7 +129,7 @@ tr:hover td{background:rgba(255,226,171,.02)}
 <div id="login-screen">
   <div class="login-card">
     <h1>The Modern Cask</h1>
-    <p>Admin panel — restricted access</p>
+    <p>Admin panel -- restricted access</p>
     <input class="inp" id="login-email" type="email" placeholder="Admin email" autocomplete="email"/>
     <input class="inp" id="login-password" type="password" placeholder="Password" autocomplete="current-password"/>
     <button class="btn-gold" onclick="doLogin()">Sign In</button>
@@ -155,27 +155,27 @@ tr:hover td{background:rgba(255,226,171,.02)}
       <div class="nav-section">Users</div>
       <div class="nav-item" data-page="users" onclick="showPage('users')">
         <span class="ms">group</span> Users
-        <span class="nav-badge" id="badge-users">—</span>
+        <span class="nav-badge" id="badge-users">--</span>
       </div>
       <div class="nav-item" data-page="checkins" onclick="showPage('checkins')">
         <span class="ms">history</span> Check-ins
-        <span class="nav-badge" id="badge-checkins">—</span>
+        <span class="nav-badge" id="badge-checkins">--</span>
       </div>
 
       <div class="nav-section">Content</div>
       <div class="nav-item" data-page="whiskies" onclick="showPage('whiskies')">
         <span class="ms">liquor</span> Whiskies
-        <span class="nav-badge" id="badge-whiskies">—</span>
+        <span class="nav-badge" id="badge-whiskies">--</span>
       </div>
       <div class="nav-item" data-page="submissions" onclick="showPage('submissions')">
         <span class="ms">add_circle</span> Submissions
-        <span class="nav-badge red" id="badge-submissions">—</span>
+        <span class="nav-badge red" id="badge-submissions">--</span>
       </div>
 
       <div class="nav-section">Moderation</div>
       <div class="nav-item" data-page="reports" onclick="showPage('reports')">
         <span class="ms">flag</span> Reports
-        <span class="nav-badge red" id="badge-reports">—</span>
+        <span class="nav-badge red" id="badge-reports">--</span>
       </div>
       <div class="nav-item" data-page="profiles" onclick="showPage('profiles')">
         <span class="ms">manage_accounts</span> Profiles
@@ -194,7 +194,7 @@ tr:hover td{background:rgba(255,226,171,.02)}
       <div class="sidebar-user">
         <div class="sidebar-avatar" id="sidebar-initials">?</div>
         <div>
-          <div class="sidebar-user-name" id="sidebar-email">Loading…</div>
+          <div class="sidebar-user-name" id="sidebar-email">Loading...</div>
           <div class="sidebar-user-role">Administrator</div>
         </div>
         <button class="sign-out-btn" onclick="doSignOut()" title="Sign out">
@@ -214,20 +214,20 @@ tr:hover td{background:rgba(255,226,171,.02)}
         <p>Real-time overview of The Modern Cask</p>
       </div>
       <div class="stats-grid" id="dash-stats">
-        <div class="stat-card"><div class="stat-label">Total Users</div><div class="stat-value" id="stat-users">—</div><div class="stat-sub">registered accounts</div></div>
-        <div class="stat-card highlight"><div class="stat-label">Total Check-ins</div><div class="stat-value" id="stat-checkins">—</div><div class="stat-sub">drams logged</div></div>
-        <div class="stat-card"><div class="stat-label">Whiskies</div><div class="stat-value" id="stat-whiskies">—</div><div class="stat-sub">in database</div></div>
-        <div class="stat-card"><div class="stat-label">Pending Review</div><div class="stat-value" id="stat-pending">—</div><div class="stat-sub">submissions + reports</div></div>
+        <div class="stat-card"><div class="stat-label">Total Users</div><div class="stat-value" id="stat-users">--</div><div class="stat-sub">registered accounts</div></div>
+        <div class="stat-card highlight"><div class="stat-label">Total Check-ins</div><div class="stat-value" id="stat-checkins">--</div><div class="stat-sub">drams logged</div></div>
+        <div class="stat-card"><div class="stat-label">Whiskies</div><div class="stat-value" id="stat-whiskies">--</div><div class="stat-sub">in database</div></div>
+        <div class="stat-card"><div class="stat-label">Pending Review</div><div class="stat-value" id="stat-pending">--</div><div class="stat-sub">submissions + reports</div></div>
       </div>
 
       <div class="chart-row">
         <div class="chart-card">
           <div class="chart-title">Top regions by check-ins</div>
-          <div id="region-chart"><div class="loading">Loading…</div></div>
+          <div id="region-chart"><div class="loading">Loading...</div></div>
         </div>
         <div class="chart-card">
           <div class="chart-title">Recent activity</div>
-          <div id="recent-activity"><div class="loading">Loading…</div></div>
+          <div id="recent-activity"><div class="loading">Loading...</div></div>
         </div>
       </div>
     </div>
@@ -242,10 +242,10 @@ tr:hover td{background:rgba(255,226,171,.02)}
         <div class="table-header">
           <span class="table-title">Accounts</span>
           <div class="table-actions">
-            <input class="search-inp" placeholder="Search users…" oninput="filterTable('users-table', this.value)"/>
+            <input class="search-inp" placeholder="Search users..." oninput="filterTable('users-table', this.value)"/>
           </div>
         </div>
-        <div id="users-table-wrap"><div class="loading">Loading…</div></div>
+        <div id="users-table-wrap"><div class="loading">Loading...</div></div>
       </div>
     </div>
 
@@ -259,10 +259,10 @@ tr:hover td{background:rgba(255,226,171,.02)}
         <div class="table-header">
           <span class="table-title">Dram log</span>
           <div class="table-actions">
-            <input class="search-inp" placeholder="Search check-ins…" oninput="filterTable('checkins-table', this.value)"/>
+            <input class="search-inp" placeholder="Search check-ins..." oninput="filterTable('checkins-table', this.value)"/>
           </div>
         </div>
-        <div id="checkins-table-wrap"><div class="loading">Loading…</div></div>
+        <div id="checkins-table-wrap"><div class="loading">Loading...</div></div>
       </div>
     </div>
 
@@ -280,10 +280,10 @@ tr:hover td{background:rgba(255,226,171,.02)}
         <div class="table-header">
           <span class="table-title">Whisky database</span>
           <div class="table-actions">
-            <input class="search-inp" placeholder="Search whiskies…" oninput="filterTable('whiskies-table', this.value)"/>
+            <input class="search-inp" placeholder="Search whiskies..." oninput="filterTable('whiskies-table', this.value)"/>
           </div>
         </div>
-        <div id="whiskies-table-wrap"><div class="loading">Loading…</div></div>
+        <div id="whiskies-table-wrap"><div class="loading">Loading...</div></div>
       </div>
     </div>
 
@@ -297,7 +297,7 @@ tr:hover td{background:rgba(255,226,171,.02)}
         <div class="table-header">
           <span class="table-title">Pending submissions</span>
         </div>
-        <div id="submissions-table-wrap"><div class="loading">Loading…</div></div>
+        <div id="submissions-table-wrap"><div class="loading">Loading...</div></div>
       </div>
     </div>
 
@@ -311,7 +311,7 @@ tr:hover td{background:rgba(255,226,171,.02)}
         <div class="table-header">
           <span class="table-title">Flagged items</span>
         </div>
-        <div id="reports-table-wrap"><div class="loading">Loading…</div></div>
+        <div id="reports-table-wrap"><div class="loading">Loading...</div></div>
       </div>
     </div>
 
@@ -325,10 +325,10 @@ tr:hover td{background:rgba(255,226,171,.02)}
         <div class="table-header">
           <span class="table-title">User profiles</span>
           <div class="table-actions">
-            <input class="search-inp" placeholder="Search profiles…" oninput="filterTable('profiles-table', this.value)"/>
+            <input class="search-inp" placeholder="Search profiles..." oninput="filterTable('profiles-table', this.value)"/>
           </div>
         </div>
-        <div id="profiles-table-wrap"><div class="loading">Loading…</div></div>
+        <div id="profiles-table-wrap"><div class="loading">Loading...</div></div>
       </div>
     </div>
 
@@ -348,20 +348,20 @@ tr:hover td{background:rgba(255,226,171,.02)}
         </div>
         <div class="security-card">
           <h3><span class="ms check-ok" style="font-size:18px;font-variation-settings:'FILL' 1">lock</span> Database (RLS)</h3>
-          <div class="check-item"><span class="ms check-ok" style="font-size:16px">check_circle</span> checkins — users see own data only</div>
-          <div class="check-item"><span class="ms check-ok" style="font-size:16px">check_circle</span> profiles — users see own data only</div>
-          <div class="check-item"><span class="ms check-ok" style="font-size:16px">check_circle</span> whiskies — public read, no write</div>
-          <div class="check-item"><span class="ms check-warn" style="font-size:16px">warning</span> whisky_requests — anon insert allowed*</div>
-          <div class="check-item"><span class="ms check-warn" style="font-size:16px">warning</span> feedback — anon insert allowed*</div>
+          <div class="check-item"><span class="ms check-ok" style="font-size:16px">check_circle</span> checkins -- users see own data only</div>
+          <div class="check-item"><span class="ms check-ok" style="font-size:16px">check_circle</span> profiles -- users see own data only</div>
+          <div class="check-item"><span class="ms check-ok" style="font-size:16px">check_circle</span> whiskies -- public read, no write</div>
+          <div class="check-item"><span class="ms check-warn" style="font-size:16px">warning</span> whisky_requests -- anon insert allowed*</div>
+          <div class="check-item"><span class="ms check-warn" style="font-size:16px">warning</span> feedback -- anon insert allowed*</div>
           <div style="font-size:10px;color:#504840;margin-top:8px">* Required for guest submissions. Consider rate limiting.</div>
         </div>
         <div class="security-card">
           <h3><span class="ms check-ok" style="font-size:18px;font-variation-settings:'FILL' 1">storage</span> Storage</h3>
-          <div class="check-item"><span class="ms check-ok" style="font-size:16px">check_circle</span> avatars — auth write, public read</div>
-          <div class="check-item"><span class="ms check-ok" style="font-size:16px">check_circle</span> avatars — 2MB file size limit</div>
-          <div class="check-item"><span class="ms check-ok" style="font-size:16px">check_circle</span> stamps — public read only</div>
-          <div class="check-item"><span class="ms check-ok" style="font-size:16px">check_circle</span> badges — public read only</div>
-          <div class="check-item"><span class="ms check-ok" style="font-size:16px">check_circle</span> logo — public read only</div>
+          <div class="check-item"><span class="ms check-ok" style="font-size:16px">check_circle</span> avatars -- auth write, public read</div>
+          <div class="check-item"><span class="ms check-ok" style="font-size:16px">check_circle</span> avatars -- 2MB file size limit</div>
+          <div class="check-item"><span class="ms check-ok" style="font-size:16px">check_circle</span> stamps -- public read only</div>
+          <div class="check-item"><span class="ms check-ok" style="font-size:16px">check_circle</span> badges -- public read only</div>
+          <div class="check-item"><span class="ms check-ok" style="font-size:16px">check_circle</span> logo -- public read only</div>
         </div>
         <div class="security-card">
           <h3><span class="ms check-ok" style="font-size:18px;font-variation-settings:'FILL' 1">shield</span> App Security</h3>
@@ -395,13 +395,13 @@ tr:hover td{background:rgba(255,226,171,.02)}
         <p>Sync whiskies from WHISKY:EDITION API into Supabase</p>
       </div>
       <div class="stats-grid" style="grid-template-columns:repeat(3,1fr)">
-        <div class="stat-card"><div class="stat-label">Whiskies in DB</div><div class="stat-value" id="sync-count">—</div><div class="stat-sub">from last sync</div></div>
+        <div class="stat-card"><div class="stat-label">Whiskies in DB</div><div class="stat-value" id="sync-count">--</div><div class="stat-sub">from last sync</div></div>
         <div class="stat-card"><div class="stat-label">API Total</div><div class="stat-value">389</div><div class="stat-sub">available from API</div></div>
-        <div class="stat-card"><div class="stat-label">Last Sync</div><div class="stat-value" id="sync-last" style="font-size:16px;padding-top:6px">—</div><div class="stat-sub">run manually or on schedule</div></div>
+        <div class="stat-card"><div class="stat-label">Last Sync</div><div class="stat-value" id="sync-last" style="font-size:16px;padding-top:6px">--</div><div class="stat-sub">run manually or on schedule</div></div>
       </div>
       <div class="table-card" style="padding:24px">
         <div class="chart-title" style="margin-bottom:16px">Manual sync</div>
-        <p style="font-size:13px;color:#7a7060;margin-bottom:20px;line-height:1.6">Fetches all whiskies from thewhiskyedition.com and upserts them into your Supabase <code style="background:#0f0e0d;padding:2px 6px;border-radius:4px;font-size:11px">whiskies</code> table. Safe to run anytime — uses upsert so no duplicates.</p>
+        <p style="font-size:13px;color:#7a7060;margin-bottom:20px;line-height:1.6">Fetches all whiskies from thewhiskyedition.com and upserts them into your Supabase <code style="background:#0f0e0d;padding:2px 6px;border-radius:4px;font-size:11px">whiskies</code> table. Safe to run anytime -- uses upsert so no duplicates.</p>
         <button class="btn-gold" style="width:auto;padding:12px 28px" onclick="triggerSync()">
           Run Sync Now
         </button>
@@ -443,7 +443,7 @@ function toast(msg) {
   setTimeout(() => t.classList.remove('show'), 2400)
 }
 
-// ── AUTH ──
+// -- AUTH --
 async function doLogin() {
   const email = document.getElementById('login-email').value.trim()
   const password = document.getElementById('login-password').value
@@ -490,7 +490,7 @@ async function doSignOut() {
 // Enter key on login
 document.getElementById('login-password').addEventListener('keydown', e => { if (e.key === 'Enter') doLogin() })
 
-// ── NAVIGATION ──
+// -- NAVIGATION --
 function showPage(page) {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'))
   document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'))
@@ -499,21 +499,21 @@ function showPage(page) {
   loadPage(page)
 }
 
-// ── DATA LOADING ──
+// -- DATA LOADING --
 async function loadAllData() {
   const counts = await getCounts()
 
-  document.getElementById('stat-users').textContent = counts.profiles || '—'
-  document.getElementById('stat-checkins').textContent = counts.checkins || '—'
-  document.getElementById('stat-whiskies').textContent = counts.whiskies || '—'
+  document.getElementById('stat-users').textContent = counts.profiles || '--'
+  document.getElementById('stat-checkins').textContent = counts.checkins || '--'
+  document.getElementById('stat-whiskies').textContent = counts.whiskies || '--'
   document.getElementById('stat-pending').textContent = (counts.submissions_pending || 0) + (counts.reports_new || 0)
 
-  document.getElementById('badge-users').textContent = counts.profiles || '—'
-  document.getElementById('badge-checkins').textContent = counts.checkins || '—'
-  document.getElementById('badge-whiskies').textContent = counts.whiskies || '—'
+  document.getElementById('badge-users').textContent = counts.profiles || '--'
+  document.getElementById('badge-checkins').textContent = counts.checkins || '--'
+  document.getElementById('badge-whiskies').textContent = counts.whiskies || '--'
   document.getElementById('badge-submissions').textContent = counts.submissions_pending || '0'
   document.getElementById('badge-reports').textContent = counts.reports_new || '0'
-  document.getElementById('sync-count').textContent = counts.whiskies || '—'
+  document.getElementById('sync-count').textContent = counts.whiskies || '--'
 
   loadDashboard(counts)
 }
@@ -566,10 +566,10 @@ async function loadDashboard(counts) {
     actEl.innerHTML = recent.map(c =>
       `<div style="display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid rgba(80,72,64,.1);font-size:12px">
         <div>
-          <span style="color:#e8e4dc;font-weight:500">${c.whisky_name || '—'}</span>
+          <span style="color:#e8e4dc;font-weight:500">${c.whisky_name || '--'}</span>
           <span style="color:#504840;margin-left:6px">${c.whisky_region || ''}</span>
         </div>
-        <span style="color:#7a7060">${c.rating ? '★'.repeat(c.rating) : '—'}</span>
+        <span style="color:#7a7060">${c.rating ? '*'.repeat(c.rating) : '--'}</span>
       </div>`
     ).join('')
   }
@@ -600,13 +600,13 @@ async function loadUsers() {
   ])
   const checkinCounts = {}
   allCheckins.forEach(c => { if (c.user_id) checkinCounts[c.user_id] = (checkinCounts[c.user_id] || 0) + 1 })
-  if (!profiles.length) { wrap.innerHTML = '<div class="empty-state"><span class="ms">group</span>No user profiles yet — users appear here after editing their profile</div>'; return }
+  if (!profiles.length) { wrap.innerHTML = '<div class="empty-state"><span class="ms">group</span>No user profiles yet -- users appear here after editing their profile</div>'; return }
   const rows = profiles.map(u => `<tr>
-    <td><div style="font-weight:600">${u.full_name || '—'}</div>${u.bio ? '<div class="td-muted" style="font-size:11px">' + u.bio.substring(0,60) + '</div>' : ''}</td>
-    <td class="td-muted">${u.favourite_region || '—'}</td>
+    <td><div style="font-weight:600">${u.full_name || '--'}</div>${u.bio ? '<div class="td-muted" style="font-size:11px">' + u.bio.substring(0,60) + '</div>' : ''}</td>
+    <td class="td-muted">${u.favourite_region || '--'}</td>
     <td style="font-family:'Manrope',sans-serif;font-weight:700;color:#ffbf00">${checkinCounts[u.id] || 0}</td>
-    <td>${u.avatar_url ? '<span class="ms check-ok" style="font-size:16px;font-variation-settings:'\''FILL'\'' 1">account_circle</span>' : '—'}</td>
-    <td class="td-muted">${u.updated_at ? new Date(u.updated_at).toLocaleDateString('en-GB') : '—'}</td>
+    <td>${u.avatar_url ? '<span class="ms check-ok" style="font-size:16px;font-variation-settings:'\''FILL'\'' 1">account_circle</span>' : '--'}</td>
+    <td class="td-muted">${u.updated_at ? new Date(u.updated_at).toLocaleDateString('en-GB') : '--'}</td>
   </tr>`).join('')
   wrap.innerHTML = `<table id="users-table"><thead><tr><th>Name</th><th>Favourite Region</th><th>Drams</th><th>Avatar</th><th>Last Active</th></tr></thead><tbody>${rows}</tbody></table>`
 }
@@ -619,11 +619,11 @@ async function loadCheckins() {
     <thead><tr><th>Whisky</th><th>Region</th><th>Rating</th><th>Location</th><th>Owned</th><th>Date</th></tr></thead>
     <tbody>${data.map(c => `
       <tr>
-        <td style="font-weight:500">${c.whisky_name || '—'}</td>
-        <td class="td-muted">${c.whisky_region || '—'}</td>
-        <td>${c.rating ? '★'.repeat(c.rating) + '<span style="color:#3d3a35">★'.repeat(5-c.rating)+'</span>' : '—'}</td>
-        <td class="td-muted">${c.location || '—'}</td>
-        <td>${c.owned ? '<span class="ms" style="font-size:16px;color:#ffbf00;font-variation-settings:\'FILL\' 1">liquor</span>' : '—'}</td>
+        <td style="font-weight:500">${c.whisky_name || '--'}</td>
+        <td class="td-muted">${c.whisky_region || '--'}</td>
+        <td>${c.rating ? '*'.repeat(c.rating) + '<span style="color:#3d3a35">*'.repeat(5-c.rating)+'</span>' : '--'}</td>
+        <td class="td-muted">${c.location || '--'}</td>
+        <td>${c.owned ? '<span class="ms" style="font-size:16px;color:#ffbf00;font-variation-settings:\'FILL\' 1">liquor</span>' : '--'}</td>
         <td class="td-muted">${new Date(c.date).toLocaleDateString('en-GB')}</td>
       </tr>`).join('')}
     </tbody>
@@ -633,18 +633,18 @@ async function loadCheckins() {
 async function loadWhiskies() {
   const data = await sbGet('whiskies', '?select=id,name,metadata,rating&order=name&limit=200')
   const wrap = document.getElementById('whiskies-table-wrap')
-  if (!data.length) { wrap.innerHTML = '<div class="empty-state"><span class="ms">liquor</span>No whiskies yet — run a sync</div>'; return }
+  if (!data.length) { wrap.innerHTML = '<div class="empty-state"><span class="ms">liquor</span>No whiskies yet -- run a sync</div>'; return }
   wrap.innerHTML = `<table id="whiskies-table">
     <thead><tr><th>Name</th><th>Distillery</th><th>Region</th><th>Age</th><th>ABV</th><th>Rating</th></tr></thead>
     <tbody>${data.map(w => {
       const m = w.metadata || {}
-      const score = w.rating?.marcel && w.rating?.sascha ? ((w.rating.marcel + w.rating.sascha)/2).toFixed(1) : '—'
+      const score = w.rating?.marcel && w.rating?.sascha ? ((w.rating.marcel + w.rating.sascha)/2).toFixed(1) : '--'
       return `<tr>
         <td style="font-weight:500">${w.name}</td>
-        <td class="td-muted">${m.distillery || '—'}</td>
-        <td class="td-muted">${m.region || '—'}</td>
+        <td class="td-muted">${m.distillery || '--'}</td>
+        <td class="td-muted">${m.region || '--'}</td>
         <td class="td-muted">${m.age ? m.age + 'yr' : 'NAS'}</td>
-        <td class="td-muted">${m.abv ? m.abv + '%' : '—'}</td>
+        <td class="td-muted">${m.abv ? m.abv + '%' : '--'}</td>
         <td style="color:#ffbf00;font-weight:700;font-family:'Manrope',sans-serif">${score}</td>
       </tr>`
     }).join('')}
@@ -666,9 +666,9 @@ async function loadSubmissions() {
          <button class="act-btn reject" onclick="reviewSubmission('${s.id}', 'rejected')">Reject</button>`
       : '<span style="color:#504840;font-size:11px">Reviewed</span>'
     return `<tr id="sub-row-${s.id}">
-      <td style="font-weight:500">${s.name || '—'}</td>
-      <td class="td-muted">${s.distillery || '—'}</td>
-      <td class="td-muted">${s.region || '—'}${s.country ? ' · ' + s.country : ''}</td>
+      <td style="font-weight:500">${s.name || '--'}</td>
+      <td class="td-muted">${s.distillery || '--'}</td>
+      <td class="td-muted">${s.region || '--'}${s.country ? ' . ' + s.country : ''}</td>
       <td class="td-muted">${s.submitted_by || 'anonymous'}</td>
       <td><span class="pill pill-${statusClass}">${s.status}</span></td>
       <td style="display:flex;gap:6px">${actions}</td>
@@ -691,7 +691,7 @@ async function reviewSubmission(id, status) {
     const td = row.querySelector('td:last-child')
     if (td) td.innerHTML = '<span style="color:#504840;font-size:11px">Reviewed</span>'
   }
-  toast(status === 'approved' ? 'Approved ✓' : 'Rejected')
+  toast(status === 'approved' ? 'Approved v' : 'Rejected')
 }
 
 async function loadReports() {
@@ -702,9 +702,9 @@ async function loadReports() {
     <thead><tr><th>Whisky</th><th>Issue type</th><th>Notes</th><th>Date</th><th>Actions</th></tr></thead>
     <tbody>${data.map(r => `
       <tr id="rep-row-${r.id}">
-        <td style="font-weight:500">${r.whisky_name || '—'}</td>
-        <td><span class="pill pill-new">${r.type?.replace(/_/g,' ') || '—'}</span></td>
-        <td class="td-muted" style="max-width:240px">${r.notes || '—'}</td>
+        <td style="font-weight:500">${r.whisky_name || '--'}</td>
+        <td><span class="pill pill-new">${r.type?.replace(/_/g,' ') || '--'}</span></td>
+        <td class="td-muted" style="max-width:240px">${r.notes || '--'}</td>
         <td class="td-muted">${new Date(r.date).toLocaleDateString('en-GB')}</td>
         <td><button class="act-btn" onclick="resolveReport(${r.id})">Resolve</button></td>
       </tr>`).join('')}
@@ -729,21 +729,21 @@ async function loadProfiles() {
     <thead><tr><th>Name</th><th>Favourite Region</th><th>Has Avatar</th><th>Has Bio</th><th>Updated</th></tr></thead>
     <tbody>${data.map(p => `
       <tr>
-        <td style="font-weight:500">${p.full_name || '—'}</td>
-        <td class="td-muted">${p.favourite_region || '—'}</td>
-        <td>${p.avatar_url ? '<span class="ms check-ok" style="font-size:16px">check_circle</span>' : '—'}</td>
-        <td>${p.bio ? '<span class="ms check-ok" style="font-size:16px">check_circle</span>' : '—'}</td>
-        <td class="td-muted">${p.updated_at ? new Date(p.updated_at).toLocaleDateString('en-GB') : '—'}</td>
+        <td style="font-weight:500">${p.full_name || '--'}</td>
+        <td class="td-muted">${p.favourite_region || '--'}</td>
+        <td>${p.avatar_url ? '<span class="ms check-ok" style="font-size:16px">check_circle</span>' : '--'}</td>
+        <td>${p.bio ? '<span class="ms check-ok" style="font-size:16px">check_circle</span>' : '--'}</td>
+        <td class="td-muted">${p.updated_at ? new Date(p.updated_at).toLocaleDateString('en-GB') : '--'}</td>
       </tr>`).join('')}
     </tbody>
   </table>`
 }
 
-// ── SYNC ──
+// -- SYNC --
 async function triggerSync() {
   const btn = document.querySelector('[onclick="triggerSync()"]')
-  if (btn) { btn.disabled = true; btn.textContent = 'Syncing…' }
-  document.getElementById('sync-status') && (document.getElementById('sync-status').textContent = 'Running sync…')
+  if (btn) { btn.disabled = true; btn.textContent = 'Syncing...' }
+  document.getElementById('sync-status') && (document.getElementById('sync-status').textContent = 'Running sync...')
 
   try {
     const r = await fetch(`${SB_URL}/functions/v1/sync-whiskies`, {
@@ -751,7 +751,7 @@ async function triggerSync() {
       headers: { 'Authorization': `Bearer ${SESSION?.access_token || SB_KEY}`, 'Content-Type': 'application/json' }
     })
     const data = await r.json()
-    const msg = data.success ? `✓ Synced ${data.synced} whiskies` : `Error: ${data.error}`
+    const msg = data.success ? `v Synced ${data.synced} whiskies` : `Error: ${data.error}`
     if (document.getElementById('sync-result')) {
       document.getElementById('sync-result').textContent = msg
       document.getElementById('sync-result').style.display = 'block'
@@ -767,7 +767,7 @@ async function triggerSync() {
   if (btn) { btn.disabled = false; btn.innerHTML = '<span class="ms" style="font-size:16px">sync</span> Sync from API' }
 }
 
-// ── TABLE FILTER ──
+// -- TABLE FILTER --
 function filterTable(tableId, query) {
   const table = document.getElementById(tableId)
   if (!table) return
