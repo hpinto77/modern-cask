@@ -9,8 +9,6 @@
 *{box-sizing:border-box;margin:0;padding:0}
 body{background:#0a0908;color:#e8e4dc;font-family:'DM Sans',sans-serif;min-height:100vh;display:flex}
 .ms{font-family:'Material Symbols Outlined';font-style:normal;display:inline-block;line-height:1;text-transform:none;letter-spacing:normal;white-space:nowrap;font-variation-settings:'FILL' 0,'wght' 300}
-
-/* -- LOGIN -- */
 #login-screen{position:fixed;inset:0;background:#0a0908;display:flex;align-items:center;justify-content:center;z-index:1000}
 .login-card{background:#1a1917;border:1px solid rgba(80,72,64,.4);border-radius:20px;padding:40px;width:360px}
 .login-card h1{font-family:'Manrope',sans-serif;font-size:22px;font-weight:800;color:#ffe2ab;margin-bottom:4px}
@@ -19,11 +17,7 @@ body{background:#0a0908;color:#e8e4dc;font-family:'DM Sans',sans-serif;min-heigh
 .inp:focus{border-color:rgba(255,191,0,.4)}
 .btn-gold{width:100%;background:linear-gradient(135deg,#ffe2ab,#ffbf00);color:#2a1a00;font-family:'Manrope',sans-serif;font-weight:700;font-size:13px;text-transform:uppercase;letter-spacing:.1em;border:none;border-radius:10px;padding:13px;cursor:pointer;margin-top:4px}
 #login-error{color:#e24b4a;font-size:12px;margin-top:8px;display:none}
-
-/* -- LAYOUT -- */
 #app{display:none;width:100%;min-height:100vh}
-
-/* -- SIDEBAR -- */
 aside{width:220px;background:#0f0e0d;border-right:1px solid rgba(80,72,64,.2);display:flex;flex-direction:column;position:fixed;top:0;bottom:0;left:0;z-index:100}
 .sidebar-logo{padding:20px 18px 16px;border-bottom:1px solid rgba(80,72,64,.2)}
 .sidebar-logo h1{font-family:'Manrope',sans-serif;font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.2em;color:#ffe2ab}
@@ -39,12 +33,11 @@ aside{width:220px;background:#0f0e0d;border-right:1px solid rgba(80,72,64,.2);di
 .sidebar-footer{padding:14px 16px;border-top:1px solid rgba(80,72,64,.2)}
 .sidebar-user{display:flex;align-items:center;gap:10px}
 .sidebar-avatar{width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,#ffe2ab,#ffbf00);display:flex;align-items:center;justify-content:center;font-family:'Manrope',sans-serif;font-weight:800;font-size:11px;color:#2a1a00;flex-shrink:0}
-.sidebar-user-name{font-size:12px;font-weight:600;color:#e8e4dc;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.sidebar-user-info{flex:1;min-width:0}
+.sidebar-user-name{font-size:12px;font-weight:600;color:#e8e4dc;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .sidebar-user-role{font-size:10px;color:#504840}
 .sign-out-btn{background:none;border:none;cursor:pointer;color:#504840;display:flex;padding:2px}
 .sign-out-btn:hover{color:#e24b4a}
-
-/* -- MAIN -- */
 main{margin-left:220px;flex:1;padding:28px 32px;min-height:100vh}
 .page{display:none}
 .page.active{display:block;animation:fadeIn .2s ease}
@@ -52,20 +45,15 @@ main{margin-left:220px;flex:1;padding:28px 32px;min-height:100vh}
 .page-header{margin-bottom:24px}
 .page-header h2{font-family:'Manrope',sans-serif;font-size:24px;font-weight:800;color:#e8e4dc}
 .page-header p{font-size:13px;color:#7a7060;margin-top:4px}
-
-/* -- STAT CARDS -- */
 .stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:24px}
 .stat-card{background:#1a1917;border:1px solid rgba(80,72,64,.25);border-radius:14px;padding:18px}
 .stat-label{font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:#7a7060;margin-bottom:6px}
 .stat-value{font-family:'Manrope',sans-serif;font-size:28px;font-weight:800;color:#ffbf00;line-height:1}
 .stat-sub{font-size:11px;color:#504840;margin-top:4px}
 .stat-card.highlight{border-color:rgba(255,191,0,.2);background:rgba(255,191,0,.04)}
-
-/* -- TABLES -- */
 .table-card{background:#1a1917;border:1px solid rgba(80,72,64,.25);border-radius:14px;overflow:hidden;margin-bottom:20px}
 .table-header{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid rgba(80,72,64,.2)}
 .table-title{font-family:'Manrope',sans-serif;font-size:14px;font-weight:700;color:#e8e4dc}
-.table-actions{display:flex;gap:8px;align-items:center}
 .search-inp{background:#0f0e0d;border:1px solid rgba(80,72,64,.3);border-radius:8px;padding:6px 12px;color:#e8e4dc;font-size:12px;font-family:'DM Sans',sans-serif;outline:none;width:200px}
 .search-inp:focus{border-color:rgba(255,191,0,.3)}
 table{width:100%;border-collapse:collapse}
@@ -74,58 +62,41 @@ td{padding:12px 16px;font-size:13px;color:#e8e4dc;border-bottom:1px solid rgba(8
 tr:last-child td{border-bottom:none}
 tr:hover td{background:rgba(255,226,171,.02)}
 .td-muted{color:#7a7060;font-size:12px}
-.td-mono{font-family:monospace;font-size:11px;color:#7a7060}
-
-/* -- STATUS PILLS -- */
 .pill{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:99px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.04em}
 .pill-pending{background:rgba(255,191,0,.12);color:#ffbf00}
 .pill-approved{background:rgba(99,153,34,.15);color:#7ab840}
 .pill-rejected{background:rgba(226,75,74,.12);color:#e24b4a}
 .pill-new{background:rgba(55,138,221,.15);color:#6ab0f0}
-.pill-resolved{background:rgba(80,72,64,.25);color:#7a7060}
-
-/* -- ACTION BUTTONS -- */
-.act-btn{background:none;border:1px solid rgba(80,72,64,.3);border-radius:6px;padding:4px 10px;font-size:11px;color:#7a7060;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .15s}
+.act-btn{background:none;border:1px solid rgba(80,72,64,.3);border-radius:6px;padding:4px 10px;font-size:11px;color:#7a7060;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .15s;margin-right:4px}
 .act-btn:hover{color:#e8e4dc;border-color:rgba(80,72,64,.6)}
 .act-btn.approve{border-color:rgba(99,153,34,.3);color:#7ab840}
 .act-btn.approve:hover{background:rgba(99,153,34,.1)}
 .act-btn.reject{border-color:rgba(226,75,74,.2);color:#e24b4a}
 .act-btn.reject:hover{background:rgba(226,75,74,.08)}
-.act-btn.danger{border-color:rgba(226,75,74,.2);color:#e24b4a}
-
-/* -- LOADING -- */
 .loading{text-align:center;padding:40px;color:#504840;font-size:13px}
 .empty-state{text-align:center;padding:48px;color:#504840}
 .empty-state .ms{font-size:40px;display:block;margin-bottom:10px;color:#3d3a35}
-
-/* -- CHART AREA -- */
 .chart-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:20px}
 .chart-card{background:#1a1917;border:1px solid rgba(80,72,64,.25);border-radius:14px;padding:20px}
 .chart-title{font-family:'Manrope',sans-serif;font-size:13px;font-weight:700;color:#e8e4dc;margin-bottom:16px}
 .bar-row{display:flex;align-items:center;gap:10px;margin-bottom:8px}
-.bar-label{font-size:11px;color:#7a7060;width:90px;text-align:right;flex-shrink:0}
+.bar-label{font-size:11px;color:#7a7060;width:100px;text-align:right;flex-shrink:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .bar-track{flex:1;height:6px;background:#2a2825;border-radius:3px;overflow:hidden}
-.bar-fill{height:100%;background:linear-gradient(90deg,#ffe2ab,#ffbf00);border-radius:3px;transition:width .6s ease}
+.bar-fill{height:100%;background:linear-gradient(90deg,#ffe2ab,#ffbf00);border-radius:3px}
 .bar-count{font-size:11px;color:#504840;width:30px;text-align:right;flex-shrink:0}
-
-/* -- SECURITY SECTION -- */
+.check-ok{color:#7ab840}
+.check-warn{color:#ffbf00}
 .security-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:20px}
 .security-card{background:#1a1917;border:1px solid rgba(80,72,64,.25);border-radius:14px;padding:18px}
 .security-card h3{font-family:'Manrope',sans-serif;font-size:13px;font-weight:700;color:#e8e4dc;margin-bottom:12px;display:flex;align-items:center;gap:8px}
 .check-item{display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:1px solid rgba(80,72,64,.1);font-size:12px}
 .check-item:last-child{border-bottom:none}
-.check-ok{color:#7ab840}
-.check-warn{color:#ffbf00}
-.check-fail{color:#e24b4a}
-
-/* -- TOAST -- */
 #toast{position:fixed;bottom:24px;right:24px;background:#ffe2ab;color:#2a1a00;padding:10px 18px;border-radius:10px;font-size:12px;font-weight:600;opacity:0;transition:opacity .25s;pointer-events:none;z-index:9999}
 #toast.show{opacity:1}
 </style>
 </head>
 <body>
 
-<!-- LOGIN -->
 <div id="login-screen">
   <div class="login-card">
     <h1>The Modern Cask</h1>
@@ -133,54 +104,47 @@ tr:hover td{background:rgba(255,226,171,.02)}
     <input class="inp" id="login-email" type="email" placeholder="Admin email" autocomplete="email"/>
     <input class="inp" id="login-password" type="password" placeholder="Password" autocomplete="current-password"/>
     <button class="btn-gold" onclick="doLogin()">Sign In</button>
-    <p id="login-error">Invalid credentials</p>
+    <p id="login-error">Invalid credentials or access denied</p>
   </div>
 </div>
 
-<!-- APP -->
 <div id="app">
-  <!-- Sidebar -->
   <aside>
     <div class="sidebar-logo">
       <h1>The Modern Cask</h1>
       <p>Admin Panel</p>
     </div>
-
     <nav class="sidebar-nav">
       <div class="nav-section">Overview</div>
       <div class="nav-item active" data-page="dashboard" onclick="showPage('dashboard')">
         <span class="ms">dashboard</span> Dashboard
       </div>
-
       <div class="nav-section">Users</div>
       <div class="nav-item" data-page="users" onclick="showPage('users')">
         <span class="ms">group</span> Users
-        <span class="nav-badge" id="badge-users">--</span>
+        <span class="nav-badge" id="badge-users">-</span>
       </div>
       <div class="nav-item" data-page="checkins" onclick="showPage('checkins')">
         <span class="ms">history</span> Check-ins
-        <span class="nav-badge" id="badge-checkins">--</span>
+        <span class="nav-badge" id="badge-checkins">-</span>
       </div>
-
       <div class="nav-section">Content</div>
       <div class="nav-item" data-page="whiskies" onclick="showPage('whiskies')">
         <span class="ms">liquor</span> Whiskies
-        <span class="nav-badge" id="badge-whiskies">--</span>
+        <span class="nav-badge" id="badge-whiskies">-</span>
       </div>
       <div class="nav-item" data-page="submissions" onclick="showPage('submissions')">
         <span class="ms">add_circle</span> Submissions
-        <span class="nav-badge red" id="badge-submissions">--</span>
+        <span class="nav-badge red" id="badge-submissions">-</span>
       </div>
-
       <div class="nav-section">Moderation</div>
       <div class="nav-item" data-page="reports" onclick="showPage('reports')">
         <span class="ms">flag</span> Reports
-        <span class="nav-badge red" id="badge-reports">--</span>
+        <span class="nav-badge red" id="badge-reports">-</span>
       </div>
       <div class="nav-item" data-page="profiles" onclick="showPage('profiles')">
         <span class="ms">manage_accounts</span> Profiles
       </div>
-
       <div class="nav-section">System</div>
       <div class="nav-item" data-page="security" onclick="showPage('security')">
         <span class="ms">security</span> Security
@@ -189,12 +153,11 @@ tr:hover td{background:rgba(255,226,171,.02)}
         <span class="ms">sync</span> DB Sync
       </div>
     </nav>
-
     <div class="sidebar-footer">
       <div class="sidebar-user">
         <div class="sidebar-avatar" id="sidebar-initials">?</div>
-        <div>
-          <div class="sidebar-user-name" id="sidebar-email">Loading...</div>
+        <div class="sidebar-user-info">
+          <div class="sidebar-user-name" id="sidebar-email">-</div>
           <div class="sidebar-user-role">Administrator</div>
         </div>
         <button class="sign-out-btn" onclick="doSignOut()" title="Sign out">
@@ -204,22 +167,15 @@ tr:hover td{background:rgba(255,226,171,.02)}
     </div>
   </aside>
 
-  <!-- Main content -->
   <main>
-
-    <!-- DASHBOARD -->
     <div class="page active" id="page-dashboard">
-      <div class="page-header">
-        <h2>Dashboard</h2>
-        <p>Real-time overview of The Modern Cask</p>
+      <div class="page-header"><h2>Dashboard</h2><p>Real-time overview of The Modern Cask</p></div>
+      <div class="stats-grid">
+        <div class="stat-card"><div class="stat-label">Users</div><div class="stat-value" id="stat-users">-</div><div class="stat-sub">with profiles</div></div>
+        <div class="stat-card highlight"><div class="stat-label">Check-ins</div><div class="stat-value" id="stat-checkins">-</div><div class="stat-sub">drams logged</div></div>
+        <div class="stat-card"><div class="stat-label">Whiskies</div><div class="stat-value" id="stat-whiskies">-</div><div class="stat-sub">in database</div></div>
+        <div class="stat-card"><div class="stat-label">Pending</div><div class="stat-value" id="stat-pending">-</div><div class="stat-sub">submissions + reports</div></div>
       </div>
-      <div class="stats-grid" id="dash-stats">
-        <div class="stat-card"><div class="stat-label">Total Users</div><div class="stat-value" id="stat-users">--</div><div class="stat-sub">registered accounts</div></div>
-        <div class="stat-card highlight"><div class="stat-label">Total Check-ins</div><div class="stat-value" id="stat-checkins">--</div><div class="stat-sub">drams logged</div></div>
-        <div class="stat-card"><div class="stat-label">Whiskies</div><div class="stat-value" id="stat-whiskies">--</div><div class="stat-sub">in database</div></div>
-        <div class="stat-card"><div class="stat-label">Pending Review</div><div class="stat-value" id="stat-pending">--</div><div class="stat-sub">submissions + reports</div></div>
-      </div>
-
       <div class="chart-row">
         <div class="chart-card">
           <div class="chart-title">Top regions by check-ins</div>
@@ -232,549 +188,464 @@ tr:hover td{background:rgba(255,226,171,.02)}
       </div>
     </div>
 
-    <!-- USERS -->
     <div class="page" id="page-users">
-      <div class="page-header">
-        <h2>Users</h2>
-        <p>All registered accounts</p>
-      </div>
+      <div class="page-header"><h2>Users</h2><p>Registered accounts with profiles</p></div>
       <div class="table-card">
         <div class="table-header">
           <span class="table-title">Accounts</span>
-          <div class="table-actions">
-            <input class="search-inp" placeholder="Search users..." oninput="filterTable('users-table', this.value)"/>
-          </div>
+          <input class="search-inp" placeholder="Search users..." oninput="filterTable('users-table', this.value)"/>
         </div>
         <div id="users-table-wrap"><div class="loading">Loading...</div></div>
       </div>
     </div>
 
-    <!-- CHECK-INS -->
     <div class="page" id="page-checkins">
-      <div class="page-header">
-        <h2>Check-ins</h2>
-        <p>All dram occasions logged by users</p>
-      </div>
+      <div class="page-header"><h2>Check-ins</h2><p>All dram occasions logged</p></div>
       <div class="table-card">
         <div class="table-header">
           <span class="table-title">Dram log</span>
-          <div class="table-actions">
-            <input class="search-inp" placeholder="Search check-ins..." oninput="filterTable('checkins-table', this.value)"/>
-          </div>
+          <input class="search-inp" placeholder="Search check-ins..." oninput="filterTable('checkins-table', this.value)"/>
         </div>
         <div id="checkins-table-wrap"><div class="loading">Loading...</div></div>
       </div>
     </div>
 
-    <!-- WHISKIES -->
     <div class="page" id="page-whiskies">
-      <div class="page-header">
-        <h2>Whiskies</h2>
-        <p>Database of all whiskies</p>
-      </div>
-      <div style="display:flex;gap:10px;margin-bottom:16px">
-        <button class="act-btn" onclick="triggerSync()" style="padding:8px 16px;font-size:12px;display:flex;align-items:center;gap:6px"><span class="ms" style="font-size:16px">sync</span> Sync from API</button>
-        <span id="sync-status" style="font-size:12px;color:#504840;align-self:center"></span>
+      <div class="page-header"><h2>Whiskies</h2><p>Full database</p></div>
+      <div style="display:flex;gap:10px;margin-bottom:16px;align-items:center">
+        <button class="act-btn" onclick="triggerSync()" style="padding:8px 16px;font-size:12px">Sync from API</button>
+        <span id="sync-status" style="font-size:12px;color:#504840"></span>
       </div>
       <div class="table-card">
         <div class="table-header">
           <span class="table-title">Whisky database</span>
-          <div class="table-actions">
-            <input class="search-inp" placeholder="Search whiskies..." oninput="filterTable('whiskies-table', this.value)"/>
-          </div>
+          <input class="search-inp" placeholder="Search whiskies..." oninput="filterTable('whiskies-table', this.value)"/>
         </div>
         <div id="whiskies-table-wrap"><div class="loading">Loading...</div></div>
       </div>
     </div>
 
-    <!-- SUBMISSIONS -->
     <div class="page" id="page-submissions">
-      <div class="page-header">
-        <h2>Submissions</h2>
-        <p>User-submitted whiskies pending review</p>
-      </div>
+      <div class="page-header"><h2>Submissions</h2><p>User-submitted whiskies for review</p></div>
       <div class="table-card">
-        <div class="table-header">
-          <span class="table-title">Pending submissions</span>
-        </div>
+        <div class="table-header"><span class="table-title">All submissions</span></div>
         <div id="submissions-table-wrap"><div class="loading">Loading...</div></div>
       </div>
     </div>
 
-    <!-- REPORTS -->
     <div class="page" id="page-reports">
-      <div class="page-header">
-        <h2>Reports</h2>
-        <p>User-reported data issues</p>
-      </div>
+      <div class="page-header"><h2>Reports</h2><p>User-reported data issues</p></div>
       <div class="table-card">
-        <div class="table-header">
-          <span class="table-title">Flagged items</span>
-        </div>
+        <div class="table-header"><span class="table-title">Flagged items</span></div>
         <div id="reports-table-wrap"><div class="loading">Loading...</div></div>
       </div>
     </div>
 
-    <!-- PROFILES -->
     <div class="page" id="page-profiles">
-      <div class="page-header">
-        <h2>Profiles</h2>
-        <p>User profile data and preferences</p>
-      </div>
+      <div class="page-header"><h2>Profiles</h2><p>User profile data</p></div>
       <div class="table-card">
         <div class="table-header">
           <span class="table-title">User profiles</span>
-          <div class="table-actions">
-            <input class="search-inp" placeholder="Search profiles..." oninput="filterTable('profiles-table', this.value)"/>
-          </div>
+          <input class="search-inp" placeholder="Search profiles..." oninput="filterTable('profiles-table', this.value)"/>
         </div>
         <div id="profiles-table-wrap"><div class="loading">Loading...</div></div>
       </div>
     </div>
 
-    <!-- SECURITY -->
     <div class="page" id="page-security">
-      <div class="page-header">
-        <h2>Security</h2>
-        <p>Privacy and security configuration status</p>
-      </div>
+      <div class="page-header"><h2>Security</h2><p>Privacy and security status</p></div>
       <div class="security-grid">
         <div class="security-card">
           <h3><span class="ms check-ok" style="font-size:18px;font-variation-settings:'FILL' 1">verified_user</span> Authentication</h3>
           <div class="check-item"><span class="ms check-ok" style="font-size:16px">check_circle</span> Google OAuth enabled</div>
-          <div class="check-item"><span class="ms check-ok" style="font-size:16px">check_circle</span> Session auto-refresh</div>
+          <div class="check-item"><span class="ms check-ok" style="font-size:16px">check_circle</span> Session auto-refresh active</div>
           <div class="check-item"><span class="ms check-ok" style="font-size:16px">check_circle</span> Redirect URLs configured</div>
           <div class="check-item"><span class="ms check-ok" style="font-size:16px">check_circle</span> PKCE flow enabled</div>
         </div>
         <div class="security-card">
-          <h3><span class="ms check-ok" style="font-size:18px;font-variation-settings:'FILL' 1">lock</span> Database (RLS)</h3>
-          <div class="check-item"><span class="ms check-ok" style="font-size:16px">check_circle</span> checkins -- users see own data only</div>
-          <div class="check-item"><span class="ms check-ok" style="font-size:16px">check_circle</span> profiles -- users see own data only</div>
+          <h3><span class="ms check-ok" style="font-size:18px;font-variation-settings:'FILL' 1">lock</span> Database RLS</h3>
+          <div class="check-item"><span class="ms check-ok" style="font-size:16px">check_circle</span> checkins -- own data only</div>
+          <div class="check-item"><span class="ms check-ok" style="font-size:16px">check_circle</span> profiles -- own data only</div>
           <div class="check-item"><span class="ms check-ok" style="font-size:16px">check_circle</span> whiskies -- public read, no write</div>
-          <div class="check-item"><span class="ms check-warn" style="font-size:16px">warning</span> whisky_requests -- anon insert allowed*</div>
-          <div class="check-item"><span class="ms check-warn" style="font-size:16px">warning</span> feedback -- anon insert allowed*</div>
-          <div style="font-size:10px;color:#504840;margin-top:8px">* Required for guest submissions. Consider rate limiting.</div>
+          <div class="check-item"><span class="ms check-warn" style="font-size:16px">warning</span> whisky_requests -- anon insert allowed</div>
+          <div class="check-item"><span class="ms check-warn" style="font-size:16px">warning</span> feedback -- anon insert allowed</div>
         </div>
         <div class="security-card">
-          <h3><span class="ms check-ok" style="font-size:18px;font-variation-settings:'FILL' 1">storage</span> Storage</h3>
-          <div class="check-item"><span class="ms check-ok" style="font-size:16px">check_circle</span> avatars -- auth write, public read</div>
-          <div class="check-item"><span class="ms check-ok" style="font-size:16px">check_circle</span> avatars -- 2MB file size limit</div>
+          <h3><span class="ms check-ok" style="font-size:18px;font-variation-settings:'FILL' 1">storage</span> Storage Buckets</h3>
+          <div class="check-item"><span class="ms check-ok" style="font-size:16px">check_circle</span> avatars -- auth write, public read, 2MB limit</div>
           <div class="check-item"><span class="ms check-ok" style="font-size:16px">check_circle</span> stamps -- public read only</div>
           <div class="check-item"><span class="ms check-ok" style="font-size:16px">check_circle</span> badges -- public read only</div>
           <div class="check-item"><span class="ms check-ok" style="font-size:16px">check_circle</span> logo -- public read only</div>
         </div>
         <div class="security-card">
           <h3><span class="ms check-ok" style="font-size:18px;font-variation-settings:'FILL' 1">shield</span> App Security</h3>
-          <div class="check-item"><span class="ms check-ok" style="font-size:16px">check_circle</span> HTTPS enforced (Netlify)</div>
+          <div class="check-item"><span class="ms check-ok" style="font-size:16px">check_circle</span> HTTPS enforced via Netlify</div>
           <div class="check-item"><span class="ms check-ok" style="font-size:16px">check_circle</span> Security headers configured</div>
-          <div class="check-item"><span class="ms check-ok" style="font-size:16px">check_circle</span> Anon key only (no service key in app)</div>
-          <div class="check-item"><span class="ms check-ok" style="font-size:16px">check_circle</span> No PII in localStorage beyond email</div>
+          <div class="check-item"><span class="ms check-ok" style="font-size:16px">check_circle</span> Anon key only in frontend</div>
           <div class="check-item"><span class="ms check-warn" style="font-size:16px">warning</span> Rate limiting not yet configured</div>
         </div>
       </div>
-
       <div class="table-card">
-        <div class="table-header"><span class="table-title">Recommended actions before public launch</span></div>
+        <div class="table-header"><span class="table-title">Pre-launch action items</span></div>
         <table>
-          <thead><tr><th>Priority</th><th>Action</th><th>How</th><th>Status</th></tr></thead>
+          <thead><tr><th>Priority</th><th>Action</th><th>Where</th><th>Status</th></tr></thead>
           <tbody>
-            <tr><td><span class="pill pill-rejected">High</span></td><td>Enable Supabase rate limiting on anon inserts</td><td>Supabase → Database → Rate Limits</td><td><span class="pill pill-pending">Pending</span></td></tr>
-            <tr><td><span class="pill pill-rejected">High</span></td><td>Add email allowlist or domain restriction for admin</td><td>This panel's login check</td><td><span class="pill pill-pending">Pending</span></td></tr>
-            <tr><td><span class="pill pill-pending">Medium</span></td><td>Set up Supabase auth email templates</td><td>Supabase → Auth → Email Templates</td><td><span class="pill pill-pending">Pending</span></td></tr>
-            <tr><td><span class="pill pill-pending">Medium</span></td><td>Configure nightly Edge Function cron</td><td>Supabase → Edge Functions → Schedule</td><td><span class="pill pill-pending">Pending</span></td></tr>
+            <tr><td><span class="pill pill-rejected">High</span></td><td>Enable Supabase rate limiting on anon inserts</td><td>Supabase Dashboard -- Rate Limits</td><td><span class="pill pill-pending">Pending</span></td></tr>
+            <tr><td><span class="pill pill-pending">Medium</span></td><td>Configure nightly Edge Function cron</td><td>Supabase -- Edge Functions -- Schedule</td><td><span class="pill pill-pending">Pending</span></td></tr>
+            <tr><td><span class="pill pill-pending">Medium</span></td><td>Set up auth email templates</td><td>Supabase -- Auth -- Email Templates</td><td><span class="pill pill-pending">Pending</span></td></tr>
             <tr><td><span class="pill pill-approved">Low</span></td><td>Add privacy policy page</td><td>Static page linked from profile</td><td><span class="pill pill-pending">Pending</span></td></tr>
           </tbody>
         </table>
       </div>
     </div>
 
-    <!-- SYNC -->
     <div class="page" id="page-sync">
-      <div class="page-header">
-        <h2>Database Sync</h2>
-        <p>Sync whiskies from WHISKY:EDITION API into Supabase</p>
-      </div>
+      <div class="page-header"><h2>DB Sync</h2><p>Sync whiskies from WHISKY:EDITION API</p></div>
       <div class="stats-grid" style="grid-template-columns:repeat(3,1fr)">
-        <div class="stat-card"><div class="stat-label">Whiskies in DB</div><div class="stat-value" id="sync-count">--</div><div class="stat-sub">from last sync</div></div>
-        <div class="stat-card"><div class="stat-label">API Total</div><div class="stat-value">389</div><div class="stat-sub">available from API</div></div>
-        <div class="stat-card"><div class="stat-label">Last Sync</div><div class="stat-value" id="sync-last" style="font-size:16px;padding-top:6px">--</div><div class="stat-sub">run manually or on schedule</div></div>
+        <div class="stat-card"><div class="stat-label">Whiskies in DB</div><div class="stat-value" id="sync-count">-</div></div>
+        <div class="stat-card"><div class="stat-label">API Total</div><div class="stat-value">389</div></div>
+        <div class="stat-card"><div class="stat-label">Last Sync</div><div class="stat-value" id="sync-last" style="font-size:16px;padding-top:6px">-</div></div>
       </div>
       <div class="table-card" style="padding:24px">
-        <div class="chart-title" style="margin-bottom:16px">Manual sync</div>
-        <p style="font-size:13px;color:#7a7060;margin-bottom:20px;line-height:1.6">Fetches all whiskies from thewhiskyedition.com and upserts them into your Supabase <code style="background:#0f0e0d;padding:2px 6px;border-radius:4px;font-size:11px">whiskies</code> table. Safe to run anytime -- uses upsert so no duplicates.</p>
-        <button class="btn-gold" style="width:auto;padding:12px 28px" onclick="triggerSync()">
-          Run Sync Now
-        </button>
+        <div class="chart-title" style="margin-bottom:12px">Manual sync</div>
+        <p style="font-size:13px;color:#7a7060;margin-bottom:20px;line-height:1.6">Fetches all whiskies from thewhiskyedition.com and upserts into Supabase. Safe to run anytime.</p>
+        <button class="btn-gold" style="width:auto;padding:12px 28px" onclick="triggerSync()">Run Sync Now</button>
         <p id="sync-result" style="font-size:12px;color:#7ab840;margin-top:12px;display:none"></p>
       </div>
     </div>
-
   </main>
 </div>
 
 <div id="toast"></div>
 
 <script>
-const SB_URL = 'https://nluezhsmgwuqdryarrmd.supabase.co'
-const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5sdWV6aHNtZ3d1cWRyeWFycm1kIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU0MDMyODMsImV4cCI6MjA5MDk3OTI4M30.61Gt5y8k46nIBjtlpyu3n2B4RVcHpPYI1WBRoqnTOYM'
-
-// Admin emails allowed (add more as needed)
-const ADMIN_EMAILS = ['hugo@humanplusmachine.io', 'hugopontopinto@gmail.com', 'hugo@getremyai.com']
-
-let SESSION = null
+var SB_URL = 'https://nluezhsmgwuqdryarrmd.supabase.co';
+var SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5sdWV6aHNtZ3d1cWRyeWFycm1kIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU0MDMyODMsImV4cCI6MjA5MDk3OTI4M30.61Gt5y8k46nIBjtlpyu3n2B4RVcHpPYI1WBRoqnTOYM';
+var ADMIN_EMAILS = ['hugo@humanplusmachine.io', 'hugopontopinto@gmail.com', 'hugo@getremyai.com'];
+var SESSION = null;
+var pageLoaded = {};
 
 function hdrs(token) {
   return {
     'apikey': SB_KEY,
-    'Authorization': `Bearer ${token || SB_KEY}`,
+    'Authorization': 'Bearer ' + (token || SB_KEY),
     'Content-Type': 'application/json'
-  }
-}
-
-async function sbGet(path, params = '') {
-  const r = await fetch(`${SB_URL}/rest/v1/${path}${params}`, { headers: hdrs(SESSION?.access_token) })
-  return r.json()
+  };
 }
 
 function toast(msg) {
-  const t = document.getElementById('toast')
-  t.textContent = msg
-  t.classList.add('show')
-  setTimeout(() => t.classList.remove('show'), 2400)
+  var t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(function() { t.classList.remove('show'); }, 2400);
 }
 
-// -- AUTH --
-async function doLogin() {
-  const email = document.getElementById('login-email').value.trim()
-  const password = document.getElementById('login-password').value
-  document.getElementById('login-error').style.display = 'none'
+function setEl(id, val) {
+  var el = document.getElementById(id);
+  if (el) el.textContent = val;
+}
 
-  const r = await fetch(`${SB_URL}/auth/v1/token?grant_type=password`, {
+async function sbGet(path, params) {
+  params = params || '';
+  var r = await fetch(SB_URL + '/rest/v1/' + path + params, { headers: hdrs(SESSION && SESSION.access_token) });
+  if (!r.ok) return [];
+  return r.json();
+}
+
+async function doLogin() {
+  var email = document.getElementById('login-email').value.trim();
+  var password = document.getElementById('login-password').value;
+  document.getElementById('login-error').style.display = 'none';
+
+  var r = await fetch(SB_URL + '/auth/v1/token?grant_type=password', {
     method: 'POST',
     headers: { 'apikey': SB_KEY, 'Content-Type': 'application/json' },
-    body: JSON.stringify({ email, password })
-  })
-  const data = await r.json()
+    body: JSON.stringify({ email: email, password: password })
+  });
+  var data = await r.json();
 
   if (!data.access_token) {
-    document.getElementById('login-error').style.display = 'block'
-    return
+    document.getElementById('login-error').style.display = 'block';
+    return;
   }
 
-  // Check admin email
-  if (!ADMIN_EMAILS.includes(email.toLowerCase())) {
-    document.getElementById('login-error').textContent = 'Access restricted to administrators'
-    document.getElementById('login-error').style.display = 'block'
-    return
+  if (ADMIN_EMAILS.indexOf(email.toLowerCase()) === -1) {
+    document.getElementById('login-error').textContent = 'Access restricted to administrators';
+    document.getElementById('login-error').style.display = 'block';
+    return;
   }
 
-  SESSION = data
-  document.getElementById('login-screen').style.display = 'none'
-  document.getElementById('app').style.display = 'flex'
-
-  // Set sidebar user info
-  const initials = email.substring(0, 2).toUpperCase()
-  document.getElementById('sidebar-initials').textContent = initials
-  document.getElementById('sidebar-email').textContent = email
-
-  loadAllData()
+  SESSION = data;
+  document.getElementById('login-screen').style.display = 'none';
+  document.getElementById('app').style.display = 'flex';
+  setEl('sidebar-initials', email.substring(0, 2).toUpperCase());
+  setEl('sidebar-email', email);
+  loadAllData();
 }
 
 async function doSignOut() {
-  await fetch(`${SB_URL}/auth/v1/logout`, { method: 'POST', headers: hdrs(SESSION?.access_token) })
-  SESSION = null
-  document.getElementById('app').style.display = 'none'
-  document.getElementById('login-screen').style.display = 'flex'
+  SESSION = null;
+  document.getElementById('app').style.display = 'none';
+  document.getElementById('login-screen').style.display = 'flex';
 }
 
-// Enter key on login
-document.getElementById('login-password').addEventListener('keydown', e => { if (e.key === 'Enter') doLogin() })
+document.getElementById('login-password').addEventListener('keydown', function(e) {
+  if (e.key === 'Enter') doLogin();
+});
 
-// -- NAVIGATION --
 function showPage(page) {
-  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'))
-  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'))
-  document.getElementById('page-' + page).classList.add('active')
-  document.querySelector(`[data-page="${page}"]`).classList.add('active')
-  loadPage(page)
+  document.querySelectorAll('.page').forEach(function(p) { p.classList.remove('active'); });
+  document.querySelectorAll('.nav-item').forEach(function(n) { n.classList.remove('active'); });
+  var pageEl = document.getElementById('page-' + page);
+  if (pageEl) pageEl.classList.add('active');
+  var navEl = document.querySelector('[data-page="' + page + '"]');
+  if (navEl) navEl.classList.add('active');
+  if (!pageLoaded[page]) {
+    pageLoaded[page] = true;
+    loadPage(page);
+  }
 }
 
-// -- DATA LOADING --
+async function getCount(table, filter) {
+  filter = filter || '';
+  var r = await fetch(SB_URL + '/rest/v1/' + table + '?select=id' + filter, {
+    headers: Object.assign({}, hdrs(SESSION && SESSION.access_token), { 'Prefer': 'count=exact', 'Range': '0-0' })
+  });
+  var cr = r.headers.get('content-range');
+  return cr ? parseInt(cr.split('/')[1]) || 0 : 0;
+}
+
 async function loadAllData() {
-  const counts = await getCounts()
+  var counts = await Promise.all([
+    getCount('profiles'),
+    getCount('checkins'),
+    getCount('whiskies'),
+    getCount('whisky_requests', '&status=eq.pending'),
+    getCount('feedback')
+  ]);
 
-  document.getElementById('stat-users').textContent = counts.profiles || '--'
-  document.getElementById('stat-checkins').textContent = counts.checkins || '--'
-  document.getElementById('stat-whiskies').textContent = counts.whiskies || '--'
-  document.getElementById('stat-pending').textContent = (counts.submissions_pending || 0) + (counts.reports_new || 0)
+  setEl('stat-users', counts[0]);
+  setEl('stat-checkins', counts[1]);
+  setEl('stat-whiskies', counts[2]);
+  setEl('stat-pending', counts[3] + counts[4]);
+  setEl('badge-users', counts[0]);
+  setEl('badge-checkins', counts[1]);
+  setEl('badge-whiskies', counts[2]);
+  setEl('badge-submissions', counts[3]);
+  setEl('badge-reports', counts[4]);
+  setEl('sync-count', counts[2]);
 
-  document.getElementById('badge-users').textContent = counts.profiles || '--'
-  document.getElementById('badge-checkins').textContent = counts.checkins || '--'
-  document.getElementById('badge-whiskies').textContent = counts.whiskies || '--'
-  document.getElementById('badge-submissions').textContent = counts.submissions_pending || '0'
-  document.getElementById('badge-reports').textContent = counts.reports_new || '0'
-  document.getElementById('sync-count').textContent = counts.whiskies || '--'
-
-  loadDashboard(counts)
+  loadDashboard();
 }
 
-async function getCounts() {
-  const heads = await Promise.all([
-    fetch(`${SB_URL}/rest/v1/profiles?select=id`, { headers: { ...hdrs(SESSION?.access_token), 'Prefer': 'count=exact', 'Range': '0-0' } }),
-    fetch(`${SB_URL}/rest/v1/checkins?select=id`, { headers: { ...hdrs(SESSION?.access_token), 'Prefer': 'count=exact', 'Range': '0-0' } }),
-    fetch(`${SB_URL}/rest/v1/whiskies?select=id`, { headers: { ...hdrs(SESSION?.access_token), 'Prefer': 'count=exact', 'Range': '0-0' } }),
-    fetch(`${SB_URL}/rest/v1/whisky_requests?select=id&status=eq.pending`, { headers: { ...hdrs(SESSION?.access_token), 'Prefer': 'count=exact', 'Range': '0-0' } }),
-    fetch(`${SB_URL}/rest/v1/feedback?select=id`, { headers: { ...hdrs(SESSION?.access_token), 'Prefer': 'count=exact', 'Range': '0-0' } }),
-  ])
-  const extract = h => {
-    const cr = h.headers.get('content-range')
-    return cr ? parseInt(cr.split('/')[1]) : 0
-  }
-  return {
-    profiles: extract(heads[0]),
-    checkins: extract(heads[1]),
-    whiskies: extract(heads[2]),
-    submissions_pending: extract(heads[3]),
-    reports_new: extract(heads[4]),
-  }
-}
+async function loadDashboard() {
+  var checkins = await sbGet('checkins', '?select=whisky_region,whisky_name,date,rating&order=date.desc&limit=200');
 
-async function loadDashboard(counts) {
-  // Region chart
-  const checkins = await sbGet('checkins', '?select=whisky_region&limit=500')
-  const regionCounts = {}
-  checkins.forEach(c => { if (c.whisky_region) regionCounts[c.whisky_region] = (regionCounts[c.whisky_region] || 0) + 1 })
-  const sorted = Object.entries(regionCounts).sort((a,b) => b[1]-a[1]).slice(0, 8)
-  const max = sorted[0]?.[1] || 1
-  const chartEl = document.getElementById('region-chart')
-  if (!sorted.length) { chartEl.innerHTML = '<div class="empty-state"><span class="ms">bar_chart</span>No check-in data yet</div>'; }
-  else {
-    chartEl.innerHTML = sorted.map(([region, count]) =>
-      `<div class="bar-row">
-        <span class="bar-label">${region}</span>
-        <div class="bar-track"><div class="bar-fill" style="width:${Math.round(count/max*100)}%"></div></div>
-        <span class="bar-count">${count}</span>
-      </div>`
-    ).join('')
+  var regionCounts = {};
+  checkins.forEach(function(c) {
+    if (c.whisky_region) regionCounts[c.whisky_region] = (regionCounts[c.whisky_region] || 0) + 1;
+  });
+  var sorted = Object.entries(regionCounts).sort(function(a, b) { return b[1] - a[1]; }).slice(0, 8);
+  var max = sorted.length ? sorted[0][1] : 1;
+
+  var chartEl = document.getElementById('region-chart');
+  if (!sorted.length) {
+    chartEl.innerHTML = '<div class="empty-state"><span class="ms">bar_chart</span>No check-in data yet</div>';
+  } else {
+    chartEl.innerHTML = sorted.map(function(item) {
+      var region = item[0], count = item[1];
+      var pct = Math.round(count / max * 100);
+      return '<div class="bar-row"><span class="bar-label">' + region + '</span><div class="bar-track"><div class="bar-fill" style="width:' + pct + '%"></div></div><span class="bar-count">' + count + '</span></div>';
+    }).join('');
   }
 
-  // Recent activity
-  const recent = await sbGet('checkins', '?select=whisky_name,whisky_region,date,rating&order=date.desc&limit=8')
-  const actEl = document.getElementById('recent-activity')
-  if (!recent.length) { actEl.innerHTML = '<div class="empty-state"><span class="ms">history</span>No activity yet</div>' }
-  else {
-    actEl.innerHTML = recent.map(c =>
-      `<div style="display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid rgba(80,72,64,.1);font-size:12px">
-        <div>
-          <span style="color:#e8e4dc;font-weight:500">${c.whisky_name || '--'}</span>
-          <span style="color:#504840;margin-left:6px">${c.whisky_region || ''}</span>
-        </div>
-        <span style="color:#7a7060">${c.rating ? '*'.repeat(c.rating) : '--'}</span>
-      </div>`
-    ).join('')
+  var recent = checkins.slice(0, 8);
+  var actEl = document.getElementById('recent-activity');
+  if (!recent.length) {
+    actEl.innerHTML = '<div class="empty-state"><span class="ms">history</span>No activity yet</div>';
+  } else {
+    actEl.innerHTML = recent.map(function(c) {
+      var stars = c.rating ? new Array(c.rating + 1).join('*') : '-';
+      return '<div style="display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid rgba(80,72,64,.1);font-size:12px"><div><span style="color:#e8e4dc;font-weight:500">' + (c.whisky_name || '-') + '</span><span style="color:#504840;margin-left:6px">' + (c.whisky_region || '') + '</span></div><span style="color:#7a7060">' + stars + '</span></div>';
+    }).join('');
   }
 }
 
-let pageLoaded = {}
 async function loadPage(page) {
-  if (pageLoaded[page]) return
-  pageLoaded[page] = true
-
-  if (page === 'users') await loadUsers()
-  if (page === 'checkins') await loadCheckins()
-  if (page === 'whiskies') await loadWhiskies()
-  if (page === 'submissions') await loadSubmissions()
-  if (page === 'reports') await loadReports()
-  if (page === 'profiles') await loadProfiles()
-  if (page === 'sync') {
-    const c = await getCounts()
-    document.getElementById('sync-count').textContent = c.whiskies
-  }
+  if (page === 'users') await loadUsers();
+  else if (page === 'checkins') await loadCheckins();
+  else if (page === 'whiskies') await loadWhiskies();
+  else if (page === 'submissions') await loadSubmissions();
+  else if (page === 'reports') await loadReports();
+  else if (page === 'profiles') await loadProfiles();
 }
 
 async function loadUsers() {
-  const wrap = document.getElementById('users-table-wrap')
-  const [profiles, allCheckins] = await Promise.all([
+  var wrap = document.getElementById('users-table-wrap');
+  var results = await Promise.all([
     sbGet('profiles', '?select=id,full_name,bio,favourite_region,avatar_url,updated_at&order=updated_at.desc&limit=100'),
     sbGet('checkins', '?select=user_id&limit=2000')
-  ])
-  const checkinCounts = {}
-  allCheckins.forEach(c => { if (c.user_id) checkinCounts[c.user_id] = (checkinCounts[c.user_id] || 0) + 1 })
-  if (!profiles.length) { wrap.innerHTML = '<div class="empty-state"><span class="ms">group</span>No user profiles yet -- users appear here after editing their profile</div>'; return }
-  const rows = profiles.map(u => `<tr>
-    <td><div style="font-weight:600">${u.full_name || '--'}</div>${u.bio ? '<div class="td-muted" style="font-size:11px">' + u.bio.substring(0,60) + '</div>' : ''}</td>
-    <td class="td-muted">${u.favourite_region || '--'}</td>
-    <td style="font-family:'Manrope',sans-serif;font-weight:700;color:#ffbf00">${checkinCounts[u.id] || 0}</td>
-    <td>${u.avatar_url ? '<span class="ms check-ok" style="font-size:16px;font-variation-settings:'\''FILL'\'' 1">account_circle</span>' : '--'}</td>
-    <td class="td-muted">${u.updated_at ? new Date(u.updated_at).toLocaleDateString('en-GB') : '--'}</td>
-  </tr>`).join('')
-  wrap.innerHTML = `<table id="users-table"><thead><tr><th>Name</th><th>Favourite Region</th><th>Drams</th><th>Avatar</th><th>Last Active</th></tr></thead><tbody>${rows}</tbody></table>`
+  ]);
+  var profiles = results[0];
+  var allCheckins = results[1];
+
+  var checkinCounts = {};
+  allCheckins.forEach(function(c) {
+    if (c.user_id) checkinCounts[c.user_id] = (checkinCounts[c.user_id] || 0) + 1;
+  });
+
+  if (!profiles.length) {
+    wrap.innerHTML = '<div class="empty-state"><span class="ms">group</span>No profiles yet -- users appear after editing their profile</div>';
+    return;
+  }
+
+  var rows = profiles.map(function(u) {
+    var name = u.full_name || '-';
+    var bio = u.bio ? u.bio.substring(0, 50) : '-';
+    var region = u.favourite_region || '-';
+    var drams = checkinCounts[u.id] || 0;
+    var avatar = u.avatar_url ? 'Yes' : 'No';
+    var date = u.updated_at ? new Date(u.updated_at).toLocaleDateString('en-GB') : '-';
+    return '<tr><td style="font-weight:600">' + name + '<div class="td-muted" style="font-size:11px">' + bio + '</div></td><td class="td-muted">' + region + '</td><td style="font-family:Manrope,sans-serif;font-weight:700;color:#ffbf00">' + drams + '</td><td class="td-muted">' + avatar + '</td><td class="td-muted">' + date + '</td></tr>';
+  }).join('');
+
+  wrap.innerHTML = '<table id="users-table"><thead><tr><th>Name</th><th>Fav Region</th><th>Drams</th><th>Avatar</th><th>Last Active</th></tr></thead><tbody>' + rows + '</tbody></table>';
 }
 
 async function loadCheckins() {
-  const data = await sbGet('checkins', '?select=id,whisky_name,whisky_region,rating,location,date,owned,user_id&order=date.desc&limit=100')
-  const wrap = document.getElementById('checkins-table-wrap')
-  if (!data.length) { wrap.innerHTML = '<div class="empty-state"><span class="ms">history</span>No check-ins yet</div>'; return }
-  wrap.innerHTML = `<table id="checkins-table">
-    <thead><tr><th>Whisky</th><th>Region</th><th>Rating</th><th>Location</th><th>Owned</th><th>Date</th></tr></thead>
-    <tbody>${data.map(c => `
-      <tr>
-        <td style="font-weight:500">${c.whisky_name || '--'}</td>
-        <td class="td-muted">${c.whisky_region || '--'}</td>
-        <td>${c.rating ? '*'.repeat(c.rating) + '<span style="color:#3d3a35">*'.repeat(5-c.rating)+'</span>' : '--'}</td>
-        <td class="td-muted">${c.location || '--'}</td>
-        <td>${c.owned ? '<span class="ms" style="font-size:16px;color:#ffbf00;font-variation-settings:\'FILL\' 1">liquor</span>' : '--'}</td>
-        <td class="td-muted">${new Date(c.date).toLocaleDateString('en-GB')}</td>
-      </tr>`).join('')}
-    </tbody>
-  </table>`
+  var wrap = document.getElementById('checkins-table-wrap');
+  var data = await sbGet('checkins', '?select=id,whisky_name,whisky_region,rating,location,date,owned&order=date.desc&limit=100');
+  if (!data.length) {
+    wrap.innerHTML = '<div class="empty-state"><span class="ms">history</span>No check-ins yet</div>';
+    return;
+  }
+  var rows = data.map(function(c) {
+    var stars = c.rating ? new Array(c.rating + 1).join('*') : '-';
+    var date = new Date(c.date).toLocaleDateString('en-GB');
+    var owned = c.owned ? 'Yes' : 'No';
+    return '<tr><td style="font-weight:500">' + (c.whisky_name || '-') + '</td><td class="td-muted">' + (c.whisky_region || '-') + '</td><td>' + stars + '</td><td class="td-muted">' + (c.location || '-') + '</td><td class="td-muted">' + owned + '</td><td class="td-muted">' + date + '</td></tr>';
+  }).join('');
+  wrap.innerHTML = '<table id="checkins-table"><thead><tr><th>Whisky</th><th>Region</th><th>Rating</th><th>Location</th><th>Owned</th><th>Date</th></tr></thead><tbody>' + rows + '</tbody></table>';
 }
 
 async function loadWhiskies() {
-  const data = await sbGet('whiskies', '?select=id,name,metadata,rating&order=name&limit=200')
-  const wrap = document.getElementById('whiskies-table-wrap')
-  if (!data.length) { wrap.innerHTML = '<div class="empty-state"><span class="ms">liquor</span>No whiskies yet -- run a sync</div>'; return }
-  wrap.innerHTML = `<table id="whiskies-table">
-    <thead><tr><th>Name</th><th>Distillery</th><th>Region</th><th>Age</th><th>ABV</th><th>Rating</th></tr></thead>
-    <tbody>${data.map(w => {
-      const m = w.metadata || {}
-      const score = w.rating?.marcel && w.rating?.sascha ? ((w.rating.marcel + w.rating.sascha)/2).toFixed(1) : '--'
-      return `<tr>
-        <td style="font-weight:500">${w.name}</td>
-        <td class="td-muted">${m.distillery || '--'}</td>
-        <td class="td-muted">${m.region || '--'}</td>
-        <td class="td-muted">${m.age ? m.age + 'yr' : 'NAS'}</td>
-        <td class="td-muted">${m.abv ? m.abv + '%' : '--'}</td>
-        <td style="color:#ffbf00;font-weight:700;font-family:'Manrope',sans-serif">${score}</td>
-      </tr>`
-    }).join('')}
-    </tbody>
-  </table>`
+  var wrap = document.getElementById('whiskies-table-wrap');
+  var data = await sbGet('whiskies', '?select=id,name,metadata,rating&order=name&limit=200');
+  if (!data.length) {
+    wrap.innerHTML = '<div class="empty-state"><span class="ms">liquor</span>No whiskies -- run a sync</div>';
+    return;
+  }
+  var rows = data.map(function(w) {
+    var m = w.metadata || {};
+    var score = (w.rating && w.rating.marcel && w.rating.sascha) ? ((w.rating.marcel + w.rating.sascha) / 2).toFixed(1) : '-';
+    return '<tr><td style="font-weight:500">' + w.name + '</td><td class="td-muted">' + (m.distillery || '-') + '</td><td class="td-muted">' + (m.region || '-') + '</td><td class="td-muted">' + (m.age ? m.age + 'yr' : 'NAS') + '</td><td class="td-muted">' + (m.abv ? m.abv + '%' : '-') + '</td><td style="color:#ffbf00;font-weight:700">' + score + '</td></tr>';
+  }).join('');
+  wrap.innerHTML = '<table id="whiskies-table"><thead><tr><th>Name</th><th>Distillery</th><th>Region</th><th>Age</th><th>ABV</th><th>Score</th></tr></thead><tbody>' + rows + '</tbody></table>';
 }
 
 async function loadSubmissions() {
-  const wrap = document.getElementById('submissions-table-wrap')
-  const data = await sbGet('whisky_requests', '?select=*&order=date.desc&limit=100')
-  if (!data || !data.length || (data.message && data.code)) {
-    wrap.innerHTML = '<div class="empty-state"><span class="ms">add_circle</span>No submissions yet</div>'
-    return
+  var wrap = document.getElementById('submissions-table-wrap');
+  var data = await sbGet('whisky_requests', '?select=id,name,distillery,region,country,submitted_by,status,date&order=date.desc&limit=100');
+  if (!data || !data.length) {
+    wrap.innerHTML = '<div class="empty-state"><span class="ms">add_circle</span>No submissions yet</div>';
+    return;
   }
-  const rows = data.map(s => {
-    const statusClass = s.status === 'pending' ? 'pending' : s.status === 'approved' ? 'approved' : 'rejected'
-    const actions = s.status === 'pending'
-      ? `<button class="act-btn approve" onclick="reviewSubmission('${s.id}', 'approved')">Approve</button>
-         <button class="act-btn reject" onclick="reviewSubmission('${s.id}', 'rejected')">Reject</button>`
-      : '<span style="color:#504840;font-size:11px">Reviewed</span>'
-    return `<tr id="sub-row-${s.id}">
-      <td style="font-weight:500">${s.name || '--'}</td>
-      <td class="td-muted">${s.distillery || '--'}</td>
-      <td class="td-muted">${s.region || '--'}${s.country ? ' . ' + s.country : ''}</td>
-      <td class="td-muted">${s.submitted_by || 'anonymous'}</td>
-      <td><span class="pill pill-${statusClass}">${s.status}</span></td>
-      <td style="display:flex;gap:6px">${actions}</td>
-    </tr>`
-  }).join('')
-  wrap.innerHTML = `<table><thead><tr><th>Whisky</th><th>Distillery</th><th>Region</th><th>Submitted by</th><th>Status</th><th>Actions</th></tr></thead><tbody>${rows}</tbody></table>`
+  var rows = data.map(function(s) {
+    var statusClass = s.status === 'approved' ? 'approved' : s.status === 'rejected' ? 'rejected' : 'pending';
+    var actions = s.status === 'pending'
+      ? '<button class="act-btn approve" onclick="reviewSubmission(\'' + s.id + '\', \'approved\')">Approve</button><button class="act-btn reject" onclick="reviewSubmission(\'' + s.id + '\', \'rejected\')">Reject</button>'
+      : '<span style="color:#504840;font-size:11px">Reviewed</span>';
+    return '<tr id="sub-row-' + s.id + '"><td style="font-weight:500">' + (s.name || '-') + '</td><td class="td-muted">' + (s.distillery || '-') + '</td><td class="td-muted">' + (s.region || '-') + '</td><td class="td-muted">' + (s.submitted_by || 'anon') + '</td><td><span class="pill pill-' + statusClass + '">' + (s.status || 'pending') + '</span></td><td>' + actions + '</td></tr>';
+  }).join('');
+  wrap.innerHTML = '<table><thead><tr><th>Whisky</th><th>Distillery</th><th>Region</th><th>Submitted by</th><th>Status</th><th>Actions</th></tr></thead><tbody>' + rows + '</tbody></table>';
 }
 
 async function reviewSubmission(id, status) {
-  const r = await fetch(`${SB_URL}/rest/v1/whisky_requests?id=eq.${id}`, {
+  await fetch(SB_URL + '/rest/v1/whisky_requests?id=eq.' + id, {
     method: 'PATCH',
-    headers: { ...hdrs(SESSION?.access_token), 'Prefer': 'return=minimal', 'Content-Type': 'application/json' },
-    body: JSON.stringify({ status })
-  })
-  const row = document.getElementById('sub-row-' + id)
+    headers: Object.assign({}, hdrs(SESSION && SESSION.access_token), { 'Prefer': 'return=minimal' }),
+    body: JSON.stringify({ status: status })
+  });
+  var row = document.getElementById('sub-row-' + id);
   if (row) {
-    const pill = row.querySelector('.pill')
-    if (pill) { pill.className = 'pill pill-' + (status === 'approved' ? 'approved' : 'rejected'); pill.textContent = status }
-    row.querySelectorAll('.act-btn').forEach(b => b.remove())
-    const td = row.querySelector('td:last-child')
-    if (td) td.innerHTML = '<span style="color:#504840;font-size:11px">Reviewed</span>'
+    var pill = row.querySelector('.pill');
+    if (pill) { pill.className = 'pill pill-' + (status === 'approved' ? 'approved' : 'rejected'); pill.textContent = status; }
+    var actBtns = row.querySelectorAll('.act-btn');
+    actBtns.forEach(function(b) { b.remove(); });
+    var lastTd = row.querySelector('td:last-child');
+    if (lastTd) lastTd.innerHTML = '<span style="color:#504840;font-size:11px">Reviewed</span>';
   }
-  toast(status === 'approved' ? 'Approved v' : 'Rejected')
+  toast(status === 'approved' ? 'Approved' : 'Rejected');
 }
 
 async function loadReports() {
-  const data = await sbGet('feedback', '?select=*&order=date.desc&limit=100')
-  const wrap = document.getElementById('reports-table-wrap')
-  if (!data.length) { wrap.innerHTML = '<div class="empty-state"><span class="ms">flag</span>No reports yet</div>'; return }
-  wrap.innerHTML = `<table>
-    <thead><tr><th>Whisky</th><th>Issue type</th><th>Notes</th><th>Date</th><th>Actions</th></tr></thead>
-    <tbody>${data.map(r => `
-      <tr id="rep-row-${r.id}">
-        <td style="font-weight:500">${r.whisky_name || '--'}</td>
-        <td><span class="pill pill-new">${r.type?.replace(/_/g,' ') || '--'}</span></td>
-        <td class="td-muted" style="max-width:240px">${r.notes || '--'}</td>
-        <td class="td-muted">${new Date(r.date).toLocaleDateString('en-GB')}</td>
-        <td><button class="act-btn" onclick="resolveReport(${r.id})">Resolve</button></td>
-      </tr>`).join('')}
-    </tbody>
-  </table>`
+  var wrap = document.getElementById('reports-table-wrap');
+  var data = await sbGet('feedback', '?select=id,whisky_name,type,notes,date&order=date.desc&limit=100');
+  if (!data || !data.length) {
+    wrap.innerHTML = '<div class="empty-state"><span class="ms">flag</span>No reports yet</div>';
+    return;
+  }
+  var rows = data.map(function(r) {
+    var date = new Date(r.date).toLocaleDateString('en-GB');
+    var type = (r.type || '-').replace(/_/g, ' ');
+    return '<tr id="rep-row-' + r.id + '"><td style="font-weight:500">' + (r.whisky_name || '-') + '</td><td><span class="pill pill-new">' + type + '</span></td><td class="td-muted" style="max-width:240px">' + (r.notes || '-') + '</td><td class="td-muted">' + date + '</td><td><button class="act-btn" onclick="resolveReport(' + r.id + ')">Resolve</button></td></tr>';
+  }).join('');
+  wrap.innerHTML = '<table><thead><tr><th>Whisky</th><th>Type</th><th>Notes</th><th>Date</th><th>Action</th></tr></thead><tbody>' + rows + '</tbody></table>';
 }
 
 async function resolveReport(id) {
-  await fetch(`${SB_URL}/rest/v1/feedback?id=eq.${id}`, {
+  await fetch(SB_URL + '/rest/v1/feedback?id=eq.' + id, {
     method: 'DELETE',
-    headers: hdrs(SESSION?.access_token)
-  })
-  document.getElementById(`rep-row-${id}`)?.remove()
-  toast('Report resolved')
+    headers: hdrs(SESSION && SESSION.access_token)
+  });
+  var row = document.getElementById('rep-row-' + id);
+  if (row) row.remove();
+  toast('Report resolved');
 }
 
 async function loadProfiles() {
-  const data = await sbGet('profiles', '?select=*&order=updated_at.desc&limit=100')
-  const wrap = document.getElementById('profiles-table-wrap')
-  if (!data.length) { wrap.innerHTML = '<div class="empty-state"><span class="ms">manage_accounts</span>No profiles yet</div>'; return }
-  wrap.innerHTML = `<table id="profiles-table">
-    <thead><tr><th>Name</th><th>Favourite Region</th><th>Has Avatar</th><th>Has Bio</th><th>Updated</th></tr></thead>
-    <tbody>${data.map(p => `
-      <tr>
-        <td style="font-weight:500">${p.full_name || '--'}</td>
-        <td class="td-muted">${p.favourite_region || '--'}</td>
-        <td>${p.avatar_url ? '<span class="ms check-ok" style="font-size:16px">check_circle</span>' : '--'}</td>
-        <td>${p.bio ? '<span class="ms check-ok" style="font-size:16px">check_circle</span>' : '--'}</td>
-        <td class="td-muted">${p.updated_at ? new Date(p.updated_at).toLocaleDateString('en-GB') : '--'}</td>
-      </tr>`).join('')}
-    </tbody>
-  </table>`
-}
-
-// -- SYNC --
-async function triggerSync() {
-  const btn = document.querySelector('[onclick="triggerSync()"]')
-  if (btn) { btn.disabled = true; btn.textContent = 'Syncing...' }
-  document.getElementById('sync-status') && (document.getElementById('sync-status').textContent = 'Running sync...')
-
-  try {
-    const r = await fetch(`${SB_URL}/functions/v1/sync-whiskies`, {
-      method: 'POST',
-      headers: { 'Authorization': `Bearer ${SESSION?.access_token || SB_KEY}`, 'Content-Type': 'application/json' }
-    })
-    const data = await r.json()
-    const msg = data.success ? `v Synced ${data.synced} whiskies` : `Error: ${data.error}`
-    if (document.getElementById('sync-result')) {
-      document.getElementById('sync-result').textContent = msg
-      document.getElementById('sync-result').style.display = 'block'
-    }
-    if (document.getElementById('sync-status')) document.getElementById('sync-status').textContent = msg
-    document.getElementById('sync-last').textContent = new Date().toLocaleTimeString('en-GB')
-    toast(msg)
-    pageLoaded['whiskies'] = false
-  } catch (e) {
-    toast('Sync failed: ' + e.message)
+  var wrap = document.getElementById('profiles-table-wrap');
+  var data = await sbGet('profiles', '?select=id,full_name,bio,favourite_region,avatar_url,updated_at&order=updated_at.desc&limit=100');
+  if (!data.length) {
+    wrap.innerHTML = '<div class="empty-state"><span class="ms">manage_accounts</span>No profiles yet</div>';
+    return;
   }
-
-  if (btn) { btn.disabled = false; btn.innerHTML = '<span class="ms" style="font-size:16px">sync</span> Sync from API' }
+  var rows = data.map(function(p) {
+    var date = p.updated_at ? new Date(p.updated_at).toLocaleDateString('en-GB') : '-';
+    return '<tr><td style="font-weight:500">' + (p.full_name || '-') + '</td><td class="td-muted">' + (p.favourite_region || '-') + '</td><td class="td-muted">' + (p.avatar_url ? 'Yes' : 'No') + '</td><td class="td-muted">' + (p.bio ? 'Yes' : 'No') + '</td><td class="td-muted">' + date + '</td></tr>';
+  }).join('');
+  wrap.innerHTML = '<table id="profiles-table"><thead><tr><th>Name</th><th>Fav Region</th><th>Avatar</th><th>Bio</th><th>Updated</th></tr></thead><tbody>' + rows + '</tbody></table>';
 }
 
-// -- TABLE FILTER --
+async function triggerSync() {
+  var statusEl = document.getElementById('sync-status');
+  if (statusEl) statusEl.textContent = 'Syncing...';
+  var resultEl = document.getElementById('sync-result');
+  try {
+    var r = await fetch(SB_URL + '/functions/v1/sync-whiskies', {
+      method: 'POST',
+      headers: { 'Authorization': 'Bearer ' + ((SESSION && SESSION.access_token) || SB_KEY), 'Content-Type': 'application/json' }
+    });
+    var data = await r.json();
+    var msg = data.success ? 'Synced ' + data.synced + ' whiskies' : 'Error: ' + data.error;
+    if (statusEl) statusEl.textContent = msg;
+    if (resultEl) { resultEl.textContent = msg; resultEl.style.display = 'block'; }
+    setEl('sync-last', new Date().toLocaleTimeString('en-GB'));
+    toast(msg);
+    pageLoaded['whiskies'] = false;
+  } catch(e) {
+    if (statusEl) statusEl.textContent = 'Sync failed';
+    toast('Sync failed: ' + e.message);
+  }
+}
+
 function filterTable(tableId, query) {
-  const table = document.getElementById(tableId)
-  if (!table) return
-  const q = query.toLowerCase()
-  table.querySelectorAll('tbody tr').forEach(row => {
-    row.style.display = row.textContent.toLowerCase().includes(q) ? '' : 'none'
-  })
+  var table = document.getElementById(tableId);
+  if (!table) return;
+  var q = query.toLowerCase();
+  table.querySelectorAll('tbody tr').forEach(function(row) {
+    row.style.display = row.textContent.toLowerCase().indexOf(q) !== -1 ? '' : 'none';
+  });
 }
 </script>
 </body>
