@@ -50,7 +50,7 @@ main{margin-left:220px;flex:1;padding:28px 32px;min-height:100vh}
 .stat-label{font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:#7a7060;margin-bottom:6px}
 .stat-value{font-family:'Manrope',sans-serif;font-size:28px;font-weight:800;color:#ffbf00;line-height:1}
 .stat-sub{font-size:11px;color:#504840;margin-top:4px}
-.stat-card.highlight{border-color:rgba(255,191,0,.2);background:rgba(255,191,0,.04)}
+.stat-card.hi{border-color:rgba(255,191,0,.2);background:rgba(255,191,0,.04)}
 .table-card{background:#1a1917;border:1px solid rgba(80,72,64,.25);border-radius:14px;overflow:hidden;margin-bottom:20px}
 .table-header{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid rgba(80,72,64,.2)}
 .table-title{font-family:'Manrope',sans-serif;font-size:14px;font-weight:700;color:#e8e4dc}
@@ -61,8 +61,8 @@ th{padding:10px 16px;text-align:left;font-size:9px;text-transform:uppercase;lett
 td{padding:12px 16px;font-size:13px;color:#e8e4dc;border-bottom:1px solid rgba(80,72,64,.1)}
 tr:last-child td{border-bottom:none}
 tr:hover td{background:rgba(255,226,171,.02)}
-.td-muted{color:#7a7060;font-size:12px}
-.pill{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:99px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.04em}
+.td-m{color:#7a7060;font-size:12px}
+.pill{display:inline-flex;align-items:center;padding:3px 10px;border-radius:99px;font-size:10px;font-weight:700;text-transform:uppercase}
 .pill-pending{background:rgba(255,191,0,.12);color:#ffbf00}
 .pill-approved{background:rgba(99,153,34,.15);color:#7ab840}
 .pill-rejected{background:rgba(226,75,74,.12);color:#e24b4a}
@@ -74,8 +74,8 @@ tr:hover td{background:rgba(255,226,171,.02)}
 .act-btn.reject{border-color:rgba(226,75,74,.2);color:#e24b4a}
 .act-btn.reject:hover{background:rgba(226,75,74,.08)}
 .loading{text-align:center;padding:40px;color:#504840;font-size:13px}
-.empty-state{text-align:center;padding:48px;color:#504840}
-.empty-state .ms{font-size:40px;display:block;margin-bottom:10px;color:#3d3a35}
+.empty{text-align:center;padding:48px;color:#504840}
+.empty .ms{font-size:40px;display:block;margin-bottom:10px;color:#3d3a35}
 .chart-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:20px}
 .chart-card{background:#1a1917;border:1px solid rgba(80,72,64,.25);border-radius:14px;padding:20px}
 .chart-title{font-family:'Manrope',sans-serif;font-size:13px;font-weight:700;color:#e8e4dc;margin-bottom:16px}
@@ -84,13 +84,13 @@ tr:hover td{background:rgba(255,226,171,.02)}
 .bar-track{flex:1;height:6px;background:#2a2825;border-radius:3px;overflow:hidden}
 .bar-fill{height:100%;background:linear-gradient(90deg,#ffe2ab,#ffbf00);border-radius:3px}
 .bar-count{font-size:11px;color:#504840;width:30px;text-align:right;flex-shrink:0}
-.check-ok{color:#7ab840}
-.check-warn{color:#ffbf00}
-.security-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:20px}
-.security-card{background:#1a1917;border:1px solid rgba(80,72,64,.25);border-radius:14px;padding:18px}
-.security-card h3{font-family:'Manrope',sans-serif;font-size:13px;font-weight:700;color:#e8e4dc;margin-bottom:12px;display:flex;align-items:center;gap:8px}
-.check-item{display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:1px solid rgba(80,72,64,.1);font-size:12px}
-.check-item:last-child{border-bottom:none}
+.sec-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:20px}
+.sec-card{background:#1a1917;border:1px solid rgba(80,72,64,.25);border-radius:14px;padding:18px}
+.sec-card h3{font-family:'Manrope',sans-serif;font-size:13px;font-weight:700;color:#e8e4dc;margin-bottom:12px;display:flex;align-items:center;gap:8px}
+.chk{display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:1px solid rgba(80,72,64,.1);font-size:12px}
+.chk:last-child{border-bottom:none}
+.ok{color:#7ab840}
+.warn{color:#ffbf00}
 #toast{position:fixed;bottom:24px;right:24px;background:#ffe2ab;color:#2a1a00;padding:10px 18px;border-radius:10px;font-size:12px;font-weight:600;opacity:0;transition:opacity .25s;pointer-events:none;z-index:9999}
 #toast.show{opacity:1}
 </style>
@@ -169,10 +169,10 @@ tr:hover td{background:rgba(255,226,171,.02)}
 
   <main>
     <div class="page active" id="page-dashboard">
-      <div class="page-header"><h2>Dashboard</h2><p>Real-time overview of The Modern Cask</p></div>
+      <div class="page-header"><h2>Dashboard</h2><p>Live overview of The Modern Cask</p></div>
       <div class="stats-grid">
-        <div class="stat-card"><div class="stat-label">Users</div><div class="stat-value" id="stat-users">-</div><div class="stat-sub">with profiles</div></div>
-        <div class="stat-card highlight"><div class="stat-label">Check-ins</div><div class="stat-value" id="stat-checkins">-</div><div class="stat-sub">drams logged</div></div>
+        <div class="stat-card"><div class="stat-label">Profiles</div><div class="stat-value" id="stat-users">-</div><div class="stat-sub">registered users</div></div>
+        <div class="stat-card hi"><div class="stat-label">Check-ins</div><div class="stat-value" id="stat-checkins">-</div><div class="stat-sub">drams logged</div></div>
         <div class="stat-card"><div class="stat-label">Whiskies</div><div class="stat-value" id="stat-whiskies">-</div><div class="stat-sub">in database</div></div>
         <div class="stat-card"><div class="stat-label">Pending</div><div class="stat-value" id="stat-pending">-</div><div class="stat-sub">submissions + reports</div></div>
       </div>
@@ -193,7 +193,7 @@ tr:hover td{background:rgba(255,226,171,.02)}
       <div class="table-card">
         <div class="table-header">
           <span class="table-title">Accounts</span>
-          <input class="search-inp" placeholder="Search users..." oninput="filterTable('users-table', this.value)"/>
+          <input class="search-inp" placeholder="Search..." oninput="filterTable('users-table', this.value)"/>
         </div>
         <div id="users-table-wrap"><div class="loading">Loading...</div></div>
       </div>
@@ -204,7 +204,7 @@ tr:hover td{background:rgba(255,226,171,.02)}
       <div class="table-card">
         <div class="table-header">
           <span class="table-title">Dram log</span>
-          <input class="search-inp" placeholder="Search check-ins..." oninput="filterTable('checkins-table', this.value)"/>
+          <input class="search-inp" placeholder="Search..." oninput="filterTable('checkins-table', this.value)"/>
         </div>
         <div id="checkins-table-wrap"><div class="loading">Loading...</div></div>
       </div>
@@ -219,7 +219,7 @@ tr:hover td{background:rgba(255,226,171,.02)}
       <div class="table-card">
         <div class="table-header">
           <span class="table-title">Whisky database</span>
-          <input class="search-inp" placeholder="Search whiskies..." oninput="filterTable('whiskies-table', this.value)"/>
+          <input class="search-inp" placeholder="Search..." oninput="filterTable('whiskies-table', this.value)"/>
         </div>
         <div id="whiskies-table-wrap"><div class="loading">Loading...</div></div>
       </div>
@@ -246,7 +246,7 @@ tr:hover td{background:rgba(255,226,171,.02)}
       <div class="table-card">
         <div class="table-header">
           <span class="table-title">User profiles</span>
-          <input class="search-inp" placeholder="Search profiles..." oninput="filterTable('profiles-table', this.value)"/>
+          <input class="search-inp" placeholder="Search..." oninput="filterTable('profiles-table', this.value)"/>
         </div>
         <div id="profiles-table-wrap"><div class="loading">Loading...</div></div>
       </div>
@@ -254,35 +254,35 @@ tr:hover td{background:rgba(255,226,171,.02)}
 
     <div class="page" id="page-security">
       <div class="page-header"><h2>Security</h2><p>Privacy and security status</p></div>
-      <div class="security-grid">
-        <div class="security-card">
-          <h3><span class="ms check-ok" style="font-size:18px;font-variation-settings:'FILL' 1">verified_user</span> Authentication</h3>
-          <div class="check-item"><span class="ms check-ok" style="font-size:16px">check_circle</span> Google OAuth enabled</div>
-          <div class="check-item"><span class="ms check-ok" style="font-size:16px">check_circle</span> Session auto-refresh active</div>
-          <div class="check-item"><span class="ms check-ok" style="font-size:16px">check_circle</span> Redirect URLs configured</div>
-          <div class="check-item"><span class="ms check-ok" style="font-size:16px">check_circle</span> PKCE flow enabled</div>
+      <div class="sec-grid">
+        <div class="sec-card">
+          <h3><span class="ms ok" style="font-size:18px;font-variation-settings:'FILL' 1">verified_user</span> Authentication</h3>
+          <div class="chk"><span class="ms ok" style="font-size:16px">check_circle</span> Google OAuth enabled</div>
+          <div class="chk"><span class="ms ok" style="font-size:16px">check_circle</span> Session auto-refresh active</div>
+          <div class="chk"><span class="ms ok" style="font-size:16px">check_circle</span> Redirect URLs configured</div>
+          <div class="chk"><span class="ms ok" style="font-size:16px">check_circle</span> PKCE flow enabled</div>
         </div>
-        <div class="security-card">
-          <h3><span class="ms check-ok" style="font-size:18px;font-variation-settings:'FILL' 1">lock</span> Database RLS</h3>
-          <div class="check-item"><span class="ms check-ok" style="font-size:16px">check_circle</span> checkins -- own data only</div>
-          <div class="check-item"><span class="ms check-ok" style="font-size:16px">check_circle</span> profiles -- own data only</div>
-          <div class="check-item"><span class="ms check-ok" style="font-size:16px">check_circle</span> whiskies -- public read, no write</div>
-          <div class="check-item"><span class="ms check-warn" style="font-size:16px">warning</span> whisky_requests -- anon insert allowed</div>
-          <div class="check-item"><span class="ms check-warn" style="font-size:16px">warning</span> feedback -- anon insert allowed</div>
+        <div class="sec-card">
+          <h3><span class="ms ok" style="font-size:18px;font-variation-settings:'FILL' 1">lock</span> Database RLS</h3>
+          <div class="chk"><span class="ms ok" style="font-size:16px">check_circle</span> checkins -- own data only</div>
+          <div class="chk"><span class="ms ok" style="font-size:16px">check_circle</span> profiles -- own data only</div>
+          <div class="chk"><span class="ms ok" style="font-size:16px">check_circle</span> whiskies -- public read, no write</div>
+          <div class="chk"><span class="ms warn" style="font-size:16px">warning</span> whisky_requests -- anon insert allowed</div>
+          <div class="chk"><span class="ms warn" style="font-size:16px">warning</span> feedback -- anon insert allowed</div>
         </div>
-        <div class="security-card">
-          <h3><span class="ms check-ok" style="font-size:18px;font-variation-settings:'FILL' 1">storage</span> Storage Buckets</h3>
-          <div class="check-item"><span class="ms check-ok" style="font-size:16px">check_circle</span> avatars -- auth write, public read, 2MB limit</div>
-          <div class="check-item"><span class="ms check-ok" style="font-size:16px">check_circle</span> stamps -- public read only</div>
-          <div class="check-item"><span class="ms check-ok" style="font-size:16px">check_circle</span> badges -- public read only</div>
-          <div class="check-item"><span class="ms check-ok" style="font-size:16px">check_circle</span> logo -- public read only</div>
+        <div class="sec-card">
+          <h3><span class="ms ok" style="font-size:18px;font-variation-settings:'FILL' 1">storage</span> Storage</h3>
+          <div class="chk"><span class="ms ok" style="font-size:16px">check_circle</span> avatars -- auth write, public read, 2MB limit</div>
+          <div class="chk"><span class="ms ok" style="font-size:16px">check_circle</span> stamps -- public read only</div>
+          <div class="chk"><span class="ms ok" style="font-size:16px">check_circle</span> badges -- public read only</div>
+          <div class="chk"><span class="ms ok" style="font-size:16px">check_circle</span> logo -- public read only</div>
         </div>
-        <div class="security-card">
-          <h3><span class="ms check-ok" style="font-size:18px;font-variation-settings:'FILL' 1">shield</span> App Security</h3>
-          <div class="check-item"><span class="ms check-ok" style="font-size:16px">check_circle</span> HTTPS enforced via Netlify</div>
-          <div class="check-item"><span class="ms check-ok" style="font-size:16px">check_circle</span> Security headers configured</div>
-          <div class="check-item"><span class="ms check-ok" style="font-size:16px">check_circle</span> Anon key only in frontend</div>
-          <div class="check-item"><span class="ms check-warn" style="font-size:16px">warning</span> Rate limiting not yet configured</div>
+        <div class="sec-card">
+          <h3><span class="ms ok" style="font-size:18px;font-variation-settings:'FILL' 1">shield</span> App Security</h3>
+          <div class="chk"><span class="ms ok" style="font-size:16px">check_circle</span> HTTPS enforced via Netlify</div>
+          <div class="chk"><span class="ms ok" style="font-size:16px">check_circle</span> Security headers configured</div>
+          <div class="chk"><span class="ms ok" style="font-size:16px">check_circle</span> Anon key only in frontend</div>
+          <div class="chk"><span class="ms warn" style="font-size:16px">warning</span> Rate limiting not yet configured</div>
         </div>
       </div>
       <div class="table-card">
@@ -290,10 +290,10 @@ tr:hover td{background:rgba(255,226,171,.02)}
         <table>
           <thead><tr><th>Priority</th><th>Action</th><th>Where</th><th>Status</th></tr></thead>
           <tbody>
-            <tr><td><span class="pill pill-rejected">High</span></td><td>Enable Supabase rate limiting on anon inserts</td><td>Supabase Dashboard -- Rate Limits</td><td><span class="pill pill-pending">Pending</span></td></tr>
-            <tr><td><span class="pill pill-pending">Medium</span></td><td>Configure nightly Edge Function cron</td><td>Supabase -- Edge Functions -- Schedule</td><td><span class="pill pill-pending">Pending</span></td></tr>
-            <tr><td><span class="pill pill-pending">Medium</span></td><td>Set up auth email templates</td><td>Supabase -- Auth -- Email Templates</td><td><span class="pill pill-pending">Pending</span></td></tr>
-            <tr><td><span class="pill pill-approved">Low</span></td><td>Add privacy policy page</td><td>Static page linked from profile</td><td><span class="pill pill-pending">Pending</span></td></tr>
+            <tr><td><span class="pill pill-rejected">High</span></td><td>Enable rate limiting on anon inserts</td><td>Supabase -- Rate Limits</td><td><span class="pill pill-pending">Pending</span></td></tr>
+            <tr><td><span class="pill pill-pending">Medium</span></td><td>Configure nightly Edge Function cron</td><td>Supabase -- Edge Functions</td><td><span class="pill pill-pending">Pending</span></td></tr>
+            <tr><td><span class="pill pill-pending">Medium</span></td><td>Set up auth email templates</td><td>Supabase -- Auth -- Templates</td><td><span class="pill pill-pending">Pending</span></td></tr>
+            <tr><td><span class="pill pill-approved">Low</span></td><td>Add privacy policy page</td><td>Static page in app</td><td><span class="pill pill-pending">Pending</span></td></tr>
           </tbody>
         </table>
       </div>
@@ -319,18 +319,16 @@ tr:hover td{background:rgba(255,226,171,.02)}
 <div id="toast"></div>
 
 <script>
-var SB_URL = 'https://nluezhsmgwuqdryarrmd.supabase.co';
-var SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5sdWV6aHNtZ3d1cWRyeWFycm1kIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU0MDMyODMsImV4cCI6MjA5MDk3OTI4M30.61Gt5y8k46nIBjtlpyu3n2B4RVcHpPYI1WBRoqnTOYM';
-var ADMIN_EMAILS = ['hugo@humanplusmachine.io', 'hugopontopinto@gmail.com', 'hugo@getremyai.com'];
-var SESSION = null;
+var SB = 'https://nluezhsmgwuqdryarrmd.supabase.co';
+var ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5sdWV6aHNtZ3d1cWRyeWFycm1kIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU0MDMyODMsImV4cCI6MjA5MDk3OTI4M30.61Gt5y8k46nIBjtlpyu3n2B4RVcHpPYI1WBRoqnTOYM';
+var SVC = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5sdWV6aHNtZ3d1cWRyeWFycm1kIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3NTQwMzI4MywiZXhwIjoyMDkwOTc5MjgzfQ.iAdgTh8_OK9iV_yqdWMourV2J2kR5ohdhwuYbQCEiRs';
+var ADMINS = ['hugo@humanplusmachine.io','hugopontopinto@gmail.com','hugo@getremyai.com'];
+var AUTH_TOKEN = null;
 var pageLoaded = {};
 
-function hdrs(token) {
-  return {
-    'apikey': SB_KEY,
-    'Authorization': 'Bearer ' + (token || SB_KEY),
-    'Content-Type': 'application/json'
-  };
+function hdr(useService) {
+  var key = useService ? SVC : ANON;
+  return { 'apikey': key, 'Authorization': 'Bearer ' + key, 'Content-Type': 'application/json' };
 }
 
 function toast(msg) {
@@ -340,90 +338,82 @@ function toast(msg) {
   setTimeout(function() { t.classList.remove('show'); }, 2400);
 }
 
-function setEl(id, val) {
-  var el = document.getElementById(id);
-  if (el) el.textContent = val;
+function el(id) { return document.getElementById(id); }
+function setEl(id, val) { var e = el(id); if (e) e.textContent = val; }
+
+async function api(path, params) {
+  params = params || '';
+  var r = await fetch(SB + '/rest/v1/' + path + params, { headers: hdr(true) });
+  if (!r.ok) return [];
+  var d = await r.json();
+  return Array.isArray(d) ? d : [];
 }
 
-async function sbGet(path, params) {
-  params = params || '';
-  var r = await fetch(SB_URL + '/rest/v1/' + path + params, { headers: hdrs(SESSION && SESSION.access_token) });
-  if (!r.ok) return [];
-  return r.json();
+async function count(table, filter) {
+  filter = filter || '';
+  var r = await fetch(SB + '/rest/v1/' + table + '?select=id' + filter, {
+    headers: Object.assign({}, hdr(true), { 'Prefer': 'count=exact', 'Range': '0-0' })
+  });
+  var cr = r.headers.get('content-range');
+  return cr ? (parseInt(cr.split('/')[1]) || 0) : 0;
 }
 
 async function doLogin() {
-  var email = document.getElementById('login-email').value.trim();
-  var password = document.getElementById('login-password').value;
-  document.getElementById('login-error').style.display = 'none';
+  var email = el('login-email').value.trim();
+  var pw = el('login-password').value;
+  el('login-error').style.display = 'none';
 
-  var r = await fetch(SB_URL + '/auth/v1/token?grant_type=password', {
+  var r = await fetch(SB + '/auth/v1/token?grant_type=password', {
     method: 'POST',
-    headers: { 'apikey': SB_KEY, 'Content-Type': 'application/json' },
-    body: JSON.stringify({ email: email, password: password })
+    headers: { 'apikey': ANON, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email: email, password: pw })
   });
   var data = await r.json();
 
   if (!data.access_token) {
-    document.getElementById('login-error').style.display = 'block';
+    el('login-error').textContent = 'Invalid email or password';
+    el('login-error').style.display = 'block';
+    return;
+  }
+  if (ADMINS.indexOf(email.toLowerCase()) === -1) {
+    el('login-error').textContent = 'Access restricted to administrators';
+    el('login-error').style.display = 'block';
     return;
   }
 
-  if (ADMIN_EMAILS.indexOf(email.toLowerCase()) === -1) {
-    document.getElementById('login-error').textContent = 'Access restricted to administrators';
-    document.getElementById('login-error').style.display = 'block';
-    return;
-  }
-
-  SESSION = data;
-  document.getElementById('login-screen').style.display = 'none';
-  document.getElementById('app').style.display = 'flex';
+  AUTH_TOKEN = data.access_token;
+  el('login-screen').style.display = 'none';
+  el('app').style.display = 'flex';
   setEl('sidebar-initials', email.substring(0, 2).toUpperCase());
   setEl('sidebar-email', email);
-  loadAllData();
+  loadAll();
 }
 
-async function doSignOut() {
-  SESSION = null;
-  document.getElementById('app').style.display = 'none';
-  document.getElementById('login-screen').style.display = 'flex';
+function doSignOut() {
+  AUTH_TOKEN = null;
+  pageLoaded = {};
+  el('app').style.display = 'none';
+  el('login-screen').style.display = 'flex';
 }
 
-document.getElementById('login-password').addEventListener('keydown', function(e) {
-  if (e.key === 'Enter') doLogin();
-});
+el('login-password').addEventListener('keydown', function(e) { if (e.key === 'Enter') doLogin(); });
 
 function showPage(page) {
   document.querySelectorAll('.page').forEach(function(p) { p.classList.remove('active'); });
   document.querySelectorAll('.nav-item').forEach(function(n) { n.classList.remove('active'); });
-  var pageEl = document.getElementById('page-' + page);
-  if (pageEl) pageEl.classList.add('active');
-  var navEl = document.querySelector('[data-page="' + page + '"]');
-  if (navEl) navEl.classList.add('active');
-  if (!pageLoaded[page]) {
-    pageLoaded[page] = true;
-    loadPage(page);
-  }
+  var pg = el('page-' + page); if (pg) pg.classList.add('active');
+  var nv = document.querySelector('[data-page="' + page + '"]'); if (nv) nv.classList.add('active');
+  if (!pageLoaded[page]) { pageLoaded[page] = true; loadPage(page); }
 }
 
-async function getCount(table, filter) {
-  filter = filter || '';
-  var r = await fetch(SB_URL + '/rest/v1/' + table + '?select=id' + filter, {
-    headers: Object.assign({}, hdrs(SESSION && SESSION.access_token), { 'Prefer': 'count=exact', 'Range': '0-0' })
-  });
-  var cr = r.headers.get('content-range');
-  return cr ? parseInt(cr.split('/')[1]) || 0 : 0;
-}
-
-async function loadAllData() {
+async function loadAll() {
   var counts = await Promise.all([
-    getCount('profiles'),
-    getCount('checkins'),
-    getCount('whiskies'),
-    getCount('whisky_requests', '&status=eq.pending'),
-    getCount('feedback')
+    count('profiles'),
+    count('checkins'),
+    count('whiskies'),
+    count('whisky_requests', '&status=eq.pending'),
+    count('feedback')
   ]);
-
   setEl('stat-users', counts[0]);
   setEl('stat-checkins', counts[1]);
   setEl('stat-whiskies', counts[2]);
@@ -434,215 +424,163 @@ async function loadAllData() {
   setEl('badge-submissions', counts[3]);
   setEl('badge-reports', counts[4]);
   setEl('sync-count', counts[2]);
-
   loadDashboard();
 }
 
 async function loadDashboard() {
-  var checkins = await sbGet('checkins', '?select=whisky_region,whisky_name,date,rating&order=date.desc&limit=200');
-
+  var checkins = await api('checkins', '?select=whisky_region,whisky_name,date,rating&order=date.desc&limit=300');
   var regionCounts = {};
   checkins.forEach(function(c) {
     if (c.whisky_region) regionCounts[c.whisky_region] = (regionCounts[c.whisky_region] || 0) + 1;
   });
   var sorted = Object.entries(regionCounts).sort(function(a, b) { return b[1] - a[1]; }).slice(0, 8);
   var max = sorted.length ? sorted[0][1] : 1;
+  var chartEl = el('region-chart');
+  chartEl.innerHTML = sorted.length ? sorted.map(function(item) {
+    return '<div class="bar-row"><span class="bar-label">' + item[0] + '</span><div class="bar-track"><div class="bar-fill" style="width:' + Math.round(item[1]/max*100) + '%"></div></div><span class="bar-count">' + item[1] + '</span></div>';
+  }).join('') : '<div class="empty"><span class="ms">bar_chart</span>No check-in data yet</div>';
 
-  var chartEl = document.getElementById('region-chart');
-  if (!sorted.length) {
-    chartEl.innerHTML = '<div class="empty-state"><span class="ms">bar_chart</span>No check-in data yet</div>';
-  } else {
-    chartEl.innerHTML = sorted.map(function(item) {
-      var region = item[0], count = item[1];
-      var pct = Math.round(count / max * 100);
-      return '<div class="bar-row"><span class="bar-label">' + region + '</span><div class="bar-track"><div class="bar-fill" style="width:' + pct + '%"></div></div><span class="bar-count">' + count + '</span></div>';
-    }).join('');
-  }
-
-  var recent = checkins.slice(0, 8);
-  var actEl = document.getElementById('recent-activity');
-  if (!recent.length) {
-    actEl.innerHTML = '<div class="empty-state"><span class="ms">history</span>No activity yet</div>';
-  } else {
-    actEl.innerHTML = recent.map(function(c) {
-      var stars = c.rating ? new Array(c.rating + 1).join('*') : '-';
-      return '<div style="display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid rgba(80,72,64,.1);font-size:12px"><div><span style="color:#e8e4dc;font-weight:500">' + (c.whisky_name || '-') + '</span><span style="color:#504840;margin-left:6px">' + (c.whisky_region || '') + '</span></div><span style="color:#7a7060">' + stars + '</span></div>';
-    }).join('');
-  }
+  var recent = checkins.slice(0, 10);
+  var actEl = el('recent-activity');
+  actEl.innerHTML = recent.length ? recent.map(function(c) {
+    var stars = c.rating ? new Array(c.rating + 1).join('*') : '-';
+    var date = c.date ? new Date(c.date).toLocaleDateString('en-GB') : '';
+    return '<div style="display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid rgba(80,72,64,.1);font-size:12px"><div><span style="color:#e8e4dc;font-weight:500">' + (c.whisky_name || '-') + '</span><span style="color:#504840;margin-left:6px">' + (c.whisky_region || '') + '</span></div><span style="color:#7a7060">' + stars + ' ' + date + '</span></div>';
+  }).join('') : '<div class="empty"><span class="ms">history</span>No activity yet</div>';
 }
 
 async function loadPage(page) {
-  if (page === 'users') await loadUsers();
-  else if (page === 'checkins') await loadCheckins();
-  else if (page === 'whiskies') await loadWhiskies();
-  else if (page === 'submissions') await loadSubmissions();
-  else if (page === 'reports') await loadReports();
-  else if (page === 'profiles') await loadProfiles();
+  if (page === 'users') loadUsers();
+  else if (page === 'checkins') loadCheckins();
+  else if (page === 'whiskies') loadWhiskies();
+  else if (page === 'submissions') loadSubmissions();
+  else if (page === 'reports') loadReports();
+  else if (page === 'profiles') loadProfiles();
 }
 
 async function loadUsers() {
-  var wrap = document.getElementById('users-table-wrap');
+  var wrap = el('users-table-wrap');
   var results = await Promise.all([
-    sbGet('profiles', '?select=id,full_name,bio,favourite_region,avatar_url,updated_at&order=updated_at.desc&limit=100'),
-    sbGet('checkins', '?select=user_id&limit=2000')
+    api('profiles', '?select=id,full_name,bio,favourite_region,avatar_url,updated_at&order=updated_at.desc&limit=200'),
+    api('checkins', '?select=user_id&limit=5000')
   ]);
   var profiles = results[0];
-  var allCheckins = results[1];
-
   var checkinCounts = {};
-  allCheckins.forEach(function(c) {
-    if (c.user_id) checkinCounts[c.user_id] = (checkinCounts[c.user_id] || 0) + 1;
-  });
-
-  if (!profiles.length) {
-    wrap.innerHTML = '<div class="empty-state"><span class="ms">group</span>No profiles yet -- users appear after editing their profile</div>';
-    return;
-  }
-
+  results[1].forEach(function(c) { if (c.user_id) checkinCounts[c.user_id] = (checkinCounts[c.user_id] || 0) + 1; });
+  if (!profiles.length) { wrap.innerHTML = '<div class="empty"><span class="ms">group</span>No profiles yet</div>'; return; }
   var rows = profiles.map(function(u) {
-    var name = u.full_name || '-';
-    var bio = u.bio ? u.bio.substring(0, 50) : '-';
-    var region = u.favourite_region || '-';
-    var drams = checkinCounts[u.id] || 0;
-    var avatar = u.avatar_url ? 'Yes' : 'No';
-    var date = u.updated_at ? new Date(u.updated_at).toLocaleDateString('en-GB') : '-';
-    return '<tr><td style="font-weight:600">' + name + '<div class="td-muted" style="font-size:11px">' + bio + '</div></td><td class="td-muted">' + region + '</td><td style="font-family:Manrope,sans-serif;font-weight:700;color:#ffbf00">' + drams + '</td><td class="td-muted">' + avatar + '</td><td class="td-muted">' + date + '</td></tr>';
+    return '<tr><td><div style="font-weight:600">' + (u.full_name || '-') + '</div><div class="td-m" style="font-size:11px">' + (u.bio ? u.bio.substring(0, 50) : '') + '</div></td><td class="td-m">' + (u.favourite_region || '-') + '</td><td style="font-family:Manrope,sans-serif;font-weight:700;color:#ffbf00">' + (checkinCounts[u.id] || 0) + '</td><td class="td-m">' + (u.avatar_url ? 'Yes' : 'No') + '</td><td class="td-m">' + (u.updated_at ? new Date(u.updated_at).toLocaleDateString('en-GB') : '-') + '</td></tr>';
   }).join('');
-
   wrap.innerHTML = '<table id="users-table"><thead><tr><th>Name</th><th>Fav Region</th><th>Drams</th><th>Avatar</th><th>Last Active</th></tr></thead><tbody>' + rows + '</tbody></table>';
 }
 
 async function loadCheckins() {
-  var wrap = document.getElementById('checkins-table-wrap');
-  var data = await sbGet('checkins', '?select=id,whisky_name,whisky_region,rating,location,date,owned&order=date.desc&limit=100');
-  if (!data.length) {
-    wrap.innerHTML = '<div class="empty-state"><span class="ms">history</span>No check-ins yet</div>';
-    return;
-  }
+  var wrap = el('checkins-table-wrap');
+  var data = await api('checkins', '?select=id,whisky_name,whisky_region,rating,location,date,owned&order=date.desc&limit=200');
+  if (!data.length) { wrap.innerHTML = '<div class="empty"><span class="ms">history</span>No check-ins yet</div>'; return; }
   var rows = data.map(function(c) {
     var stars = c.rating ? new Array(c.rating + 1).join('*') : '-';
-    var date = new Date(c.date).toLocaleDateString('en-GB');
-    var owned = c.owned ? 'Yes' : 'No';
-    return '<tr><td style="font-weight:500">' + (c.whisky_name || '-') + '</td><td class="td-muted">' + (c.whisky_region || '-') + '</td><td>' + stars + '</td><td class="td-muted">' + (c.location || '-') + '</td><td class="td-muted">' + owned + '</td><td class="td-muted">' + date + '</td></tr>';
+    return '<tr><td style="font-weight:500">' + (c.whisky_name || '-') + '</td><td class="td-m">' + (c.whisky_region || '-') + '</td><td>' + stars + '</td><td class="td-m">' + (c.location || '-') + '</td><td class="td-m">' + (c.owned ? 'Yes' : 'No') + '</td><td class="td-m">' + (c.date ? new Date(c.date).toLocaleDateString('en-GB') : '-') + '</td></tr>';
   }).join('');
   wrap.innerHTML = '<table id="checkins-table"><thead><tr><th>Whisky</th><th>Region</th><th>Rating</th><th>Location</th><th>Owned</th><th>Date</th></tr></thead><tbody>' + rows + '</tbody></table>';
 }
 
 async function loadWhiskies() {
-  var wrap = document.getElementById('whiskies-table-wrap');
-  var data = await sbGet('whiskies', '?select=id,name,metadata,rating&order=name&limit=200');
-  if (!data.length) {
-    wrap.innerHTML = '<div class="empty-state"><span class="ms">liquor</span>No whiskies -- run a sync</div>';
-    return;
-  }
+  var wrap = el('whiskies-table-wrap');
+  var data = await api('whiskies', '?select=id,name,metadata,rating&order=name&limit=400');
+  if (!data.length) { wrap.innerHTML = '<div class="empty"><span class="ms">liquor</span>No whiskies -- run a sync</div>'; return; }
   var rows = data.map(function(w) {
     var m = w.metadata || {};
-    var score = (w.rating && w.rating.marcel && w.rating.sascha) ? ((w.rating.marcel + w.rating.sascha) / 2).toFixed(1) : '-';
-    return '<tr><td style="font-weight:500">' + w.name + '</td><td class="td-muted">' + (m.distillery || '-') + '</td><td class="td-muted">' + (m.region || '-') + '</td><td class="td-muted">' + (m.age ? m.age + 'yr' : 'NAS') + '</td><td class="td-muted">' + (m.abv ? m.abv + '%' : '-') + '</td><td style="color:#ffbf00;font-weight:700">' + score + '</td></tr>';
+    var score = (w.rating && w.rating.marcel && w.rating.sascha) ? ((w.rating.marcel + w.rating.sascha)/2).toFixed(1) : '-';
+    return '<tr><td style="font-weight:500">' + w.name + '</td><td class="td-m">' + (m.distillery || '-') + '</td><td class="td-m">' + (m.region || '-') + '</td><td class="td-m">' + (m.age ? m.age + 'yr' : 'NAS') + '</td><td class="td-m">' + (m.abv ? m.abv + '%' : '-') + '</td><td style="color:#ffbf00;font-weight:700">' + score + '</td></tr>';
   }).join('');
   wrap.innerHTML = '<table id="whiskies-table"><thead><tr><th>Name</th><th>Distillery</th><th>Region</th><th>Age</th><th>ABV</th><th>Score</th></tr></thead><tbody>' + rows + '</tbody></table>';
 }
 
 async function loadSubmissions() {
-  var wrap = document.getElementById('submissions-table-wrap');
-  var data = await sbGet('whisky_requests', '?select=id,whisky_name,distillery,region,country,requested_by,status,created_at&order=created_at.desc&limit=100');
-  if (!data || !data.length) {
-    wrap.innerHTML = '<div class="empty-state"><span class="ms">add_circle</span>No submissions yet</div>';
-    return;
-  }
+  var wrap = el('submissions-table-wrap');
+  var data = await api('whisky_requests', '?select=id,whisky_name,distillery,region,country,requested_by,status,created_at&order=created_at.desc&limit=200');
+  if (!data.length) { wrap.innerHTML = '<div class="empty"><span class="ms">add_circle</span>No submissions yet</div>'; return; }
   var rows = data.map(function(s) {
-    var statusClass = s.status === 'approved' ? 'approved' : s.status === 'rejected' ? 'rejected' : 'pending';
+    var sc = s.status === 'approved' ? 'approved' : s.status === 'rejected' ? 'rejected' : 'pending';
     var actions = s.status === 'pending'
-      ? '<button class="act-btn approve" onclick="reviewSubmission(\'' + s.id + '\', \'approved\')">Approve</button><button class="act-btn reject" onclick="reviewSubmission(\'' + s.id + '\', \'rejected\')">Reject</button>'
-      : '<span style="color:#504840;font-size:11px">Reviewed</span>';
-    return '<tr id="sub-row-' + s.id + '"><td style="font-weight:500">' + (s.whisky_name || '-') + '</td><td class="td-muted">' + (s.distillery || '-') + '</td><td class="td-muted">' + (s.region || '-') + '</td><td class="td-muted">' + (s.requested_by || 'anon') + '</td><td><span class="pill pill-' + statusClass + '">' + (s.status || 'pending') + '</span></td><td>' + actions + '</td></tr>';
+      ? '<button class="act-btn approve" onclick="reviewSub(\'' + s.id + '\',\'approved\')">Approve</button><button class="act-btn reject" onclick="reviewSub(\'' + s.id + '\',\'rejected\')">Reject</button>'
+      : '<span class="td-m">Done</span>';
+    return '<tr id="sub-' + s.id + '"><td style="font-weight:500">' + (s.whisky_name || '-') + '</td><td class="td-m">' + (s.distillery || '-') + '</td><td class="td-m">' + (s.region || '-') + '</td><td class="td-m">' + (s.requested_by || 'anon') + '</td><td><span class="pill pill-' + sc + '">' + (s.status || 'pending') + '</span></td><td>' + actions + '</td></tr>';
   }).join('');
   wrap.innerHTML = '<table><thead><tr><th>Whisky</th><th>Distillery</th><th>Region</th><th>Submitted by</th><th>Status</th><th>Actions</th></tr></thead><tbody>' + rows + '</tbody></table>';
 }
 
-async function reviewSubmission(id, status) {
-  await fetch(SB_URL + '/rest/v1/whisky_requests?id=eq.' + id, {
+async function reviewSub(id, status) {
+  await fetch(SB + '/rest/v1/whisky_requests?id=eq.' + id, {
     method: 'PATCH',
-    headers: Object.assign({}, hdrs(SESSION && SESSION.access_token), { 'Prefer': 'return=minimal' }),
+    headers: Object.assign({}, hdr(true), { 'Prefer': 'return=minimal' }),
     body: JSON.stringify({ status: status })
   });
-  var row = document.getElementById('sub-row-' + id);
+  var row = el('sub-' + id);
   if (row) {
     var pill = row.querySelector('.pill');
     if (pill) { pill.className = 'pill pill-' + (status === 'approved' ? 'approved' : 'rejected'); pill.textContent = status; }
-    var actBtns = row.querySelectorAll('.act-btn');
-    actBtns.forEach(function(b) { b.remove(); });
-    var lastTd = row.querySelector('td:last-child');
-    if (lastTd) lastTd.innerHTML = '<span style="color:#504840;font-size:11px">Reviewed</span>';
+    var btns = row.querySelectorAll('.act-btn');
+    btns.forEach(function(b) { b.remove(); });
+    var last = row.querySelector('td:last-child');
+    if (last) last.innerHTML = '<span class="td-m">Done</span>';
   }
   toast(status === 'approved' ? 'Approved' : 'Rejected');
 }
 
 async function loadReports() {
-  var wrap = document.getElementById('reports-table-wrap');
-  var data = await sbGet('feedback', '?select=id,whisky_name,type,notes,date&order=date.desc&limit=100');
-  if (!data || !data.length) {
-    wrap.innerHTML = '<div class="empty-state"><span class="ms">flag</span>No reports yet</div>';
-    return;
-  }
+  var wrap = el('reports-table-wrap');
+  var data = await api('feedback', '?select=id,whisky_name,type,notes,date&order=date.desc&limit=200');
+  if (!data.length) { wrap.innerHTML = '<div class="empty"><span class="ms">flag</span>No reports yet</div>'; return; }
   var rows = data.map(function(r) {
-    var date = new Date(r.date).toLocaleDateString('en-GB');
     var type = (r.type || '-').replace(/_/g, ' ');
-    return '<tr id="rep-row-' + r.id + '"><td style="font-weight:500">' + (r.whisky_name || '-') + '</td><td><span class="pill pill-new">' + type + '</span></td><td class="td-muted" style="max-width:240px">' + (r.notes || '-') + '</td><td class="td-muted">' + date + '</td><td><button class="act-btn" onclick="resolveReport(' + r.id + ')">Resolve</button></td></tr>';
+    var date = r.date ? new Date(r.date).toLocaleDateString('en-GB') : '-';
+    return '<tr id="rep-' + r.id + '"><td style="font-weight:500">' + (r.whisky_name || '-') + '</td><td><span class="pill pill-new">' + type + '</span></td><td class="td-m" style="max-width:240px">' + (r.notes || '-') + '</td><td class="td-m">' + date + '</td><td><button class="act-btn" onclick="resolveReport(' + r.id + ')">Resolve</button></td></tr>';
   }).join('');
   wrap.innerHTML = '<table><thead><tr><th>Whisky</th><th>Type</th><th>Notes</th><th>Date</th><th>Action</th></tr></thead><tbody>' + rows + '</tbody></table>';
 }
 
 async function resolveReport(id) {
-  await fetch(SB_URL + '/rest/v1/feedback?id=eq.' + id, {
-    method: 'DELETE',
-    headers: hdrs(SESSION && SESSION.access_token)
-  });
-  var row = document.getElementById('rep-row-' + id);
-  if (row) row.remove();
+  await fetch(SB + '/rest/v1/feedback?id=eq.' + id, { method: 'DELETE', headers: hdr(true) });
+  var row = el('rep-' + id); if (row) row.remove();
   toast('Report resolved');
 }
 
 async function loadProfiles() {
-  var wrap = document.getElementById('profiles-table-wrap');
-  var data = await sbGet('profiles', '?select=id,full_name,bio,favourite_region,avatar_url,updated_at&order=updated_at.desc&limit=100');
-  if (!data.length) {
-    wrap.innerHTML = '<div class="empty-state"><span class="ms">manage_accounts</span>No profiles yet</div>';
-    return;
-  }
+  var wrap = el('profiles-table-wrap');
+  var data = await api('profiles', '?select=id,full_name,bio,favourite_region,avatar_url,updated_at&order=updated_at.desc&limit=200');
+  if (!data.length) { wrap.innerHTML = '<div class="empty"><span class="ms">manage_accounts</span>No profiles yet</div>'; return; }
   var rows = data.map(function(p) {
-    var date = p.updated_at ? new Date(p.updated_at).toLocaleDateString('en-GB') : '-';
-    return '<tr><td style="font-weight:500">' + (p.full_name || '-') + '</td><td class="td-muted">' + (p.favourite_region || '-') + '</td><td class="td-muted">' + (p.avatar_url ? 'Yes' : 'No') + '</td><td class="td-muted">' + (p.bio ? 'Yes' : 'No') + '</td><td class="td-muted">' + date + '</td></tr>';
+    return '<tr><td style="font-weight:500">' + (p.full_name || '-') + '</td><td class="td-m">' + (p.favourite_region || '-') + '</td><td class="td-m">' + (p.avatar_url ? 'Yes' : 'No') + '</td><td class="td-m">' + (p.bio ? 'Yes' : 'No') + '</td><td class="td-m">' + (p.updated_at ? new Date(p.updated_at).toLocaleDateString('en-GB') : '-') + '</td></tr>';
   }).join('');
   wrap.innerHTML = '<table id="profiles-table"><thead><tr><th>Name</th><th>Fav Region</th><th>Avatar</th><th>Bio</th><th>Updated</th></tr></thead><tbody>' + rows + '</tbody></table>';
 }
 
 async function triggerSync() {
-  var statusEl = document.getElementById('sync-status');
+  var statusEl = el('sync-status');
   if (statusEl) statusEl.textContent = 'Syncing...';
-  var resultEl = document.getElementById('sync-result');
   try {
-    var r = await fetch(SB_URL + '/functions/v1/sync-whiskies', {
+    var r = await fetch(SB + '/functions/v1/sync-whiskies', {
       method: 'POST',
-      headers: { 'Authorization': 'Bearer ' + ((SESSION && SESSION.access_token) || SB_KEY), 'Content-Type': 'application/json' }
+      headers: { 'Authorization': 'Bearer ' + SVC, 'Content-Type': 'application/json' }
     });
     var data = await r.json();
     var msg = data.success ? 'Synced ' + data.synced + ' whiskies' : 'Error: ' + data.error;
     if (statusEl) statusEl.textContent = msg;
-    if (resultEl) { resultEl.textContent = msg; resultEl.style.display = 'block'; }
+    var res = el('sync-result'); if (res) { res.textContent = msg; res.style.display = 'block'; }
     setEl('sync-last', new Date().toLocaleTimeString('en-GB'));
     toast(msg);
     pageLoaded['whiskies'] = false;
   } catch(e) {
     if (statusEl) statusEl.textContent = 'Sync failed';
-    toast('Sync failed: ' + e.message);
+    toast('Sync failed');
   }
 }
 
-function filterTable(tableId, query) {
-  var table = document.getElementById(tableId);
-  if (!table) return;
-  var q = query.toLowerCase();
+function filterTable(tableId, q) {
+  var table = el(tableId); if (!table) return;
+  q = q.toLowerCase();
   table.querySelectorAll('tbody tr').forEach(function(row) {
     row.style.display = row.textContent.toLowerCase().indexOf(q) !== -1 ? '' : 'none';
   });
