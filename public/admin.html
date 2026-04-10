@@ -545,7 +545,7 @@ async function loadWhiskies() {
 
 async function loadSubmissions() {
   var wrap = document.getElementById('submissions-table-wrap');
-  var data = await sbGet('whisky_requests', '?select=id,name,distillery,region,country,submitted_by,status,date&order=date.desc&limit=100');
+  var data = await sbGet('whisky_requests', '?select=id,whisky_name,distillery,region,country,requested_by,status,created_at&order=created_at.desc&limit=100');
   if (!data || !data.length) {
     wrap.innerHTML = '<div class="empty-state"><span class="ms">add_circle</span>No submissions yet</div>';
     return;
@@ -555,7 +555,7 @@ async function loadSubmissions() {
     var actions = s.status === 'pending'
       ? '<button class="act-btn approve" onclick="reviewSubmission(\'' + s.id + '\', \'approved\')">Approve</button><button class="act-btn reject" onclick="reviewSubmission(\'' + s.id + '\', \'rejected\')">Reject</button>'
       : '<span style="color:#504840;font-size:11px">Reviewed</span>';
-    return '<tr id="sub-row-' + s.id + '"><td style="font-weight:500">' + (s.name || '-') + '</td><td class="td-muted">' + (s.distillery || '-') + '</td><td class="td-muted">' + (s.region || '-') + '</td><td class="td-muted">' + (s.submitted_by || 'anon') + '</td><td><span class="pill pill-' + statusClass + '">' + (s.status || 'pending') + '</span></td><td>' + actions + '</td></tr>';
+    return '<tr id="sub-row-' + s.id + '"><td style="font-weight:500">' + (s.whisky_name || '-') + '</td><td class="td-muted">' + (s.distillery || '-') + '</td><td class="td-muted">' + (s.region || '-') + '</td><td class="td-muted">' + (s.requested_by || 'anon') + '</td><td><span class="pill pill-' + statusClass + '">' + (s.status || 'pending') + '</span></td><td>' + actions + '</td></tr>';
   }).join('');
   wrap.innerHTML = '<table><thead><tr><th>Whisky</th><th>Distillery</th><th>Region</th><th>Submitted by</th><th>Status</th><th>Actions</th></tr></thead><tbody>' + rows + '</tbody></table>';
 }

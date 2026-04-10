@@ -1,978 +1,652 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8"/>
+<meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Modern Cask — Admin</title>
-<script src="https://cdn.tailwindcss.com"></script>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="https://js-de.sentry-cdn.com/b9a540d51bfee4b8d51e19b7c03598a8.min.js" crossorigin="anonymous"></script>
+<title>The Modern Cask -- Admin</title>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,300,0,0&display=swap" rel="stylesheet"/>
 <style>
-body{background:#0a0a0a;color:#e5e2e1;font-family:system-ui,sans-serif;margin:0}
-.card{background:#1c1b1b;border:1px solid #2a2a2a;border-radius:12px}
-.badge-pending{background:rgba(255,191,0,0.15);color:#FFD700}
-.badge-done{background:rgba(76,175,80,0.15);color:#4CAF50}
-.badge-rejected{background:rgba(244,67,54,0.15);color:#f44336}
-.drop-zone{border:2px dashed #504532;border-radius:10px;transition:all 0.2s}
-.drop-zone.over{border-color:#FFBF00;background:rgba(255,191,0,0.05)}
-.drop-zone input[type=file]{display:none}
-.nav-item{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:8px;cursor:pointer;font-size:13px;font-weight:500;transition:all 0.15s;border:none;background:none;color:#6b7280;width:100%;text-align:left}
-.nav-item:hover{background:rgba(255,255,255,0.04);color:#e5e2e1}
-.nav-item.active{background:rgba(255,191,0,0.1);color:#FFE2AB}
-.page-panel{display:none}
-.page-panel.active{display:block}
-.stat-card{background:#1c1b1b;border:1px solid #2a2a2a;border-radius:10px;padding:14px;text-align:center}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#0a0908;color:#e8e4dc;font-family:'DM Sans',sans-serif;min-height:100vh;display:flex}
+.ms{font-family:'Material Symbols Outlined';font-style:normal;display:inline-block;line-height:1;text-transform:none;letter-spacing:normal;white-space:nowrap;font-variation-settings:'FILL' 0,'wght' 300}
+#login-screen{position:fixed;inset:0;background:#0a0908;display:flex;align-items:center;justify-content:center;z-index:1000}
+.login-card{background:#1a1917;border:1px solid rgba(80,72,64,.4);border-radius:20px;padding:40px;width:360px}
+.login-card h1{font-family:'Manrope',sans-serif;font-size:22px;font-weight:800;color:#ffe2ab;margin-bottom:4px}
+.login-card p{font-size:13px;color:#7a7060;margin-bottom:28px}
+.inp{width:100%;background:#0f0e0d;border:1px solid rgba(80,72,64,.4);border-radius:10px;padding:12px 14px;color:#e8e4dc;font-size:14px;font-family:'DM Sans',sans-serif;outline:none;margin-bottom:10px}
+.inp:focus{border-color:rgba(255,191,0,.4)}
+.btn-gold{width:100%;background:linear-gradient(135deg,#ffe2ab,#ffbf00);color:#2a1a00;font-family:'Manrope',sans-serif;font-weight:700;font-size:13px;text-transform:uppercase;letter-spacing:.1em;border:none;border-radius:10px;padding:13px;cursor:pointer;margin-top:4px}
+#login-error{color:#e24b4a;font-size:12px;margin-top:8px;display:none}
+#app{display:none;width:100%;min-height:100vh}
+aside{width:220px;background:#0f0e0d;border-right:1px solid rgba(80,72,64,.2);display:flex;flex-direction:column;position:fixed;top:0;bottom:0;left:0;z-index:100}
+.sidebar-logo{padding:20px 18px 16px;border-bottom:1px solid rgba(80,72,64,.2)}
+.sidebar-logo h1{font-family:'Manrope',sans-serif;font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.2em;color:#ffe2ab}
+.sidebar-logo p{font-size:10px;color:#504840;margin-top:2px}
+.sidebar-nav{flex:1;padding:12px 0;overflow-y:auto}
+.nav-section{padding:8px 16px 4px;font-size:9px;text-transform:uppercase;letter-spacing:.12em;color:#504840;font-weight:700}
+.nav-item{display:flex;align-items:center;gap:10px;padding:9px 16px;cursor:pointer;transition:all .15s;border-left:2px solid transparent;color:#7a7060;font-size:13px}
+.nav-item:hover{background:rgba(255,226,171,.04);color:#e8e4dc}
+.nav-item.active{background:rgba(255,191,0,.08);border-left-color:#ffbf00;color:#ffe2ab}
+.nav-item .ms{font-size:18px}
+.nav-badge{margin-left:auto;background:rgba(255,191,0,.15);color:#ffbf00;font-size:9px;font-weight:700;padding:2px 6px;border-radius:99px;min-width:18px;text-align:center}
+.nav-badge.red{background:rgba(226,75,74,.15);color:#e24b4a}
+.sidebar-footer{padding:14px 16px;border-top:1px solid rgba(80,72,64,.2)}
+.sidebar-user{display:flex;align-items:center;gap:10px}
+.sidebar-avatar{width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,#ffe2ab,#ffbf00);display:flex;align-items:center;justify-content:center;font-family:'Manrope',sans-serif;font-weight:800;font-size:11px;color:#2a1a00;flex-shrink:0}
+.sidebar-user-info{flex:1;min-width:0}
+.sidebar-user-name{font-size:12px;font-weight:600;color:#e8e4dc;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.sidebar-user-role{font-size:10px;color:#504840}
+.sign-out-btn{background:none;border:none;cursor:pointer;color:#504840;display:flex;padding:2px}
+.sign-out-btn:hover{color:#e24b4a}
+main{margin-left:220px;flex:1;padding:28px 32px;min-height:100vh}
+.page{display:none}
+.page.active{display:block;animation:fadeIn .2s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}
+.page-header{margin-bottom:24px}
+.page-header h2{font-family:'Manrope',sans-serif;font-size:24px;font-weight:800;color:#e8e4dc}
+.page-header p{font-size:13px;color:#7a7060;margin-top:4px}
+.stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:24px}
+.stat-card{background:#1a1917;border:1px solid rgba(80,72,64,.25);border-radius:14px;padding:18px}
+.stat-label{font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:#7a7060;margin-bottom:6px}
+.stat-value{font-family:'Manrope',sans-serif;font-size:28px;font-weight:800;color:#ffbf00;line-height:1}
+.stat-sub{font-size:11px;color:#504840;margin-top:4px}
+.stat-card.highlight{border-color:rgba(255,191,0,.2);background:rgba(255,191,0,.04)}
+.table-card{background:#1a1917;border:1px solid rgba(80,72,64,.25);border-radius:14px;overflow:hidden;margin-bottom:20px}
+.table-header{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid rgba(80,72,64,.2)}
+.table-title{font-family:'Manrope',sans-serif;font-size:14px;font-weight:700;color:#e8e4dc}
+.search-inp{background:#0f0e0d;border:1px solid rgba(80,72,64,.3);border-radius:8px;padding:6px 12px;color:#e8e4dc;font-size:12px;font-family:'DM Sans',sans-serif;outline:none;width:200px}
+.search-inp:focus{border-color:rgba(255,191,0,.3)}
+table{width:100%;border-collapse:collapse}
+th{padding:10px 16px;text-align:left;font-size:9px;text-transform:uppercase;letter-spacing:.1em;color:#504840;font-weight:700;border-bottom:1px solid rgba(80,72,64,.2);background:#0f0e0d}
+td{padding:12px 16px;font-size:13px;color:#e8e4dc;border-bottom:1px solid rgba(80,72,64,.1)}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:rgba(255,226,171,.02)}
+.td-muted{color:#7a7060;font-size:12px}
+.pill{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:99px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.04em}
+.pill-pending{background:rgba(255,191,0,.12);color:#ffbf00}
+.pill-approved{background:rgba(99,153,34,.15);color:#7ab840}
+.pill-rejected{background:rgba(226,75,74,.12);color:#e24b4a}
+.pill-new{background:rgba(55,138,221,.15);color:#6ab0f0}
+.act-btn{background:none;border:1px solid rgba(80,72,64,.3);border-radius:6px;padding:4px 10px;font-size:11px;color:#7a7060;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .15s;margin-right:4px}
+.act-btn:hover{color:#e8e4dc;border-color:rgba(80,72,64,.6)}
+.act-btn.approve{border-color:rgba(99,153,34,.3);color:#7ab840}
+.act-btn.approve:hover{background:rgba(99,153,34,.1)}
+.act-btn.reject{border-color:rgba(226,75,74,.2);color:#e24b4a}
+.act-btn.reject:hover{background:rgba(226,75,74,.08)}
+.loading{text-align:center;padding:40px;color:#504840;font-size:13px}
+.empty-state{text-align:center;padding:48px;color:#504840}
+.empty-state .ms{font-size:40px;display:block;margin-bottom:10px;color:#3d3a35}
+.chart-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:20px}
+.chart-card{background:#1a1917;border:1px solid rgba(80,72,64,.25);border-radius:14px;padding:20px}
+.chart-title{font-family:'Manrope',sans-serif;font-size:13px;font-weight:700;color:#e8e4dc;margin-bottom:16px}
+.bar-row{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+.bar-label{font-size:11px;color:#7a7060;width:100px;text-align:right;flex-shrink:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.bar-track{flex:1;height:6px;background:#2a2825;border-radius:3px;overflow:hidden}
+.bar-fill{height:100%;background:linear-gradient(90deg,#ffe2ab,#ffbf00);border-radius:3px}
+.bar-count{font-size:11px;color:#504840;width:30px;text-align:right;flex-shrink:0}
+.check-ok{color:#7ab840}
+.check-warn{color:#ffbf00}
+.security-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:20px}
+.security-card{background:#1a1917;border:1px solid rgba(80,72,64,.25);border-radius:14px;padding:18px}
+.security-card h3{font-family:'Manrope',sans-serif;font-size:13px;font-weight:700;color:#e8e4dc;margin-bottom:12px;display:flex;align-items:center;gap:8px}
+.check-item{display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:1px solid rgba(80,72,64,.1);font-size:12px}
+.check-item:last-child{border-bottom:none}
+#toast{position:fixed;bottom:24px;right:24px;background:#ffe2ab;color:#2a1a00;padding:10px 18px;border-radius:10px;font-size:12px;font-weight:600;opacity:0;transition:opacity .25s;pointer-events:none;z-index:9999}
+#toast.show{opacity:1}
 </style>
 </head>
 <body>
 
-<!-- AUTH GATE — shown before login -->
-<div id="auth-gate" class="min-h-screen flex items-center justify-center p-6">
-  <div class="card p-8 w-full max-w-sm">
-    <h1 class="text-xl font-bold text-yellow-300 mb-1">Modern Cask</h1>
-    <p class="text-gray-500 text-sm mb-6">Admin panel</p>
-    <input id="admin-email-input" type="email" placeholder="Email" class="w-full bg-black/40 border border-gray-700 rounded-lg px-4 py-2.5 text-sm mb-3 outline-none focus:border-yellow-500/50"/>
-    <input id="admin-pass-input" type="password" placeholder="Password" class="w-full bg-black/40 border border-gray-700 rounded-lg px-4 py-2.5 text-sm mb-4 outline-none focus:border-yellow-500/50"/>
-    <button onclick="adminSignIn()" class="w-full bg-yellow-400 text-black font-bold py-2.5 rounded-lg text-sm hover:bg-yellow-300 transition-all">Sign In</button>
-    <p id="auth-error" class="text-red-400 text-xs mt-2 hidden"></p>
+<div id="login-screen">
+  <div class="login-card">
+    <h1>The Modern Cask</h1>
+    <p>Admin panel -- restricted access</p>
+    <input class="inp" id="login-email" type="email" placeholder="Admin email" autocomplete="email"/>
+    <input class="inp" id="login-password" type="password" placeholder="Password" autocomplete="current-password"/>
+    <button class="btn-gold" onclick="doLogin()">Sign In</button>
+    <p id="login-error">Invalid credentials or access denied</p>
   </div>
 </div>
 
-<!-- MAIN LAYOUT — sidebar + content -->
-<div id="main-content" class="hidden min-h-screen flex">
-
-  <!-- SIDEBAR -->
-  <aside class="w-52 shrink-0 border-r border-gray-800 flex flex-col" style="background:#111;min-height:100vh">
-    <!-- Logo -->
-    <div class="px-4 py-5 border-b border-gray-800">
-      <p class="text-yellow-300 font-bold text-sm tracking-wider uppercase">Modern Cask</p>
-      <p class="text-gray-600 text-[10px] mt-0.5">Admin</p>
+<div id="app">
+  <aside>
+    <div class="sidebar-logo">
+      <h1>The Modern Cask</h1>
+      <p>Admin Panel</p>
     </div>
-
-    <!-- Stats pills -->
-    <div class="px-3 py-3 border-b border-gray-800 grid grid-cols-2 gap-2">
-      <div class="bg-black/40 rounded-lg p-2 text-center">
-        <p class="text-yellow-400 font-bold text-lg leading-none" id="stat-pending">–</p>
-        <p class="text-[9px] text-gray-600 uppercase tracking-wider mt-0.5">Pending</p>
+    <nav class="sidebar-nav">
+      <div class="nav-section">Overview</div>
+      <div class="nav-item active" data-page="dashboard" onclick="showPage('dashboard')">
+        <span class="ms">dashboard</span> Dashboard
       </div>
-      <div class="bg-black/40 rounded-lg p-2 text-center">
-        <p class="text-green-400 font-bold text-lg leading-none" id="stat-done">–</p>
-        <p class="text-[9px] text-gray-600 uppercase tracking-wider mt-0.5">Done</p>
+      <div class="nav-section">Users</div>
+      <div class="nav-item" data-page="users" onclick="showPage('users')">
+        <span class="ms">group</span> Users
+        <span class="nav-badge" id="badge-users">-</span>
       </div>
-      <div class="bg-black/40 rounded-lg p-2 text-center">
-        <p class="text-blue-400 font-bold text-lg leading-none" id="stat-images">–</p>
-        <p class="text-[9px] text-gray-600 uppercase tracking-wider mt-0.5">Images</p>
+      <div class="nav-item" data-page="checkins" onclick="showPage('checkins')">
+        <span class="ms">history</span> Check-ins
+        <span class="nav-badge" id="badge-checkins">-</span>
       </div>
-      <div class="bg-black/40 rounded-lg p-2 text-center">
-        <p class="text-purple-400 font-bold text-lg leading-none" id="stat-feedback">–</p>
-        <p class="text-[9px] text-gray-600 uppercase tracking-wider mt-0.5">Feedback</p>
+      <div class="nav-section">Content</div>
+      <div class="nav-item" data-page="whiskies" onclick="showPage('whiskies')">
+        <span class="ms">liquor</span> Whiskies
+        <span class="nav-badge" id="badge-whiskies">-</span>
       </div>
-    </div>
-
-    <!-- Nav -->
-    <nav class="flex-1 px-2 py-3 space-y-0.5">
-      <p class="text-[9px] text-gray-600 uppercase tracking-widest px-3 pb-1 pt-1">Images</p>
-      <button class="nav-item active" data-page="images" onclick="switchTab('images')">
-        <span style="font-size:14px">📷</span> Upload
-      </button>
-      <button class="nav-item" data-page="queue" onclick="switchTab('queue')">
-        <span style="font-size:14px">📋</span> Photo Queue
-      </button>
-      <button class="nav-item" data-page="all-requests" onclick="switchTab('all-requests')">
-        <span style="font-size:14px">🗂</span> All Requests
-      </button>
-
-      <p class="text-[9px] text-gray-600 uppercase tracking-widest px-3 pb-1 pt-3">Community</p>
-      <button class="nav-item" data-page="whisky-requests" onclick="switchTab('whisky-requests')">
-        <span style="font-size:14px">🥃</span> Whisky Requests
-      </button>
-      <button class="nav-item" data-page="users" onclick="switchTab('users')">
-        <span style="font-size:14px">👤</span> Users
-      </button>
-      <button class="nav-item" data-page="feedback" onclick="switchTab('feedback')">
-        <span style="font-size:14px">💬</span> Feedback
-      </button>
-
-      <p class="text-[9px] text-gray-600 uppercase tracking-widest px-3 pb-1 pt-3">System</p>
-      <button class="nav-item" data-page="config" onclick="switchTab('config')">
-        <span style="font-size:14px">⚙️</span> Config
-      </button>
-
-      <p class="text-[9px] text-gray-600 uppercase tracking-widest px-3 pb-1 pt-3">Tools</p>
-      <button class="nav-item" data-page="analytics" onclick="switchTab('analytics')">
-        <span style="font-size:14px">📊</span> Analytics
-      </button>
-      <button class="nav-item" data-page="slug-audit" onclick="switchTab('slug-audit')">
-        <span style="font-size:14px">🔗</span> Slug Audit
-      </button>
-      <button class="nav-item" data-page="whisky-browser" onclick="switchTab('whisky-browser')">
-        <span style="font-size:14px">🔍</span> DB Browser
-      </button>
+      <div class="nav-item" data-page="submissions" onclick="showPage('submissions')">
+        <span class="ms">add_circle</span> Submissions
+        <span class="nav-badge red" id="badge-submissions">-</span>
+      </div>
+      <div class="nav-section">Moderation</div>
+      <div class="nav-item" data-page="reports" onclick="showPage('reports')">
+        <span class="ms">flag</span> Reports
+        <span class="nav-badge red" id="badge-reports">-</span>
+      </div>
+      <div class="nav-item" data-page="profiles" onclick="showPage('profiles')">
+        <span class="ms">manage_accounts</span> Profiles
+      </div>
+      <div class="nav-section">System</div>
+      <div class="nav-item" data-page="security" onclick="showPage('security')">
+        <span class="ms">security</span> Security
+      </div>
+      <div class="nav-item" data-page="sync" onclick="showPage('sync')">
+        <span class="ms">sync</span> DB Sync
+      </div>
     </nav>
-
-    <!-- User -->
-    <div class="px-3 py-3 border-t border-gray-800">
-      <p id="admin-email" class="text-gray-500 text-[10px] truncate mb-2"></p>
-      <button onclick="signOut()" class="text-[10px] text-gray-600 hover:text-red-400 transition-colors">Sign out</button>
+    <div class="sidebar-footer">
+      <div class="sidebar-user">
+        <div class="sidebar-avatar" id="sidebar-initials">?</div>
+        <div class="sidebar-user-info">
+          <div class="sidebar-user-name" id="sidebar-email">-</div>
+          <div class="sidebar-user-role">Administrator</div>
+        </div>
+        <button class="sign-out-btn" onclick="doSignOut()" title="Sign out">
+          <span class="ms" style="font-size:18px">logout</span>
+        </button>
+      </div>
     </div>
   </aside>
 
-  <!-- CONTENT AREA -->
-  <main class="flex-1 overflow-y-auto p-6" style="min-height:100vh">
-
-    <!-- PAGE: IMAGES (Upload + Audit) -->
-    <div id="page-images" class="page-panel active">
-      <h2 class="text-lg font-bold text-white mb-5">Upload Image</h2>
-      <div class="card p-5 mb-5">
-        <div class="grid grid-cols-2 gap-3 mb-3">
-          <div>
-            <label class="block text-xs text-gray-500 mb-1">Whisky Name</label>
-            <div style="position:relative">
-              <input id="manual-name" type="text" placeholder="Type to search DB…" autocomplete="off"
-                class="w-full bg-black/40 border border-gray-700 rounded-lg px-3 py-2 text-sm outline-none focus:border-yellow-500/50"
-                oninput="searchWhiskyName(this.value)"/>
-              <span id="name-match-badge" class="hidden absolute right-2 top-1/2 -translate-y-1/2 text-[10px] text-green-400 font-bold">✓</span>
-              <div id="name-dropdown" style="position:absolute;top:100%;left:0;right:0;z-index:50;background:#1a1a1a;border:1px solid #374151;border-radius:8px;max-height:220px;overflow-y:auto;display:none;margin-top:2px;box-shadow:0 8px 24px rgba(0,0,0,0.6)"></div>
-            </div>
-          </div>
-          <div>
-            <label class="block text-xs text-gray-500 mb-1">Slug <span class="text-gray-700">(auto)</span></label>
-            <input id="manual-slug" type="text" placeholder="auto-filled from DB" readonly
-              class="w-full bg-black/40 border border-gray-700 rounded-lg px-3 py-2 text-sm outline-none text-gray-500 cursor-default"/>
-          </div>
+  <main>
+    <div class="page active" id="page-dashboard">
+      <div class="page-header"><h2>Dashboard</h2><p>Real-time overview of The Modern Cask</p></div>
+      <div class="stats-grid">
+        <div class="stat-card"><div class="stat-label">Users</div><div class="stat-value" id="stat-users">-</div><div class="stat-sub">with profiles</div></div>
+        <div class="stat-card highlight"><div class="stat-label">Check-ins</div><div class="stat-value" id="stat-checkins">-</div><div class="stat-sub">drams logged</div></div>
+        <div class="stat-card"><div class="stat-label">Whiskies</div><div class="stat-value" id="stat-whiskies">-</div><div class="stat-sub">in database</div></div>
+        <div class="stat-card"><div class="stat-label">Pending</div><div class="stat-value" id="stat-pending">-</div><div class="stat-sub">submissions + reports</div></div>
+      </div>
+      <div class="chart-row">
+        <div class="chart-card">
+          <div class="chart-title">Top regions by check-ins</div>
+          <div id="region-chart"><div class="loading">Loading...</div></div>
         </div>
-        <div id="manual-drop" class="drop-zone p-8 text-center cursor-pointer mb-3"
-          onclick="document.getElementById('manual-file').click()"
-          ondragover="dragOver(event,'manual-drop')" ondragleave="dragLeave('manual-drop')" ondrop="dropFile(event,'manual')">
-          <p class="text-gray-400 text-sm">📷 Drag & drop or click to browse</p>
-          <p class="text-gray-600 text-xs mt-1">Any format → auto-converted to 600×900 WebP</p>
-          <input type="file" id="manual-file" accept="image/*" onchange="handleManualFile(this)"/>
-        </div>
-        <div id="manual-preview" class="hidden mb-3 flex items-center gap-3">
-          <img id="manual-preview-img" class="w-16 h-24 object-contain bg-black/20 rounded-lg"/>
-          <div><p id="manual-preview-name" class="text-sm font-semibold"></p><p id="manual-preview-size" class="text-xs text-gray-500"></p></div>
-          <button onclick="clearManualFile()" class="ml-auto text-gray-500 hover:text-red-400 text-xs">✕ Clear</button>
-        </div>
-        <button onclick="uploadManual()" class="bg-yellow-400 text-black font-bold px-6 py-2.5 rounded-lg text-sm hover:bg-yellow-300 transition-all">Upload</button>
-        <p id="manual-status" class="text-xs mt-2 text-gray-500"></p>
-      </div>
-
-      <div class="card p-5">
-        <div class="flex items-center justify-between mb-4">
-          <h3 class="text-sm font-bold text-yellow-300 uppercase tracking-wider">Uploaded Images</h3>
-          <button onclick="loadAudit()" class="text-xs text-gray-500 hover:text-yellow-300 border border-gray-700 px-3 py-1 rounded-lg">↻ Refresh</button>
-        </div>
-        <p class="text-xs text-gray-600 mb-3">Fix slugs or delete and re-upload incorrect images.</p>
-        <div id="audit-list" class="space-y-2"><p class="text-gray-600 text-sm text-center py-4">Loading…</p></div>
-      </div>
-    </div>
-
-    <!-- PAGE: PHOTO QUEUE -->
-    <div id="page-queue" class="page-panel">
-      <div class="flex items-center justify-between mb-5">
-        <h2 class="text-lg font-bold text-white">Photo Request Queue</h2>
-        <button onclick="loadQueue()" class="text-xs text-gray-500 hover:text-yellow-300 border border-gray-700 px-3 py-1.5 rounded-lg">↻ Refresh</button>
-      </div>
-      <div class="card p-5">
-        <div id="queue-list" class="space-y-3"><p class="text-gray-600 text-sm text-center py-8">Loading…</p></div>
-      </div>
-    </div>
-
-    <!-- PAGE: ALL REQUESTS -->
-    <div id="page-all-requests" class="page-panel">
-      <div class="flex items-center justify-between mb-5">
-        <h2 class="text-lg font-bold text-white">All Photo Requests</h2>
-        <div class="flex gap-2">
-          <select id="req-filter" onchange="loadAllRequests()" class="text-xs text-gray-400 bg-black/40 border border-gray-700 rounded px-2 py-1.5 outline-none">
-            <option value="all">All statuses</option>
-            <option value="pending">Pending</option>
-            <option value="done">Done</option>
-            <option value="rejected">Rejected</option>
-          </select>
-          <button onclick="loadAllRequests()" class="text-xs text-gray-500 hover:text-yellow-300 border border-gray-700 px-3 py-1.5 rounded-lg">↻ Refresh</button>
-        </div>
-      </div>
-      <div class="card p-5">
-        <div id="all-requests-list" class="space-y-2"><p class="text-gray-600 text-sm text-center py-4">Select a filter above…</p></div>
-      </div>
-    </div>
-
-    <!-- PAGE: WHISKY REQUESTS -->
-    <div id="page-whisky-requests" class="page-panel">
-      <div class="flex items-center justify-between mb-5">
-        <h2 class="text-lg font-bold text-white">Whisky Requests</h2>
-        <button onclick="loadWhiskyRequests()" class="text-xs text-gray-500 hover:text-yellow-300 border border-gray-700 px-3 py-1.5 rounded-lg">↻ Refresh</button>
-      </div>
-      <p class="text-sm text-gray-500 mb-5">Whiskies users want added to the database.</p>
-      <div class="card p-5">
-        <div id="whisky-requests-list" class="space-y-2"><p class="text-gray-600 text-sm text-center py-4">Loading…</p></div>
-      </div>
-    </div>
-
-    <!-- PAGE: USERS -->
-    <div id="page-users" class="page-panel">
-      <div class="flex items-center justify-between mb-5">
-        <h2 class="text-lg font-bold text-white">Users</h2>
-        <button onclick="loadUsers()" class="text-xs text-gray-500 hover:text-yellow-300 border border-gray-700 px-3 py-1.5 rounded-lg">↻ Refresh</button>
-      </div>
-      <p class="text-sm text-gray-500 mb-5">Users ranked by check-in activity.</p>
-      <div class="card p-5">
-        <div id="users-list" class="space-y-2"><p class="text-gray-600 text-sm text-center py-4">Loading…</p></div>
-      </div>
-    </div>
-
-    <!-- PAGE: FEEDBACK -->
-    <div id="page-feedback" class="page-panel">
-      <div class="flex items-center justify-between mb-5">
-        <h2 class="text-lg font-bold text-white">User Feedback</h2>
-        <div class="flex gap-2">
-          <select id="feedback-filter" onchange="loadFeedback()" class="text-xs text-gray-400 bg-black/40 border border-gray-700 rounded px-2 py-1.5 outline-none">
-            <option value="all">All types</option>
-            <option value="bug">🐛 Bugs</option>
-            <option value="idea">💡 Ideas</option>
-            <option value="praise">⭐ Praise</option>
-            <option value="other">💬 Other</option>
-          </select>
-          <button onclick="loadFeedback()" class="text-xs text-gray-500 hover:text-yellow-300 border border-gray-700 px-3 py-1.5 rounded-lg">↻ Refresh</button>
-        </div>
-      </div>
-      <div class="card p-5">
-        <div id="feedback-list" class="space-y-3"><p class="text-gray-600 text-sm text-center py-8">Loading…</p></div>
-      </div>
-    </div>
-
-    <!-- PAGE: CONFIG -->
-    <div id="page-config" class="page-panel">
-      <h2 class="text-lg font-bold text-white mb-5">Configuration</h2>
-      <div class="card p-5 mb-4">
-        <h3 class="text-sm font-bold text-yellow-300 uppercase tracking-wider mb-4">Current Config</h3>
-        <p class="text-xs text-gray-500 mb-4">Read-only. Edit in the CFG block at the top of index.html.</p>
-        <div class="space-y-2" id="config-display"></div>
-      </div>
-      <div class="card p-5 mb-4">
-        <h3 class="text-sm font-bold text-yellow-300 uppercase tracking-wider mb-3">Netlify Env Variables</h3>
-        <p class="text-xs text-gray-500 mb-3">Set in Netlify dashboard → Site config → Environment variables:</p>
-        <div class="space-y-2">
-          <div class="flex justify-between items-center bg-black/30 rounded-lg px-3 py-2.5">
-            <div><p class="text-xs font-mono text-yellow-300">GEMINI_API_KEY</p><p class="text-[10px] text-gray-500 mt-0.5">Gemini Vision — photo label search</p></div>
-            <a href="https://aistudio.google.com/app/apikey" target="_blank" class="text-[10px] text-blue-400 hover:underline">Get key ↗</a>
-          </div>
-          <div class="flex justify-between items-center bg-black/30 rounded-lg px-3 py-2.5">
-            <div><p class="text-xs font-mono text-yellow-300">SUPABASE_SERVICE_KEY</p><p class="text-[10px] text-gray-500 mt-0.5">Server-side admin operations</p></div>
-            <a href="https://supabase.com/dashboard/project/nluezhsmgwuqdryarrmd/settings/api" target="_blank" class="text-[10px] text-blue-400 hover:underline">Dashboard ↗</a>
-          </div>
-        </div>
-      </div>
-      <div class="card p-5">
-        <h3 class="text-sm font-bold text-yellow-300 uppercase tracking-wider mb-3">Sentry</h3>
-        <div class="space-y-2">
-          <div class="flex justify-between items-center bg-black/30 rounded-lg px-3 py-2.5">
-            <div><p class="text-xs text-gray-300">Error monitoring dashboard</p><p class="text-[10px] text-gray-600" id="sentry-dsn-display">DSN: b9a540d5…</p></div>
-            <a href="https://sentry.io" target="_blank" class="text-[10px] text-blue-400 hover:underline">Open ↗</a>
-          </div>
-          <button onclick="testSentry()" class="text-xs border border-gray-700 px-4 py-2 rounded-lg text-gray-400 hover:text-yellow-300 hover:border-yellow-300/30 transition-all">Test Sentry (fire test error)</button>
-          <p id="sentry-test-result" class="text-xs text-gray-600"></p>
+        <div class="chart-card">
+          <div class="chart-title">Recent activity</div>
+          <div id="recent-activity"><div class="loading">Loading...</div></div>
         </div>
       </div>
     </div>
 
-
-    <!-- PAGE: ANALYTICS -->
-    <div id="page-analytics" class="page-panel">
-      <div class="flex items-center justify-between mb-5">
-        <h2 class="text-lg font-bold text-white">Analytics</h2>
-        <button onclick="loadAnalytics()" class="text-xs text-gray-500 hover:text-yellow-300 border border-gray-700 px-3 py-1.5 rounded-lg">↻ Refresh</button>
-      </div>
-      <!-- Summary stats -->
-      <div class="grid grid-cols-4 gap-3 mb-5">
-        <div class="card p-4 text-center"><p class="text-2xl font-bold text-yellow-400" id="an-total-checkins">–</p><p class="text-[10px] text-gray-500 uppercase tracking-wider mt-1">Total Check-ins</p></div>
-        <div class="card p-4 text-center"><p class="text-2xl font-bold text-green-400" id="an-total-users">–</p><p class="text-[10px] text-gray-500 uppercase tracking-wider mt-1">Active Users</p></div>
-        <div class="card p-4 text-center"><p class="text-2xl font-bold text-blue-400" id="an-avg-per-user">–</p><p class="text-[10px] text-gray-500 uppercase tracking-wider mt-1">Avg per User</p></div>
-        <div class="card p-4 text-center"><p class="text-2xl font-bold text-purple-400" id="an-images-pct">–</p><p class="text-[10px] text-gray-500 uppercase tracking-wider mt-1">With Images</p></div>
-      </div>
-      <div class="grid grid-cols-2 gap-4 mb-4">
-        <!-- Top whiskies -->
-        <div class="card p-4">
-          <h3 class="text-xs font-bold text-yellow-300 uppercase tracking-wider mb-3">Most Checked-in</h3>
-          <div id="an-top-whiskies" class="space-y-2"><p class="text-gray-600 text-xs text-center py-4">Loading…</p></div>
+    <div class="page" id="page-users">
+      <div class="page-header"><h2>Users</h2><p>Registered accounts with profiles</p></div>
+      <div class="table-card">
+        <div class="table-header">
+          <span class="table-title">Accounts</span>
+          <input class="search-inp" placeholder="Search users..." oninput="filterTable('users-table', this.value)"/>
         </div>
-        <!-- Top regions -->
-        <div class="card p-4">
-          <h3 class="text-xs font-bold text-yellow-300 uppercase tracking-wider mb-3">Top Regions</h3>
-          <div id="an-top-regions" class="space-y-2"><p class="text-gray-600 text-xs text-center py-4">Loading…</p></div>
-        </div>
-      </div>
-      <!-- Recent activity -->
-      <div class="card p-4">
-        <h3 class="text-xs font-bold text-yellow-300 uppercase tracking-wider mb-3">Recent Check-ins (last 20)</h3>
-        <div id="an-recent" class="space-y-1"><p class="text-gray-600 text-xs text-center py-4">Loading…</p></div>
+        <div id="users-table-wrap"><div class="loading">Loading...</div></div>
       </div>
     </div>
 
-    <!-- PAGE: SLUG AUDIT -->
-    <div id="page-slug-audit" class="page-panel">
-      <div class="flex items-center justify-between mb-5">
-        <h2 class="text-lg font-bold text-white">Slug Audit</h2>
-        <button onclick="loadSlugAudit()" class="text-xs text-gray-500 hover:text-yellow-300 border border-gray-700 px-3 py-1.5 rounded-lg">↻ Refresh</button>
-      </div>
-      <p class="text-sm text-gray-500 mb-5">Compare stored image slugs against API slugs to catch mismatches. Whiskies without images are listed for prioritisation.</p>
-      <div class="grid grid-cols-2 gap-4 mb-4">
-        <div class="card p-4">
-          <h3 class="text-xs font-bold text-yellow-300 uppercase tracking-wider mb-3">⚠ Potential Mismatches</h3>
-          <div id="slug-mismatches" class="space-y-2"><p class="text-gray-600 text-xs text-center py-4">Loading…</p></div>
+    <div class="page" id="page-checkins">
+      <div class="page-header"><h2>Check-ins</h2><p>All dram occasions logged</p></div>
+      <div class="table-card">
+        <div class="table-header">
+          <span class="table-title">Dram log</span>
+          <input class="search-inp" placeholder="Search check-ins..." oninput="filterTable('checkins-table', this.value)"/>
         </div>
-        <div class="card p-4">
-          <h3 class="text-xs font-bold text-yellow-300 uppercase tracking-wider mb-3">✓ Matched Images</h3>
-          <div id="slug-matched" class="space-y-1 max-h-80 overflow-y-auto"><p class="text-gray-600 text-xs text-center py-4">Loading…</p></div>
-        </div>
-      </div>
-      <div class="card p-4">
-        <h3 class="text-xs font-bold text-yellow-300 uppercase tracking-wider mb-3">Priority Upload List (no image yet)</h3>
-        <div class="flex gap-2 mb-3">
-          <select id="slug-region-filter" onchange="filterPriorityList()" class="text-xs bg-black/40 border border-gray-700 rounded px-2 py-1.5 text-gray-400 outline-none">
-            <option value="">All regions</option>
-            <option>Islay</option><option>Speyside</option><option>Highland</option>
-            <option>Lowland</option><option>Campbeltown</option><option>Islands</option>
-            <option>Orkney</option><option>Japan</option><option>Ireland</option>
-          </select>
-        </div>
-        <div id="slug-missing" class="space-y-1 max-h-96 overflow-y-auto"><p class="text-gray-600 text-xs text-center py-4">Loading…</p></div>
+        <div id="checkins-table-wrap"><div class="loading">Loading...</div></div>
       </div>
     </div>
 
-    <!-- PAGE: WHISKY BROWSER -->
-    <div id="page-whisky-browser" class="page-panel">
-      <div class="flex items-center justify-between mb-5">
-        <h2 class="text-lg font-bold text-white">DB Browser</h2>
+    <div class="page" id="page-whiskies">
+      <div class="page-header"><h2>Whiskies</h2><p>Full database</p></div>
+      <div style="display:flex;gap:10px;margin-bottom:16px;align-items:center">
+        <button class="act-btn" onclick="triggerSync()" style="padding:8px 16px;font-size:12px">Sync from API</button>
+        <span id="sync-status" style="font-size:12px;color:#504840"></span>
       </div>
-      <p class="text-sm text-gray-500 mb-4">Search the live WHISKY:EDITION API. See which whiskies have images and request photos directly.</p>
-      <div class="card p-4 mb-4">
-        <div class="flex gap-3">
-          <input id="browser-search" type="text" placeholder="Search by name, distillery, region…"
-            class="flex-1 bg-black/40 border border-gray-700 rounded-lg px-4 py-2.5 text-sm outline-none focus:border-yellow-500/50"
-            oninput="debounceSearch(this.value)"/>
-          <select id="browser-region" onchange="runBrowserSearch()" class="bg-black/40 border border-gray-700 rounded-lg px-3 py-2.5 text-sm text-gray-400 outline-none">
-            <option value="">All regions</option>
-            <option>Islay</option><option>Speyside</option><option>Highland</option>
-            <option>Lowland</option><option>Campbeltown</option><option>Islands</option>
-            <option>Orkney</option><option>Japan</option><option>Ireland</option>
-          </select>
+      <div class="table-card">
+        <div class="table-header">
+          <span class="table-title">Whisky database</span>
+          <input class="search-inp" placeholder="Search whiskies..." oninput="filterTable('whiskies-table', this.value)"/>
         </div>
-      </div>
-      <div class="card p-4">
-        <div id="browser-count" class="text-xs text-gray-600 mb-3">Enter a search term above</div>
-        <div id="browser-results" class="space-y-2"></div>
+        <div id="whiskies-table-wrap"><div class="loading">Loading...</div></div>
       </div>
     </div>
 
+    <div class="page" id="page-submissions">
+      <div class="page-header"><h2>Submissions</h2><p>User-submitted whiskies for review</p></div>
+      <div class="table-card">
+        <div class="table-header"><span class="table-title">All submissions</span></div>
+        <div id="submissions-table-wrap"><div class="loading">Loading...</div></div>
+      </div>
+    </div>
+
+    <div class="page" id="page-reports">
+      <div class="page-header"><h2>Reports</h2><p>User-reported data issues</p></div>
+      <div class="table-card">
+        <div class="table-header"><span class="table-title">Flagged items</span></div>
+        <div id="reports-table-wrap"><div class="loading">Loading...</div></div>
+      </div>
+    </div>
+
+    <div class="page" id="page-profiles">
+      <div class="page-header"><h2>Profiles</h2><p>User profile data</p></div>
+      <div class="table-card">
+        <div class="table-header">
+          <span class="table-title">User profiles</span>
+          <input class="search-inp" placeholder="Search profiles..." oninput="filterTable('profiles-table', this.value)"/>
+        </div>
+        <div id="profiles-table-wrap"><div class="loading">Loading...</div></div>
+      </div>
+    </div>
+
+    <div class="page" id="page-security">
+      <div class="page-header"><h2>Security</h2><p>Privacy and security status</p></div>
+      <div class="security-grid">
+        <div class="security-card">
+          <h3><span class="ms check-ok" style="font-size:18px;font-variation-settings:'FILL' 1">verified_user</span> Authentication</h3>
+          <div class="check-item"><span class="ms check-ok" style="font-size:16px">check_circle</span> Google OAuth enabled</div>
+          <div class="check-item"><span class="ms check-ok" style="font-size:16px">check_circle</span> Session auto-refresh active</div>
+          <div class="check-item"><span class="ms check-ok" style="font-size:16px">check_circle</span> Redirect URLs configured</div>
+          <div class="check-item"><span class="ms check-ok" style="font-size:16px">check_circle</span> PKCE flow enabled</div>
+        </div>
+        <div class="security-card">
+          <h3><span class="ms check-ok" style="font-size:18px;font-variation-settings:'FILL' 1">lock</span> Database RLS</h3>
+          <div class="check-item"><span class="ms check-ok" style="font-size:16px">check_circle</span> checkins -- own data only</div>
+          <div class="check-item"><span class="ms check-ok" style="font-size:16px">check_circle</span> profiles -- own data only</div>
+          <div class="check-item"><span class="ms check-ok" style="font-size:16px">check_circle</span> whiskies -- public read, no write</div>
+          <div class="check-item"><span class="ms check-warn" style="font-size:16px">warning</span> whisky_requests -- anon insert allowed</div>
+          <div class="check-item"><span class="ms check-warn" style="font-size:16px">warning</span> feedback -- anon insert allowed</div>
+        </div>
+        <div class="security-card">
+          <h3><span class="ms check-ok" style="font-size:18px;font-variation-settings:'FILL' 1">storage</span> Storage Buckets</h3>
+          <div class="check-item"><span class="ms check-ok" style="font-size:16px">check_circle</span> avatars -- auth write, public read, 2MB limit</div>
+          <div class="check-item"><span class="ms check-ok" style="font-size:16px">check_circle</span> stamps -- public read only</div>
+          <div class="check-item"><span class="ms check-ok" style="font-size:16px">check_circle</span> badges -- public read only</div>
+          <div class="check-item"><span class="ms check-ok" style="font-size:16px">check_circle</span> logo -- public read only</div>
+        </div>
+        <div class="security-card">
+          <h3><span class="ms check-ok" style="font-size:18px;font-variation-settings:'FILL' 1">shield</span> App Security</h3>
+          <div class="check-item"><span class="ms check-ok" style="font-size:16px">check_circle</span> HTTPS enforced via Netlify</div>
+          <div class="check-item"><span class="ms check-ok" style="font-size:16px">check_circle</span> Security headers configured</div>
+          <div class="check-item"><span class="ms check-ok" style="font-size:16px">check_circle</span> Anon key only in frontend</div>
+          <div class="check-item"><span class="ms check-warn" style="font-size:16px">warning</span> Rate limiting not yet configured</div>
+        </div>
+      </div>
+      <div class="table-card">
+        <div class="table-header"><span class="table-title">Pre-launch action items</span></div>
+        <table>
+          <thead><tr><th>Priority</th><th>Action</th><th>Where</th><th>Status</th></tr></thead>
+          <tbody>
+            <tr><td><span class="pill pill-rejected">High</span></td><td>Enable Supabase rate limiting on anon inserts</td><td>Supabase Dashboard -- Rate Limits</td><td><span class="pill pill-pending">Pending</span></td></tr>
+            <tr><td><span class="pill pill-pending">Medium</span></td><td>Configure nightly Edge Function cron</td><td>Supabase -- Edge Functions -- Schedule</td><td><span class="pill pill-pending">Pending</span></td></tr>
+            <tr><td><span class="pill pill-pending">Medium</span></td><td>Set up auth email templates</td><td>Supabase -- Auth -- Email Templates</td><td><span class="pill pill-pending">Pending</span></td></tr>
+            <tr><td><span class="pill pill-approved">Low</span></td><td>Add privacy policy page</td><td>Static page linked from profile</td><td><span class="pill pill-pending">Pending</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="page" id="page-sync">
+      <div class="page-header"><h2>DB Sync</h2><p>Sync whiskies from WHISKY:EDITION API</p></div>
+      <div class="stats-grid" style="grid-template-columns:repeat(3,1fr)">
+        <div class="stat-card"><div class="stat-label">Whiskies in DB</div><div class="stat-value" id="sync-count">-</div></div>
+        <div class="stat-card"><div class="stat-label">API Total</div><div class="stat-value">389</div></div>
+        <div class="stat-card"><div class="stat-label">Last Sync</div><div class="stat-value" id="sync-last" style="font-size:16px;padding-top:6px">-</div></div>
+      </div>
+      <div class="table-card" style="padding:24px">
+        <div class="chart-title" style="margin-bottom:12px">Manual sync</div>
+        <p style="font-size:13px;color:#7a7060;margin-bottom:20px;line-height:1.6">Fetches all whiskies from thewhiskyedition.com and upserts into Supabase. Safe to run anytime.</p>
+        <button class="btn-gold" style="width:auto;padding:12px 28px" onclick="triggerSync()">Run Sync Now</button>
+        <p id="sync-result" style="font-size:12px;color:#7ab840;margin-top:12px;display:none"></p>
+      </div>
+    </div>
   </main>
 </div>
 
+<div id="toast"></div>
+
 <script>
-const SUPABASE_URL  = 'https://nluezhsmgwuqdryarrmd.supabase.co';
-const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5sdWV6aHNtZ3d1cWRyeWFycm1kIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU0MDMyODMsImV4cCI6MjA5MDk3OTI4M30.61Gt5y8k46nIBjtlpyu3n2B4RVcHpPYI1WBRoqnTOYM';
-const { createClient } = supabase;
-if(typeof Sentry !== 'undefined'){
-  Sentry.init({
-    dsn: 'https://b9a540d51bfee4b8d51e19b7c03598a8@js-de.sentry-cdn.com/0',
-    environment: 'admin',
-    tracesSampleRate: 0,
-  });
-}
+var SB_URL = 'https://nluezhsmgwuqdryarrmd.supabase.co';
+var SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5sdWV6aHNtZ3d1cWRyeWFycm1kIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU0MDMyODMsImV4cCI6MjA5MDk3OTI4M30.61Gt5y8k46nIBjtlpyu3n2B4RVcHpPYI1WBRoqnTOYM';
+var ADMIN_EMAILS = ['hugo@humanplusmachine.io', 'hugopontopinto@gmail.com', 'hugo@getremyai.com'];
+var SESSION = null;
+var pageLoaded = {};
 
-const sb = createClient(SUPABASE_URL, SUPABASE_ANON);
-
-let manualFileData = null;
-let manualFileType = null;
-
-// ── AUTH ────────────────────────────────────────────────────────────────────
-async function adminSignIn() {
-  const email = document.getElementById('admin-email-input').value;
-  const pass  = document.getElementById('admin-pass-input').value;
-  const { error } = await sb.auth.signInWithPassword({ email, password: pass });
-  if (error) {
-    const el = document.getElementById('auth-error');
-    el.textContent = error.message; el.classList.remove('hidden');
-  }
-}
-
-async function signOut() {
-  await sb.auth.signOut();
-  location.reload();
-}
-
-sb.auth.onAuthStateChange((event, session) => {
-  if (session?.user) {
-    document.getElementById('auth-gate').style.display='none';
-    document.getElementById('main-content').classList.remove('hidden');
-    document.getElementById('admin-email').textContent = session.user.email;
-    loadStats(); loadFeedbackCount(); loadAudit(); loadQueue();
-  } else {
-    document.getElementById('auth-gate').style.display='';
-    document.getElementById('main-content').classList.add('hidden');
-  }
-});
-
-// ── STATS ───────────────────────────────────────────────────────────────────
-async function loadStats() {
-  const [{ count: pending }, { count: done }, { count: images }] = await Promise.all([
-    sb.from('image_requests').select('*', { count: 'exact', head: true }).eq('status','pending'),
-    sb.from('image_requests').select('*', { count: 'exact', head: true }).eq('status','done'),
-    sb.from('bottle_images').select('*', { count: 'exact', head: true }),
-  ]);
-  document.getElementById('stat-pending').textContent = pending || 0;
-  document.getElementById('stat-done').textContent = done || 0;
-  document.getElementById('stat-images').textContent = images || 0;
-}
-
-// ── QUEUE ───────────────────────────────────────────────────────────────────
-async function loadQueue() {
-  const el = document.getElementById('queue-list');
-  const { data, error } = await sb.from('image_requests')
-    .select('*').order('requested_at', { ascending: false }).limit(50);
-  if (error || !data?.length) {
-    el.innerHTML = '<p class="text-gray-600 text-sm text-center py-8">No requests yet</p>';
-    return;
-  }
-  el.innerHTML = data.map(r => `
-    <div class="flex items-center gap-4 p-4 bg-black/20 rounded-xl border border-gray-800">
-      <div class="flex-1 min-w-0">
-        <p class="font-semibold text-sm">${r.whisky_name}</p>
-        <p class="text-xs text-gray-500 mt-0.5">${r.whisky_slug} · ${r.region || 'Unknown region'}</p>
-        <p class="text-xs text-gray-600 mt-0.5">${new Date(r.requested_at).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'})}</p>
-      </div>
-      <span class="badge-${r.status} text-xs font-bold px-2.5 py-1 rounded-full uppercase tracking-wider">${r.status}</span>
-      ${r.status === 'pending' ? `
-        <div class="flex gap-2">
-          <div class="drop-zone px-3 py-2 cursor-pointer text-center" style="min-width:100px" 
-            onclick="document.getElementById('file-${r.id}').click()"
-            ondragover="dragOver(event,'dz-${r.id}')" 
-            ondragleave="dragLeave('dz-${r.id}')"
-            ondrop="dropFile(event,'${r.id}','${r.whisky_slug}','${r.whisky_name}')"
-            id="dz-${r.id}">
-            <p class="text-xs text-gray-400">📁 Upload</p>
-            <input type="file" id="file-${r.id}" accept="image/*" 
-              onchange="handleQueueFile(this,'${r.id}','${r.whisky_slug}','${r.whisky_name}')"/>
-          </div>
-          <div class="flex flex-col gap-1">
-            <button onclick="skipRequest('${r.id}')" class="text-[10px] text-gray-600 hover:text-yellow-400 border border-gray-800 px-2 py-1 rounded-lg whitespace-nowrap">↓ Skip</button>
-            <button onclick="deleteRequest('${r.id}')" class="text-[10px] text-gray-600 hover:text-red-400 border border-gray-800 px-2 py-1 rounded-lg whitespace-nowrap">✕ Delete</button>
-          </div>
-        </div>
-      ` : r.image_url ? `<img src="${r.image_url}" class="w-10 h-14 object-contain rounded"/>` : ''}
-    </div>
-  `).join('');
-}
-
-// ── DRAG & DROP ─────────────────────────────────────────────────────────────
-function dragOver(e, id) { e.preventDefault(); document.getElementById(id)?.classList.add('over'); }
-function dragLeave(id) { document.getElementById(id)?.classList.remove('over'); }
-
-function dropFile(e, idOrAction, slug, name) {
-  e.preventDefault();
-  const dzId = typeof idOrAction === 'string' && !slug ? 'manual-drop' : `dz-${idOrAction}`;
-  document.getElementById(dzId)?.classList.remove('over');
-  const file = e.dataTransfer.files[0];
-  if (!file) return;
-  if (idOrAction === 'manual') {
-    setManualFile(file);
-  } else {
-    uploadQueueFile(file, idOrAction, slug, name);
-  }
-}
-
-// ── MANUAL UPLOAD ────────────────────────────────────────────────────────────
-function handleManualFile(input) {
-  if (input.files[0]) setManualFile(input.files[0]);
-}
-
-function autoSlug(name) {
-  // Kept for fallback only — selectWhisky is the primary path now
-  const slug = name.toLowerCase()
-    .replace(/[^a-z0-9\s-]/g, '').trim()
-    .replace(/\s+/g, '-').replace(/-+/g, '-');
-  return slug;
-}
-
-let _nameDebounce = null;
-let _selectedFromDB = false;
-
-function searchWhiskyName(q) {
-  _selectedFromDB = false;
-  document.getElementById('name-match-badge')?.classList.add('hidden');
-  const dd = document.getElementById('name-dropdown');
-  clearTimeout(_nameDebounce);
-  if (!q || q.length < 2) { dd.style.display = 'none'; return; }
-  _nameDebounce = setTimeout(async () => {
-    dd.style.display = 'block';
-    dd.innerHTML = '<p class="px-3 py-2 text-xs text-gray-500">Searching…</p>';
-    try {
-      const url = `/.netlify/functions/whisky?q=${encodeURIComponent(q)}&per_page=8`;
-      const r = await fetch(url, { signal: AbortSignal.timeout(5000) });
-      const data = await r.json();
-      const items = data.items || [];
-      if (!items.length) {
-        dd.innerHTML = '<p class="px-3 py-2 text-xs text-gray-500">No matches — slug will be auto-generated from name</p>';
-        // Auto-generate slug from typed name as fallback
-        document.getElementById('manual-slug').value = autoSlug(q);
-        return;
-      }
-      dd.innerHTML = items.map(w => {
-        const m = w.metadata || {};
-        return `<div class="px-3 py-2.5 cursor-pointer hover:bg-white/5 border-b border-gray-800/50 last:border-0"
-          onclick="selectWhisky('${(w.slug||w.id).replace(/'/g,"\'")}','${w.name.replace(/'/g,"\'")}','${(m.distillery||'').replace(/'/g,"\'")}','${m.region||''}')">
-          <p class="text-sm font-medium text-gray-200">${w.name}</p>
-          <p class="text-xs text-gray-500">${m.distillery||''}${m.region?' · '+m.region:''}${m.age?' · '+m.age+'yr':''}${m.abv?' · '+m.abv+'%':''}</p>
-        </div>`;
-      }).join('');
-    } catch(e) {
-      dd.innerHTML = '<p class="px-3 py-2 text-xs text-red-400">Search failed — type slug manually</p>';
-    }
-  }, 300);
-}
-
-function selectWhisky(slug, name, distillery, region) {
-  document.getElementById('manual-name').value = name;
-  document.getElementById('manual-slug').value = slug;
-  document.getElementById('name-dropdown').style.display = 'none';
-  document.getElementById('name-match-badge')?.classList.remove('hidden');
-  _selectedFromDB = true;
-  // Close dropdown on outside click
-}
-
-// Close dropdown on click outside
-document.addEventListener('click', e => {
-  if (!e.target.closest('#manual-name') && !e.target.closest('#name-dropdown')) {
-    const dd = document.getElementById('name-dropdown');
-    if (dd) dd.style.display = 'none';
-  }
-});
-function setManualFile(file) {
-  const originalSize = file.size;
-  const sizeEl = document.getElementById('manual-preview-size');
-  if (sizeEl) sizeEl.textContent = 'Optimising…';
-  optimiseImage(file).then(({ base64, contentType, width, height, newSize }) => {
-    manualFileData = base64;
-    manualFileType = contentType;
-    const dataUrl = `data:${contentType};base64,${base64}`;
-    document.getElementById('manual-preview').classList.remove('hidden');
-    document.getElementById('manual-preview-img').src = dataUrl;
-    document.getElementById('manual-preview-name').textContent = file.name + ' → WebP';
-    const saved = Math.round((1 - newSize/originalSize) * 100);
-    if (sizeEl) sizeEl.textContent = `${(originalSize/1024).toFixed(0)}KB → ${(newSize/1024).toFixed(0)}KB (${saved}% saved)`;
-    document.getElementById('manual-drop').style.display = 'none';
-  }).catch(err => {
-    console.error('Image optimise failed, using original', err);
-    // Fallback to original file
-    const reader = new FileReader();
-    reader.onload = e => {
-      manualFileData = e.target.result.split(',')[1];
-      manualFileType = file.type;
-      document.getElementById('manual-preview').classList.remove('hidden');
-      document.getElementById('manual-preview-img').src = e.target.result;
-      document.getElementById('manual-preview-name').textContent = file.name;
-      if (sizeEl) sizeEl.textContent = `${(file.size/1024).toFixed(0)}KB (unoptimised)`;
-      document.getElementById('manual-drop').style.display = 'none';
-    };
-    reader.readAsDataURL(file);
-  });
-}
-
-// Canvas-based image optimisation — 600×900 WebP, transparent bg, EXIF stripped
-function optimiseImage(file) {
-  return new Promise((resolve, reject) => {
-    const img = new Image();
-    const url = URL.createObjectURL(file);
-    img.onload = () => {
-      URL.revokeObjectURL(url);
-      const TARGET_W = 600, TARGET_H = 900;
-      const canvas = document.createElement('canvas');
-      canvas.width = TARGET_W;
-      canvas.height = TARGET_H;
-      const ctx = canvas.getContext('2d');
-      // Transparent background (for PNG bottles)
-      ctx.clearRect(0, 0, TARGET_W, TARGET_H);
-      // Scale to fit inside 600×900, centred, preserve aspect ratio
-      const scale = Math.min(TARGET_W / img.width, TARGET_H / img.height);
-      const dw = img.width * scale;
-      const dh = img.height * scale;
-      const dx = (TARGET_W - dw) / 2;
-      const dy = (TARGET_H - dh) / 2;
-      ctx.drawImage(img, dx, dy, dw, dh);
-      canvas.toBlob(blob => {
-        if (!blob) return reject(new Error('Canvas toBlob failed'));
-        const reader = new FileReader();
-        reader.onload = e => {
-          const base64 = e.target.result.split(',')[1];
-          resolve({ base64, contentType: 'image/webp', width: TARGET_W, height: TARGET_H, newSize: blob.size });
-        };
-        reader.readAsDataURL(blob);
-      }, 'image/webp', 0.85);
-    };
-    img.onerror = reject;
-    img.src = url;
-  });
-}
-
-function clearManualFile() {
-  manualFileData = null; manualFileType = null;
-  document.getElementById('manual-preview').classList.add('hidden');
-  document.getElementById('manual-drop').style.display = '';
-  document.getElementById('manual-file').value = '';
-}
-
-async function uploadManual() {
-  const slug = document.getElementById('manual-slug').value.trim();
-  const name = document.getElementById('manual-name').value.trim();
-  const statusEl = document.getElementById('manual-status');
-  if (!slug || !name) { statusEl.textContent = 'Enter slug and name'; statusEl.className = 'text-xs mt-2 text-red-400'; return; }
-  if (!manualFileData) { statusEl.textContent = 'Choose an image first'; statusEl.className = 'text-xs mt-2 text-red-400'; return; }
-  statusEl.textContent = 'Uploading…'; statusEl.className = 'text-xs mt-2 text-gray-400';
-  const url = await uploadToStorage(slug, manualFileData, manualFileType);
-  if (url) {
-    await sb.from('bottle_images').upsert({ slug, whisky_name: name, image_url: url }, { onConflict: 'slug' });
-    statusEl.textContent = `✓ Uploaded — ${url}`; statusEl.className = 'text-xs mt-2 text-green-400';
-    clearManualFile(); loadStats();
-  } else {
-    statusEl.textContent = 'Upload failed — check console'; statusEl.className = 'text-xs mt-2 text-red-400';
-  }
-}
-
-// ── QUEUE FILE UPLOAD ────────────────────────────────────────────────────────
-function handleQueueFile(input, requestId, slug, name) {
-  if (input.files[0]) uploadQueueFile(input.files[0], requestId, slug, name);
-}
-
-async function uploadQueueFile(file, requestId, slug, name) {
-  const dz = document.getElementById(`dz-${requestId}`);
-  if (dz) dz.innerHTML = '<p class="text-xs text-yellow-400">Optimising…</p>';
-  try {
-    const { base64, contentType } = await optimiseImage(file);
-    if (dz) dz.innerHTML = '<p class="text-xs text-yellow-400">Uploading…</p>';
-    const url = await uploadToStorage(slug, base64, contentType);
-    if (url) {
-      await Promise.all([
-        sb.from('bottle_images').upsert({ slug, whisky_name: name, image_url: url }, { onConflict: 'slug' }),
-        sb.from('image_requests').update({ status: 'done', image_url: url, fulfilled_at: new Date().toISOString() }).eq('id', requestId),
-      ]);
-      loadQueue(); loadStats();
-    } else {
-      if (dz) dz.innerHTML = '<p class="text-xs text-red-400">Upload failed</p>';
-    }
-  } catch(err) {
-    console.error('uploadQueueFile error:', err);
-    if (dz) dz.innerHTML = '<p class="text-xs text-red-400">Error: ' + err.message + '</p>';
-  }
-}
-
-function switchTab(tab){
-  document.querySelectorAll('.nav-item').forEach(b=>{
-    b.classList.toggle('active', b.dataset.page === tab);
-  });
-  document.querySelectorAll('.page-panel').forEach(p=>p.classList.remove('active'));
-  document.getElementById('page-'+tab)?.classList.add('active');
-  if(tab==='images') loadAudit();
-  if(tab==='queue') loadQueue();
-  if(tab==='all-requests') loadAllRequests();
-  if(tab==='whisky-requests') loadWhiskyRequests();
-  if(tab==='feedback') loadFeedback();
-  if(tab==='users') loadUsers();
-  if(tab==='config') renderConfig();
-  if(tab==='analytics') loadAnalytics();
-  if(tab==='slug-audit') loadSlugAudit();
-  if(tab==='whisky-browser') document.getElementById('browser-search')?.focus();
-}
-
-async function loadFeedback(){
-  const el=document.getElementById('feedback-list');
-  const filter=document.getElementById('feedback-filter')?.value||'all';
-  el.innerHTML='<p class="text-gray-600 text-sm text-center py-4">Loading…</p>';
-  let q=sb.from('feedback').select('id,type,message,email,user_id,created_at,url').order('created_at',{ascending:false}).limit(100);
-  if(filter!=='all') q=q.eq('type',filter);
-  const {data,error}=await q;
-  if(error){
-    el.innerHTML=`<p class="text-red-400 text-sm text-center py-4">Error: ${error.message}</p>`;
-    if(error.code==='42P01') el.innerHTML='<p class="text-gray-500 text-sm text-center py-8">feedback table not created yet.<br><span class="text-yellow-400 text-xs">Run: CREATE TABLE feedback (id bigserial primary key, type text, message text, email text, user_id uuid, app_version text, url text, created_at timestamptz default now());</span></p>';
-    return;
-  }
-  if(!data?.length){el.innerHTML='<p class="text-gray-500 text-sm text-center py-8">No feedback yet.</p>';return;}
-  const typeEmoji={bug:'🐛',idea:'💡',praise:'⭐',other:'💬'};
-  el.innerHTML=data.map(f=>`
-    <div class="bg-black/30 rounded-lg p-3 border border-gray-800">
-      <div class="flex items-start gap-2 mb-1">
-        <span class="text-sm">${typeEmoji[f.type]||'💬'}</span>
-        <span class="text-[10px] font-bold uppercase tracking-wider text-gray-500">${f.type||'other'}</span>
-        <span class="text-[10px] text-gray-600 ml-auto">${new Date(f.created_at).toLocaleDateString('en-GB',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'})}</span>
-      </div>
-      <p class="text-gray-300 text-sm leading-relaxed">${f.message}</p>
-      ${f.email?`<p class="text-[10px] text-blue-400 mt-1">${f.email}</p>`:''}
-      ${f.url?`<p class="text-[10px] text-gray-600 mt-0.5 truncate">${f.url}</p>`:''}
-    </div>`).join('');
-  document.getElementById('stat-feedback').textContent=data.length;
-}
-
-async function loadUsers(){
-  const el=document.getElementById('users-list');
-  if(!el)return;
-  el.innerHTML='<p class="text-gray-600 text-sm text-center py-4">Loading…</p>';
-  try{
-    const {data,error}=await sb.from('checkins')
-      .select('user_id, whisky_name, date')
-      .order('date',{ascending:false});
-    if(error) throw error;
-    // Group by user_id
-    const users={};
-    (data||[]).forEach(r=>{
-      if(!r.user_id) return;
-      if(!users[r.user_id]) users[r.user_id]={id:r.user_id,count:0,last:r.date};
-      users[r.user_id].count++;
-      if(r.date>users[r.user_id].last) users[r.user_id].last=r.date;
-    });
-    const list=Object.values(users).sort((a,b)=>b.count-a.count);
-    if(!list.length){el.innerHTML='<p class="text-gray-500 text-sm text-center py-8">No user activity yet.</p>';return;}
-    el.innerHTML=list.map((u,i)=>`
-      <div class="flex items-center gap-3 bg-black/20 rounded-lg px-4 py-3 border border-gray-800">
-        <div class="w-8 h-8 rounded-full bg-yellow-400/10 border border-yellow-400/20 flex items-center justify-center text-yellow-400 text-xs font-bold shrink-0">${i+1}</div>
-        <div class="flex-1 min-w-0">
-          <p class="text-xs font-mono text-gray-400 truncate">${u.id}</p>
-          <p class="text-[10px] text-gray-600">Last active: ${new Date(u.last).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'})}</p>
-        </div>
-        <div class="text-right shrink-0">
-          <p class="text-lg font-bold text-yellow-400">${u.count}</p>
-          <p class="text-[10px] text-gray-600">check-ins</p>
-        </div>
-      </div>`).join('');
-    // Update stat
-    document.getElementById('stat-users').textContent=list.length;
-  }catch(e){
-    el.innerHTML=`<p class="text-red-400 text-sm text-center py-4">${e.message}</p>`;
-  }
-}
-
-function renderConfig(){
-  const cfg={
-    'Supabase URL': SUPABASE_URL,
-    'Supabase Anon Key': SUPABASE_ANON.substring(0,30)+'…',
-    'API Proxy': '/.netlify/functions/whisky',
-    'API Direct': 'https://thewhiskyedition.com/api/whisky-reviews',
-    'Gemini Model': 'gemini-2.0-flash (set in whisky.js)',
-    'Sentry DSN': 'b9a540d5… (see index.html CFG.SENTRY_DSN)',
+function hdrs(token) {
+  return {
+    'apikey': SB_KEY,
+    'Authorization': 'Bearer ' + (token || SB_KEY),
+    'Content-Type': 'application/json'
   };
-  document.getElementById('config-display').innerHTML=Object.entries(cfg).map(([k,v])=>`
-    <div class="flex justify-between items-center bg-black/30 rounded-lg px-3 py-2 gap-3">
-      <p class="text-xs text-gray-400 shrink-0">${k}</p>
-      <p class="text-xs font-mono text-gray-300 text-right truncate">${v}</p>
-    </div>`).join('');
-  document.getElementById('sentry-dsn-display').textContent='DSN: b9a540d5…@js-de.sentry-cdn.com';
 }
 
-function testSentry(){
-  const el=document.getElementById('sentry-test-result');
-  try{
-    if(typeof Sentry==='undefined'){el.textContent='Sentry not loaded';return;}
-    Sentry.captureMessage('Admin test error — '+new Date().toISOString());
-    el.textContent='✓ Test event sent — check Sentry dashboard';
-    el.className='text-xs text-green-400';
-  }catch(e){el.textContent='✗ '+e.message;el.className='text-xs text-red-400';}
+function toast(msg) {
+  var t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(function() { t.classList.remove('show'); }, 2400);
 }
 
-async function loadFeedbackCount(){
-  const {count}=await sb.from('feedback').select('*',{count:'exact',head:true});
-  const el=document.getElementById('stat-feedback');
-  if(el) el.textContent=count||0;
+function setEl(id, val) {
+  var el = document.getElementById(id);
+  if (el) el.textContent = val;
 }
 
-async function loadWhiskyRequests(){
-  const el=document.getElementById('whisky-requests-list');
-  if(!el)return;
-  el.innerHTML='<p class="text-gray-600 text-sm text-center py-4">Loading…</p>';
-  const {data,error}=await sb.from('whisky_requests')
-    .select('id,whisky_name,distillery,region,age_statement,notes,status,requested_at')
-    .order('requested_at',{ascending:false}).limit(100);
-  if(error){
-    if(error.code==='42P01'){
-      el.innerHTML='<p class="text-yellow-400 text-xs text-center py-4">Table not created yet — run create_whisky_requests_table.sql in Supabase</p>';
-    } else {
-      el.innerHTML=`<p class="text-red-400 text-xs text-center py-4">${error.message}</p>`;
-    }
+async function sbGet(path, params) {
+  params = params || '';
+  var r = await fetch(SB_URL + '/rest/v1/' + path + params, { headers: hdrs(SESSION && SESSION.access_token) });
+  if (!r.ok) return [];
+  return r.json();
+}
+
+async function doLogin() {
+  var email = document.getElementById('login-email').value.trim();
+  var password = document.getElementById('login-password').value;
+  document.getElementById('login-error').style.display = 'none';
+
+  var r = await fetch(SB_URL + '/auth/v1/token?grant_type=password', {
+    method: 'POST',
+    headers: { 'apikey': SB_KEY, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email: email, password: password })
+  });
+  var data = await r.json();
+
+  if (!data.access_token) {
+    document.getElementById('login-error').style.display = 'block';
     return;
   }
-  if(!data?.length){el.innerHTML='<p class="text-gray-500 text-sm text-center py-4">No requests yet.</p>';return;}
-  const statusCol={pending:'text-yellow-400',added:'text-green-400',rejected:'text-red-400'};
-  el.innerHTML=data.map(r=>`
-    <div class="bg-black/30 rounded-lg p-3 border border-gray-800">
-      <div class="flex items-start justify-between gap-2">
-        <div class="flex-1 min-w-0">
-          <p class="text-sm font-semibold text-gray-200">${r.whisky_name}</p>
-          <p class="text-xs text-gray-500">${[r.distillery,r.region,r.age_statement?r.age_statement+'yr':null].filter(Boolean).join(' · ')||'No details'}</p>
-          ${r.notes?`<p class="text-xs text-gray-600 mt-1 italic">"${r.notes}"</p>`:''}
-        </div>
-        <div class="flex flex-col items-end gap-1 shrink-0">
-          <span class="${statusCol[r.status]||'text-gray-400'} text-[10px] font-bold uppercase">${r.status}</span>
-          <span class="text-[10px] text-gray-600">${new Date(r.requested_at).toLocaleDateString('en-GB',{day:'numeric',month:'short'})}</span>
-        </div>
-      </div>
-      ${r.status==='pending'?`<div class="flex gap-2 mt-2">
-        <button onclick="updateWhiskyReq(${r.id},'added')" class="text-[10px] text-green-400 border border-green-400/30 px-2 py-1 rounded hover:bg-green-400/10">✓ Mark Added</button>
-        <button onclick="rejectWhiskyReq(${r.id})" class="text-[10px] text-red-400 border border-red-400/30 px-2 py-1 rounded hover:bg-red-400/10">✕ Reject</button>
-      </div>`:''}
-    </div>`).join('');
-}
 
-async function updateWhiskyReq(id, status, admin_note) {
-  const update = { status };
-  if (admin_note) update.admin_note = admin_note;
-  await sb.from('whisky_requests').update(update).eq('id', id);
-  loadWhiskyRequests();
-}
-
-async function rejectWhiskyReq(id) {
-  const note = prompt('Reason for rejecting? (shown to user — optional):', 'Not available in our data source yet');
-  if (note === null) return; // cancelled
-  await updateWhiskyReq(id, 'rejected', note || null);
-  showAdminToast('Request rejected');
-}
-
-async function skipRequest(id) {
-  // Move to bottom of queue by updating requested_at to now (sorts last)
-  await sb.from('image_requests')
-    .update({ requested_at: new Date(Date.now() + 9999999999).toISOString() })
-    .eq('id', id);
-  loadQueue(); loadStats();
-  showAdminToast('Moved to bottom of queue');
-}
-
-async function deleteRequest(id) {
-  if (!confirm('Delete this request permanently?')) return;
-  await sb.from('image_requests').delete().eq('id', id);
-  loadQueue(); loadAllRequests(); loadStats();
-  showAdminToast('Request deleted');
-}
-
-function showAdminToast(msg) {
-  let t = document.getElementById('admin-toast');
-  if (!t) {
-    t = document.createElement('div');
-    t.id = 'admin-toast';
-    t.style.cssText = 'position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#facc15;color:#1a1a1a;padding:8px 18px;border-radius:99px;font-size:12px;font-weight:700;z-index:999;transition:opacity .3s;pointer-events:none';
-    document.body.appendChild(t);
+  if (ADMIN_EMAILS.indexOf(email.toLowerCase()) === -1) {
+    document.getElementById('login-error').textContent = 'Access restricted to administrators';
+    document.getElementById('login-error').style.display = 'block';
+    return;
   }
-  t.textContent = msg;
-  t.style.opacity = '1';
-  clearTimeout(t._timer);
-  t._timer = setTimeout(() => t.style.opacity = '0', 2000);
+
+  SESSION = data;
+  document.getElementById('login-screen').style.display = 'none';
+  document.getElementById('app').style.display = 'flex';
+  setEl('sidebar-initials', email.substring(0, 2).toUpperCase());
+  setEl('sidebar-email', email);
+  loadAllData();
 }
 
-async function loadAudit() {
-  const el = document.getElementById('audit-list');
-  el.innerHTML = '<p class="text-gray-600 text-sm text-center py-4">Loading…</p>';
-  const { data: images } = await sb.from('bottle_images').select('id,slug,whisky_name,image_url').order('slug');
-  if (!images?.length) { el.innerHTML = '<p class="text-gray-500 text-sm text-center py-4">No images uploaded yet.</p>'; return; }
-  el.innerHTML = images.map(img => {
-    const url = img.image_url || '';
-    const ext = url.includes('.') ? url.split('.').pop().split('?')[0].toUpperCase() : '??';
-    const isWebP = ext === 'WEBP';
-    const isAVIF = ext === 'AVIF';
-    const extBadge = isWebP
-      ? '<span class="text-green-400 text-[10px] font-bold uppercase">WebP ✓</span>'
-      : isAVIF
-        ? '<span class="text-blue-400 text-[10px] font-bold uppercase">AVIF ✓</span>'
-        : `<span class="text-yellow-400 text-[10px] font-bold uppercase">${ext}</span>`;
-    return `<div class="bg-black/30 rounded-lg p-3 border border-gray-800">
-      <div class="flex items-center gap-3">
-        <img src="${url}" class="w-8 h-14 object-contain bg-black/20 rounded flex-shrink-0" onerror="this.style.opacity=0.2;this.src=''"/>
-        <div class="flex-1 min-w-0">
-          <div class="flex items-center gap-2 mb-1">
-            ${extBadge}
-            <span class="text-gray-400 text-[10px]">${img.slug}</span>
-          </div>
-          <p class="text-gray-300 text-xs truncate">${img.whisky_name || '—'}</p>
-          <p class="text-gray-600 text-[10px] truncate">${url.substring(url.lastIndexOf('/')+1)}</p>
-        </div>
-        <div class="flex flex-col gap-1.5 flex-shrink-0">
-          <button onclick="auditFixSlug(${img.id},'${img.slug}','${(img.whisky_name||'').replace(/'/g,"\'")}','${url}')"
-            class="text-[10px] text-yellow-400 border border-yellow-400/30 px-2 py-1 rounded hover:bg-yellow-400/10">Fix Slug</button>
-          <button onclick="auditDelete(${img.id},'${img.slug}')"
-            class="text-[10px] text-red-400 border border-red-400/30 px-2 py-1 rounded hover:bg-red-400/10">Delete</button>
-        </div>
-      </div>
-    </div>`;
-  }).join('');
+async function doSignOut() {
+  SESSION = null;
+  document.getElementById('app').style.display = 'none';
+  document.getElementById('login-screen').style.display = 'flex';
 }
 
-async function auditFixSlug(id, currentSlug, name, imageUrl) {
-  const newSlug = prompt(`Fix slug for "${name}":
-Current: ${currentSlug}
-Enter correct slug (e.g. lagavulin-16):`, currentSlug);
-  if (!newSlug || newSlug === currentSlug) return;
-  const { error } = await sb.from('bottle_images').update({ slug: newSlug }).eq('id', id);
-  if (error) { alert('Error: ' + error.message); return; }
-  // Also update matching image_requests
-  await sb.from('image_requests').update({ whisky_slug: newSlug }).eq('whisky_slug', currentSlug);
-  alert(`✓ Slug updated to: ${newSlug}`);
-  loadAudit();
+document.getElementById('login-password').addEventListener('keydown', function(e) {
+  if (e.key === 'Enter') doLogin();
+});
+
+function showPage(page) {
+  document.querySelectorAll('.page').forEach(function(p) { p.classList.remove('active'); });
+  document.querySelectorAll('.nav-item').forEach(function(n) { n.classList.remove('active'); });
+  var pageEl = document.getElementById('page-' + page);
+  if (pageEl) pageEl.classList.add('active');
+  var navEl = document.querySelector('[data-page="' + page + '"]');
+  if (navEl) navEl.classList.add('active');
+  if (!pageLoaded[page]) {
+    pageLoaded[page] = true;
+    loadPage(page);
+  }
 }
 
-async function auditDelete(id, slug) {
-  if (!confirm(`Delete image for "${slug}"? This removes it from the database (not Storage).`)) return;
-  await sb.from('bottle_images').delete().eq('id', id);
-  // Reset the image_request back to pending so it can be re-uploaded
-  await sb.from('image_requests').update({ status: 'pending', image_url: null }).eq('whisky_slug', slug);
-  loadAudit(); loadStats(); loadQueue();
-}
-
-async function loadAllRequests() {
-  const el = document.getElementById('all-requests-list');
-  const filter = document.getElementById('req-filter')?.value || 'all';
-  el.innerHTML = '<p class="text-gray-600 text-sm text-center py-4">Loading…</p>';
-  let query = sb.from('image_requests').select('id,whisky_slug,whisky_name,status,image_url,requested_at').order('requested_at', { ascending: false }).limit(200);
-  if (filter !== 'all') query = query.eq('status', filter);
-  const { data } = await query;
-  if (!data?.length) { el.innerHTML = '<p class="text-gray-500 text-sm text-center py-4">No requests found.</p>'; return; }
-  const statusColor = { pending: 'text-yellow-400', done: 'text-green-400', rejected: 'text-red-400' };
-  el.innerHTML = data.map(r => `
-    <div class="flex items-center gap-3 bg-black/20 rounded-lg px-3 py-2.5 border border-gray-800/50">
-      <span class="${statusColor[r.status]||'text-gray-400'} text-[10px] font-bold uppercase w-14 flex-shrink-0">${r.status}</span>
-      <div class="flex-1 min-w-0">
-        <p class="text-gray-300 text-xs font-medium truncate">${r.whisky_name||r.whisky_slug}</p>
-        <p class="text-gray-600 text-[10px]">${r.whisky_slug}</p>
-      </div>
-      ${r.status==='done'?`<button onclick="auditReopen('${r.id}','${r.whisky_slug}')" class="text-[10px] text-yellow-400 border border-yellow-400/30 px-2 py-1 rounded hover:bg-yellow-400/10 flex-shrink-0">Re-open</button>`:''}
-      ${r.status==='pending'?`<button onclick="rejectRequest('${r.id}')" class="text-[10px] text-red-400 border border-red-400/30 px-2 py-1 rounded flex-shrink-0">Reject</button>`:''}
-    </div>`).join('');
-}
-
-async function auditReopen(id, slug) {
-  await sb.from('image_requests').update({ status: 'pending', image_url: null, fulfilled_at: null }).eq('id', id);
-  // Remove from bottle_images so it shows as missing again
-  await sb.from('bottle_images').delete().eq('slug', slug);
-  loadAllRequests(); loadStats(); loadQueue();
-}
-
-// ── SUPABASE STORAGE ─────────────────────────────────────────────────────────
-async function requestImageForSlug(slug,name,region){
-  const {error}=await sb.from('image_requests').upsert({
-    whisky_slug:slug,whisky_name:name,region:region||'',
-    status:'pending',requested_at:new Date().toISOString()
-  },{onConflict:'whisky_slug'});
-  showAdminToast(error?'Already in queue':'📷 Added: '+name);
-}
-
-async function uploadToStorage(slug, base64Data, contentType) {
-  // Always store as webp (optimiseImage converts before upload)
-  const ext = contentType.includes('webp') ? 'webp' : contentType.includes('png') ? 'png' : 'jpg';
-  const path = `whiskies/${slug}.${ext}`;
-  const binary = atob(base64Data);
-  const bytes = new Uint8Array(binary.length);
-  for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
-  const { error } = await sb.storage.from('bottle-photos').upload(path, bytes.buffer, {
-    contentType, upsert: true,
+async function getCount(table, filter) {
+  filter = filter || '';
+  var r = await fetch(SB_URL + '/rest/v1/' + table + '?select=id' + filter, {
+    headers: Object.assign({}, hdrs(SESSION && SESSION.access_token), { 'Prefer': 'count=exact', 'Range': '0-0' })
   });
-  if (error) { console.error('Storage error:', error); return null; }
-  const { data } = sb.storage.from('bottle-photos').getPublicUrl(path);
-  return data.publicUrl;
+  var cr = r.headers.get('content-range');
+  return cr ? parseInt(cr.split('/')[1]) || 0 : 0;
+}
+
+async function loadAllData() {
+  var counts = await Promise.all([
+    getCount('profiles'),
+    getCount('checkins'),
+    getCount('whiskies'),
+    getCount('whisky_requests', '&status=eq.pending'),
+    getCount('feedback')
+  ]);
+
+  setEl('stat-users', counts[0]);
+  setEl('stat-checkins', counts[1]);
+  setEl('stat-whiskies', counts[2]);
+  setEl('stat-pending', counts[3] + counts[4]);
+  setEl('badge-users', counts[0]);
+  setEl('badge-checkins', counts[1]);
+  setEl('badge-whiskies', counts[2]);
+  setEl('badge-submissions', counts[3]);
+  setEl('badge-reports', counts[4]);
+  setEl('sync-count', counts[2]);
+
+  loadDashboard();
+}
+
+async function loadDashboard() {
+  var checkins = await sbGet('checkins', '?select=whisky_region,whisky_name,date,rating&order=date.desc&limit=200');
+
+  var regionCounts = {};
+  checkins.forEach(function(c) {
+    if (c.whisky_region) regionCounts[c.whisky_region] = (regionCounts[c.whisky_region] || 0) + 1;
+  });
+  var sorted = Object.entries(regionCounts).sort(function(a, b) { return b[1] - a[1]; }).slice(0, 8);
+  var max = sorted.length ? sorted[0][1] : 1;
+
+  var chartEl = document.getElementById('region-chart');
+  if (!sorted.length) {
+    chartEl.innerHTML = '<div class="empty-state"><span class="ms">bar_chart</span>No check-in data yet</div>';
+  } else {
+    chartEl.innerHTML = sorted.map(function(item) {
+      var region = item[0], count = item[1];
+      var pct = Math.round(count / max * 100);
+      return '<div class="bar-row"><span class="bar-label">' + region + '</span><div class="bar-track"><div class="bar-fill" style="width:' + pct + '%"></div></div><span class="bar-count">' + count + '</span></div>';
+    }).join('');
+  }
+
+  var recent = checkins.slice(0, 8);
+  var actEl = document.getElementById('recent-activity');
+  if (!recent.length) {
+    actEl.innerHTML = '<div class="empty-state"><span class="ms">history</span>No activity yet</div>';
+  } else {
+    actEl.innerHTML = recent.map(function(c) {
+      var stars = c.rating ? new Array(c.rating + 1).join('*') : '-';
+      return '<div style="display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid rgba(80,72,64,.1);font-size:12px"><div><span style="color:#e8e4dc;font-weight:500">' + (c.whisky_name || '-') + '</span><span style="color:#504840;margin-left:6px">' + (c.whisky_region || '') + '</span></div><span style="color:#7a7060">' + stars + '</span></div>';
+    }).join('');
+  }
+}
+
+async function loadPage(page) {
+  if (page === 'users') await loadUsers();
+  else if (page === 'checkins') await loadCheckins();
+  else if (page === 'whiskies') await loadWhiskies();
+  else if (page === 'submissions') await loadSubmissions();
+  else if (page === 'reports') await loadReports();
+  else if (page === 'profiles') await loadProfiles();
+}
+
+async function loadUsers() {
+  var wrap = document.getElementById('users-table-wrap');
+  var results = await Promise.all([
+    sbGet('profiles', '?select=id,full_name,bio,favourite_region,avatar_url,updated_at&order=updated_at.desc&limit=100'),
+    sbGet('checkins', '?select=user_id&limit=2000')
+  ]);
+  var profiles = results[0];
+  var allCheckins = results[1];
+
+  var checkinCounts = {};
+  allCheckins.forEach(function(c) {
+    if (c.user_id) checkinCounts[c.user_id] = (checkinCounts[c.user_id] || 0) + 1;
+  });
+
+  if (!profiles.length) {
+    wrap.innerHTML = '<div class="empty-state"><span class="ms">group</span>No profiles yet -- users appear after editing their profile</div>';
+    return;
+  }
+
+  var rows = profiles.map(function(u) {
+    var name = u.full_name || '-';
+    var bio = u.bio ? u.bio.substring(0, 50) : '-';
+    var region = u.favourite_region || '-';
+    var drams = checkinCounts[u.id] || 0;
+    var avatar = u.avatar_url ? 'Yes' : 'No';
+    var date = u.updated_at ? new Date(u.updated_at).toLocaleDateString('en-GB') : '-';
+    return '<tr><td style="font-weight:600">' + name + '<div class="td-muted" style="font-size:11px">' + bio + '</div></td><td class="td-muted">' + region + '</td><td style="font-family:Manrope,sans-serif;font-weight:700;color:#ffbf00">' + drams + '</td><td class="td-muted">' + avatar + '</td><td class="td-muted">' + date + '</td></tr>';
+  }).join('');
+
+  wrap.innerHTML = '<table id="users-table"><thead><tr><th>Name</th><th>Fav Region</th><th>Drams</th><th>Avatar</th><th>Last Active</th></tr></thead><tbody>' + rows + '</tbody></table>';
+}
+
+async function loadCheckins() {
+  var wrap = document.getElementById('checkins-table-wrap');
+  var data = await sbGet('checkins', '?select=id,whisky_name,whisky_region,rating,location,date,owned&order=date.desc&limit=100');
+  if (!data.length) {
+    wrap.innerHTML = '<div class="empty-state"><span class="ms">history</span>No check-ins yet</div>';
+    return;
+  }
+  var rows = data.map(function(c) {
+    var stars = c.rating ? new Array(c.rating + 1).join('*') : '-';
+    var date = new Date(c.date).toLocaleDateString('en-GB');
+    var owned = c.owned ? 'Yes' : 'No';
+    return '<tr><td style="font-weight:500">' + (c.whisky_name || '-') + '</td><td class="td-muted">' + (c.whisky_region || '-') + '</td><td>' + stars + '</td><td class="td-muted">' + (c.location || '-') + '</td><td class="td-muted">' + owned + '</td><td class="td-muted">' + date + '</td></tr>';
+  }).join('');
+  wrap.innerHTML = '<table id="checkins-table"><thead><tr><th>Whisky</th><th>Region</th><th>Rating</th><th>Location</th><th>Owned</th><th>Date</th></tr></thead><tbody>' + rows + '</tbody></table>';
+}
+
+async function loadWhiskies() {
+  var wrap = document.getElementById('whiskies-table-wrap');
+  var data = await sbGet('whiskies', '?select=id,name,metadata,rating&order=name&limit=200');
+  if (!data.length) {
+    wrap.innerHTML = '<div class="empty-state"><span class="ms">liquor</span>No whiskies -- run a sync</div>';
+    return;
+  }
+  var rows = data.map(function(w) {
+    var m = w.metadata || {};
+    var score = (w.rating && w.rating.marcel && w.rating.sascha) ? ((w.rating.marcel + w.rating.sascha) / 2).toFixed(1) : '-';
+    return '<tr><td style="font-weight:500">' + w.name + '</td><td class="td-muted">' + (m.distillery || '-') + '</td><td class="td-muted">' + (m.region || '-') + '</td><td class="td-muted">' + (m.age ? m.age + 'yr' : 'NAS') + '</td><td class="td-muted">' + (m.abv ? m.abv + '%' : '-') + '</td><td style="color:#ffbf00;font-weight:700">' + score + '</td></tr>';
+  }).join('');
+  wrap.innerHTML = '<table id="whiskies-table"><thead><tr><th>Name</th><th>Distillery</th><th>Region</th><th>Age</th><th>ABV</th><th>Score</th></tr></thead><tbody>' + rows + '</tbody></table>';
+}
+
+async function loadSubmissions() {
+  var wrap = document.getElementById('submissions-table-wrap');
+  var data = await sbGet('whisky_requests', '?select=id,whisky_name,distillery,region,country,requested_by,status,created_at&order=created_at.desc&limit=100');
+  if (!data || !data.length) {
+    wrap.innerHTML = '<div class="empty-state"><span class="ms">add_circle</span>No submissions yet</div>';
+    return;
+  }
+  var rows = data.map(function(s) {
+    var statusClass = s.status === 'approved' ? 'approved' : s.status === 'rejected' ? 'rejected' : 'pending';
+    var actions = s.status === 'pending'
+      ? '<button class="act-btn approve" onclick="reviewSubmission(\'' + s.id + '\', \'approved\')">Approve</button><button class="act-btn reject" onclick="reviewSubmission(\'' + s.id + '\', \'rejected\')">Reject</button>'
+      : '<span style="color:#504840;font-size:11px">Reviewed</span>';
+    return '<tr id="sub-row-' + s.id + '"><td style="font-weight:500">' + (s.whisky_name || '-') + '</td><td class="td-muted">' + (s.distillery || '-') + '</td><td class="td-muted">' + (s.region || '-') + '</td><td class="td-muted">' + (s.requested_by || 'anon') + '</td><td><span class="pill pill-' + statusClass + '">' + (s.status || 'pending') + '</span></td><td>' + actions + '</td></tr>';
+  }).join('');
+  wrap.innerHTML = '<table><thead><tr><th>Whisky</th><th>Distillery</th><th>Region</th><th>Submitted by</th><th>Status</th><th>Actions</th></tr></thead><tbody>' + rows + '</tbody></table>';
+}
+
+async function reviewSubmission(id, status) {
+  await fetch(SB_URL + '/rest/v1/whisky_requests?id=eq.' + id, {
+    method: 'PATCH',
+    headers: Object.assign({}, hdrs(SESSION && SESSION.access_token), { 'Prefer': 'return=minimal' }),
+    body: JSON.stringify({ status: status })
+  });
+  var row = document.getElementById('sub-row-' + id);
+  if (row) {
+    var pill = row.querySelector('.pill');
+    if (pill) { pill.className = 'pill pill-' + (status === 'approved' ? 'approved' : 'rejected'); pill.textContent = status; }
+    var actBtns = row.querySelectorAll('.act-btn');
+    actBtns.forEach(function(b) { b.remove(); });
+    var lastTd = row.querySelector('td:last-child');
+    if (lastTd) lastTd.innerHTML = '<span style="color:#504840;font-size:11px">Reviewed</span>';
+  }
+  toast(status === 'approved' ? 'Approved' : 'Rejected');
+}
+
+async function loadReports() {
+  var wrap = document.getElementById('reports-table-wrap');
+  var data = await sbGet('feedback', '?select=id,whisky_name,type,notes,date&order=date.desc&limit=100');
+  if (!data || !data.length) {
+    wrap.innerHTML = '<div class="empty-state"><span class="ms">flag</span>No reports yet</div>';
+    return;
+  }
+  var rows = data.map(function(r) {
+    var date = new Date(r.date).toLocaleDateString('en-GB');
+    var type = (r.type || '-').replace(/_/g, ' ');
+    return '<tr id="rep-row-' + r.id + '"><td style="font-weight:500">' + (r.whisky_name || '-') + '</td><td><span class="pill pill-new">' + type + '</span></td><td class="td-muted" style="max-width:240px">' + (r.notes || '-') + '</td><td class="td-muted">' + date + '</td><td><button class="act-btn" onclick="resolveReport(' + r.id + ')">Resolve</button></td></tr>';
+  }).join('');
+  wrap.innerHTML = '<table><thead><tr><th>Whisky</th><th>Type</th><th>Notes</th><th>Date</th><th>Action</th></tr></thead><tbody>' + rows + '</tbody></table>';
+}
+
+async function resolveReport(id) {
+  await fetch(SB_URL + '/rest/v1/feedback?id=eq.' + id, {
+    method: 'DELETE',
+    headers: hdrs(SESSION && SESSION.access_token)
+  });
+  var row = document.getElementById('rep-row-' + id);
+  if (row) row.remove();
+  toast('Report resolved');
+}
+
+async function loadProfiles() {
+  var wrap = document.getElementById('profiles-table-wrap');
+  var data = await sbGet('profiles', '?select=id,full_name,bio,favourite_region,avatar_url,updated_at&order=updated_at.desc&limit=100');
+  if (!data.length) {
+    wrap.innerHTML = '<div class="empty-state"><span class="ms">manage_accounts</span>No profiles yet</div>';
+    return;
+  }
+  var rows = data.map(function(p) {
+    var date = p.updated_at ? new Date(p.updated_at).toLocaleDateString('en-GB') : '-';
+    return '<tr><td style="font-weight:500">' + (p.full_name || '-') + '</td><td class="td-muted">' + (p.favourite_region || '-') + '</td><td class="td-muted">' + (p.avatar_url ? 'Yes' : 'No') + '</td><td class="td-muted">' + (p.bio ? 'Yes' : 'No') + '</td><td class="td-muted">' + date + '</td></tr>';
+  }).join('');
+  wrap.innerHTML = '<table id="profiles-table"><thead><tr><th>Name</th><th>Fav Region</th><th>Avatar</th><th>Bio</th><th>Updated</th></tr></thead><tbody>' + rows + '</tbody></table>';
+}
+
+async function triggerSync() {
+  var statusEl = document.getElementById('sync-status');
+  if (statusEl) statusEl.textContent = 'Syncing...';
+  var resultEl = document.getElementById('sync-result');
+  try {
+    var r = await fetch(SB_URL + '/functions/v1/sync-whiskies', {
+      method: 'POST',
+      headers: { 'Authorization': 'Bearer ' + ((SESSION && SESSION.access_token) || SB_KEY), 'Content-Type': 'application/json' }
+    });
+    var data = await r.json();
+    var msg = data.success ? 'Synced ' + data.synced + ' whiskies' : 'Error: ' + data.error;
+    if (statusEl) statusEl.textContent = msg;
+    if (resultEl) { resultEl.textContent = msg; resultEl.style.display = 'block'; }
+    setEl('sync-last', new Date().toLocaleTimeString('en-GB'));
+    toast(msg);
+    pageLoaded['whiskies'] = false;
+  } catch(e) {
+    if (statusEl) statusEl.textContent = 'Sync failed';
+    toast('Sync failed: ' + e.message);
+  }
+}
+
+function filterTable(tableId, query) {
+  var table = document.getElementById(tableId);
+  if (!table) return;
+  var q = query.toLowerCase();
+  table.querySelectorAll('tbody tr').forEach(function(row) {
+    row.style.display = row.textContent.toLowerCase().indexOf(q) !== -1 ? '' : 'none';
+  });
 }
 </script>
-</body>
 </body>
 </html>

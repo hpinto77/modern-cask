@@ -38,13 +38,16 @@ export function AddWhiskyModal({ open, onClose, onSubmit }) {
     if (!name || !distillery) { toast('Name and distillery are required'); return }
     setSaving(true)
     const row = {
-      id: Date.now(), name, distillery,
-      age: age || null, abv: abv || null,
-      region: region || null, country: country || null,
+      whisky_name: name,
+      distillery: distillery || null,
+      age: age ? parseInt(age) : null,
+      abv: abv ? parseFloat(abv) : null,
+      region: region || null,
+      country: country || null,
       description: description || null,
-      has_photo: !!photo, status: 'pending',
-      submitted_by: user?.email || 'anonymous',
-      date: new Date().toISOString()
+      has_photo: !!photo,
+      status: 'pending',
+      requested_by: user?.email || 'anonymous',
     }
     await supabase.from('whisky_requests').insert(row)
     onSubmit?.(row)
