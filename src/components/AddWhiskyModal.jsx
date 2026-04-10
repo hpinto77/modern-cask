@@ -47,7 +47,7 @@ export function AddWhiskyModal({ open, onClose, onSubmit }) {
       description: description || null,
       has_photo: !!photo,
       status: 'pending',
-      requested_by: user?.email || 'anonymous',
+      requested_by: user?.id || null,
     }
     await supabase.from('whisky_requests').insert(row)
     onSubmit?.(row)

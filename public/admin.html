@@ -506,7 +506,8 @@ async function loadSubmissions() {
     var actions = s.status === 'pending'
       ? '<button class="act-btn approve" onclick="reviewSub(\'' + s.id + '\',\'approved\')">Approve</button><button class="act-btn reject" onclick="reviewSub(\'' + s.id + '\',\'rejected\')">Reject</button>'
       : '<span class="td-m">Done</span>';
-    return '<tr id="sub-' + s.id + '"><td style="font-weight:500">' + (s.whisky_name || '-') + '</td><td class="td-m">' + (s.distillery || '-') + '</td><td class="td-m">' + (s.region || '-') + '</td><td class="td-m">' + (s.requested_by || 'anon') + '</td><td><span class="pill pill-' + sc + '">' + (s.status || 'pending') + '</span></td><td>' + actions + '</td></tr>';
+    var reqBy = s.requested_by ? (s.requested_by.includes('@') ? s.requested_by : s.requested_by.substring(0,8) + '...') : 'anon';
+    return '<tr id="sub-' + s.id + '"><td style="font-weight:500">' + (s.whisky_name || '-') + '</td><td class="td-m">' + (s.distillery || '-') + '</td><td class="td-m">' + (s.region || '-') + '</td><td class="td-m">' + reqBy + '</td><td><span class="pill pill-' + sc + '">' + (s.status || 'pending') + '</span></td><td>' + actions + '</td></tr>';
   }).join('');
   wrap.innerHTML = '<table><thead><tr><th>Whisky</th><th>Distillery</th><th>Region</th><th>Submitted by</th><th>Status</th><th>Actions</th></tr></thead><tbody>' + rows + '</tbody></table>';
 }
@@ -531,14 +532,14 @@ async function reviewSub(id, status) {
 
 async function loadReports() {
   var wrap = el('reports-table-wrap');
-  var data = await api('feedback', '?select=id,whisky_name,type,notes,date&order=date.desc&limit=200');
+  var data = await api('feedback', '?select=id,type,message,email,created_at&order=created_at.desc&limit=200');
   if (!data.length) { wrap.innerHTML = '<div class="empty"><span class="ms">flag</span>No reports yet</div>'; return; }
   var rows = data.map(function(r) {
     var type = (r.type || '-').replace(/_/g, ' ');
-    var date = r.date ? new Date(r.date).toLocaleDateString('en-GB') : '-';
-    return '<tr id="rep-' + r.id + '"><td style="font-weight:500">' + (r.whisky_name || '-') + '</td><td><span class="pill pill-new">' + type + '</span></td><td class="td-m" style="max-width:240px">' + (r.notes || '-') + '</td><td class="td-m">' + date + '</td><td><button class="act-btn" onclick="resolveReport(' + r.id + ')">Resolve</button></td></tr>';
+    var date = r.created_at ? new Date(r.created_at).toLocaleDateString('en-GB') : '-';
+    return '<tr id="rep-' + r.id + '"><td style="font-weight:500">' + (r.email || '-') + '</td><td><span class="pill pill-new">' + type + '</span></td><td class="td-m" style="max-width:240px">' + (r.message || '-') + '</td><td class="td-m">' + date + '</td><td><button class="act-btn" onclick="resolveReport(' + r.id + ')">Resolve</button></td></tr>';
   }).join('');
-  wrap.innerHTML = '<table><thead><tr><th>Whisky</th><th>Type</th><th>Notes</th><th>Date</th><th>Action</th></tr></thead><tbody>' + rows + '</tbody></table>';
+  wrap.innerHTML = '<table><thead><tr><th>User</th><th>Type</th><th>Message</th><th>Date</th><th>Action</th></tr></thead><tbody>' + rows + '</tbody></table>';
 }
 
 async function resolveReport(id) {
